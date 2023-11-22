@@ -1,0 +1,28 @@
+image:https://m-m-m.github.io/logo.svg[logo,width="150",link="https://m-m-m.github.io"]
+
+image:https://img.shields.io/github/license/m-m-m/orm.svg?label=License["Apache License, Version 2.0",link=https://github.com/m-m-m/orm/blob/master/LICENSE]
+image:https://github.com/m-m-m/orm/actions/workflows/build.yml/badge.svg["Build Status",link="https://github.com/m-m-m/orm/actions/workflows/build.yml"]
+
+= mmm-orm
+
+image:https://img.shields.io/maven-central/v/io.github.m-m-m/mmm-orm.svg?label=Maven%20Central["Maven Central",link=https://search.maven.org/search?q=g:io.github.m-m-m%20a:mmm-orm*]
+image:https://javadoc.io/badge2/io.github.m-m-m/mmm-orm/javadoc.svg["base JavaDoc", link=https://javadoc.io/doc/io.github.m-m-m/mmm-orm]
+
+The module `io.github.mmm.orm` (artifactId `mmm-orm`) provides API and fundamentals for object/relational mapping (ORM)
+for `mmm-entity-bean`.
+
+== Usage
+
+Maven Dependency:
+```xml
+<dependency>
+  <groupId>io.github.m-m-m</groupId>
+  <artifactId>mmm-orm</artifactId>
+  <version>${mmm.entity.version}</version>
+</dependency>
+```
+
+Module Dependency:
+```java
+  requires transitive io.github.mmm.orm;
+```
