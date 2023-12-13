@@ -2,17 +2,24 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.jdbc.h2;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.ZonedDateTime;
-import java.util.UUID;
-
+import io.github.mmm.orm.type.DbTypeBigDecimal;
+import io.github.mmm.orm.type.DbTypeBigInteger2Number;
+import io.github.mmm.orm.type.DbTypeBoolean;
+import io.github.mmm.orm.type.DbTypeByte;
+import io.github.mmm.orm.type.DbTypeCharacter;
+import io.github.mmm.orm.type.DbTypeDouble;
+import io.github.mmm.orm.type.DbTypeFloat;
+import io.github.mmm.orm.type.DbTypeInstant;
+import io.github.mmm.orm.type.DbTypeInteger;
+import io.github.mmm.orm.type.DbTypeLocalDate;
+import io.github.mmm.orm.type.DbTypeLocalDateTime;
+import io.github.mmm.orm.type.DbTypeLocalTime;
+import io.github.mmm.orm.type.DbTypeLong;
+import io.github.mmm.orm.type.DbTypeOffsetDateTime;
+import io.github.mmm.orm.type.DbTypeOffsetTime;
+import io.github.mmm.orm.type.DbTypeShort;
+import io.github.mmm.orm.type.DbTypeUuid;
+import io.github.mmm.orm.type.DbTypeZonedDateTime;
 import io.github.mmm.orm.typemapping.DbTypeMapping;
 
 /**
@@ -28,24 +35,24 @@ public class H2TypeMapping extends DbTypeMapping {
   public H2TypeMapping() {
 
     super();
-    add(Long.class, "BIGINT");
-    add(Integer.class, "INTEGER");
-    add(Short.class, "SMALLINT");
-    add(Byte.class, "TINYINT");
-    add(Double.class, "float8");
-    add(Float.class, "float4");
-    add(BigDecimal.class, "NUMERIC");
-    add(BigInteger.class, "NUMERIC(100000)");
-    add(Boolean.class, "BOOLEAN");
-    add(Character.class, "CHAR");
-    add(UUID.class, "UUID");
-    add(Instant.class, "TIMESTAMP");
-    add(OffsetDateTime.class, "TIMESTAMP WITH TIME ZONE");
-    add(ZonedDateTime.class, "TIMESTAMP WITH TIME ZONE");
-    add(LocalDate.class, "DATE");
-    add(LocalTime.class, "TIME");
-    add(OffsetTime.class, "TIME WITH TIME ZONE");
-    add(LocalDateTime.class, "DATETIME");
+    add(new DbTypeLong("BIGINT"));
+    add(new DbTypeInteger("INTEGER"));
+    add(new DbTypeShort("SMALLINT"));
+    add(new DbTypeByte("TINYINT"));
+    add(new DbTypeDouble("DOUBLE PRECISION"));
+    add(new DbTypeFloat("REAL"));
+    add(new DbTypeBigDecimal("NUMERIC"));
+    add(new DbTypeBigInteger2Number("NUMERIC(100000)"));
+    add(new DbTypeBoolean("BOOLEAN"));
+    add(new DbTypeCharacter("CHAR"));
+    add(new DbTypeUuid("UUID"));
+    add(new DbTypeInstant("TIMESTAMP"));
+    add(new DbTypeOffsetDateTime("TIMESTAMP WITH TIME ZONE"));
+    add(new DbTypeZonedDateTime("TIMESTAMP WITH TIME ZONE"));
+    add(new DbTypeLocalDate("DATE"));
+    add(new DbTypeLocalTime("TIME"));
+    add(new DbTypeOffsetTime("TIME WITH TIME ZONE"));
+    add(new DbTypeLocalDateTime("DATETIME"));
     addBinary("BINARY", "BINARY(%s)");
     addString("VARCHAR", "VARCHAR(%s)", "CHAR(%s)");
   }

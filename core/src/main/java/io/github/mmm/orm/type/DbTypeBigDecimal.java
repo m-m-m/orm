@@ -11,7 +11,7 @@ import java.sql.Types;
 /**
  * Implementation of {@link DbTypeSimple} for a regular {@link BigDecimal}.
  */
-public abstract class DbTypeBigDecimal extends DbTypeSimple<BigDecimal> {
+public class DbTypeBigDecimal extends DbTypeSimple<BigDecimal> {
 
   /**
    * The constructor.

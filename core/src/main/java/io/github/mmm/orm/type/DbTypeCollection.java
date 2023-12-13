@@ -13,7 +13,7 @@ import java.util.Collection;
  * Implementation of {@link DbTypeSimple} for a regular {@link LocalDate}.
  */
 @SuppressWarnings("rawtypes")
-public abstract class DbTypeCollection extends DbTypeSimple<Collection> {
+public class DbTypeCollection extends DbTypeSimple<Collection> {
 
   private final DbType<?, ?> elementType;
 

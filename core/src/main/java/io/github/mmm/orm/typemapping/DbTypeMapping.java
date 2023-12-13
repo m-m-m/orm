@@ -41,7 +41,7 @@ public class DbTypeMapping extends ComposedTypeMapping {
 
   /**
    * @param declarationAny the {@link TypeMapper#getDeclaration() declaration} for {@link String}s of any length (e.g.
-   *        "CLOB").
+   *        "VARCHAR").
    * @param declarationVariable the {@link TypeMapper#getDeclaration() declaration} for length limited {@link String}s
    *        (e.g. "VARCHAR(%s)" or "VARCHAR2(%s CHAR)").
    * @param declarationFixed the {@link TypeMapper#getDeclaration() declaration} for fixed length {@link String}s (e.g.
@@ -67,7 +67,6 @@ public class DbTypeMapping extends ComposedTypeMapping {
 
     TypeMapper<V, ?> typeMapper = super.getTypeMapper(valueType, property);
     if (typeMapper == null) {
-
       if (BigDecimal.class.equals(valueType)) {
         typeMapper = new IdentityTypeMapper<>(valueType, getDeclarationDecimal(30, 10));
       } else if (BigInteger.class.equals(valueType)) {

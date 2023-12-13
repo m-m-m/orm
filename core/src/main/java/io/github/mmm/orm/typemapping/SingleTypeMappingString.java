@@ -4,9 +4,8 @@ package io.github.mmm.orm.typemapping;
 
 import io.github.mmm.base.range.Range;
 import io.github.mmm.entity.bean.typemapping.SingleTypeMapping;
+import io.github.mmm.orm.type.DbTypeString;
 import io.github.mmm.property.ReadableProperty;
-import io.github.mmm.value.converter.IdentityTypeMapper;
-import io.github.mmm.value.converter.TypeMapper;
 
 /**
  * Implementation of {@link SingleTypeMapping} for a {@link String}.
@@ -15,7 +14,7 @@ import io.github.mmm.value.converter.TypeMapper;
  */
 public class SingleTypeMappingString extends SingleTypeMapping<String> {
 
-  private final IdentityTypeMapper<String> typeMapper;
+  private final DbTypeString typeMapper;
 
   private final String sqlTypeVariable;
 
@@ -27,24 +26,24 @@ public class SingleTypeMappingString extends SingleTypeMapping<String> {
    * @param declarationAny the SQL type for {@link String}s of any length (e.g. "TEXT" or "VARCHAR(MAX)").
    * @param declarationVariable the SQL type for length limited {@link String}s (e.g. "VARCHAR(%s)" or "VARCHAR2(%s
    *        CHAR)").
-   * @param declarationFixed the SQL type for fixed length {@link String}s (e.g. "ChAR(%s)").
+   * @param declarationFixed the SQL type for fixed length {@link String}s (e.g. "CHAR(%s)").
    */
   public SingleTypeMappingString(String declarationAny, String declarationVariable, String declarationFixed) {
 
     super();
-    this.typeMapper = new IdentityTypeMapper<>(String.class, declarationAny);
+    this.typeMapper = new DbTypeString(declarationAny);
     this.sqlTypeVariable = declarationVariable;
     this.sqlTypeFixed = declarationFixed;
   }
 
   @Override
-  public TypeMapper<String, ?> getTypeMapper() {
+  public DbTypeString getTypeMapper() {
 
     return this.typeMapper;
   }
 
   @Override
-  public TypeMapper<String, ?> getTypeMapper(ReadableProperty<?> property) {
+  public DbTypeString getTypeMapper(ReadableProperty<?> property) {
 
     Range<Integer> range = getRange(property);
     Integer max = range.getMax();
@@ -53,9 +52,9 @@ public class SingleTypeMappingString extends SingleTypeMapping<String> {
     } else {
       Integer min = range.getMin();
       if (max.equals(min)) {
-        return new IdentityTypeMapper<>(String.class, String.format(this.sqlTypeFixed, max));
+        return new DbTypeString(String.format(this.sqlTypeFixed, max));
       }
-      return new IdentityTypeMapper<>(String.class, String.format(this.sqlTypeVariable, max));
+      return new DbTypeString(String.format(this.sqlTypeVariable, max));
     }
   }
 

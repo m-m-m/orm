@@ -20,9 +20,17 @@ module io.github.mmm.orm {
 
   exports io.github.mmm.orm.access;
 
+  exports io.github.mmm.orm.access.session to io.github.mmm.orm.jdbc;
+
+  exports io.github.mmm.orm.config;
+
   exports io.github.mmm.orm.constraint;
 
   exports io.github.mmm.orm.dialect;
+
+  exports io.github.mmm.orm.metadata;
+
+  exports io.github.mmm.orm.metadata.impl to io.github.mmm.orm.jdbc;
 
   exports io.github.mmm.orm.naming;
 
@@ -49,6 +57,8 @@ module io.github.mmm.orm {
   exports io.github.mmm.orm.statement.update;
 
   exports io.github.mmm.orm.statement.upsert;
+
+  exports io.github.mmm.orm.tx;
 
   exports io.github.mmm.orm.type;
 

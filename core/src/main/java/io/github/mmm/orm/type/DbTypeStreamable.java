@@ -12,7 +12,7 @@ import io.github.mmm.binary.Streamable;
 /**
  * Implementation of {@link DbTypeSimple} for a regular {@link String}.
  */
-public abstract class DbTypeStreamable extends DbTypeSimple<Streamable> {
+public class DbTypeStreamable extends DbTypeSimple<Streamable> {
 
   /**
    * The constructor.

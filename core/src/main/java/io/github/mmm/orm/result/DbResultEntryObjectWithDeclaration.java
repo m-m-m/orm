@@ -1,3 +1,5 @@
+/* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.result;
 
 import io.github.mmm.value.CriteriaObject;
@@ -20,8 +22,7 @@ public class DbResultEntryObjectWithDeclaration<V> extends DbResultEntryObject<V
    * @param dbName the {@link #getDbName() database name}.
    * @param declaration the {@link #getDeclaration() declaration}.
    */
-  public DbResultEntryObjectWithDeclaration(CriteriaObject<?> selection, V value, String dbName,
-      String declaration) {
+  public DbResultEntryObjectWithDeclaration(CriteriaObject<?> selection, V value, String dbName, String declaration) {
 
     super(selection, value, dbName);
     this.declaration = declaration;

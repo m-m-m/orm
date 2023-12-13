@@ -1,3 +1,5 @@
+/* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.result;
 
 import io.github.mmm.base.exception.ObjectNotFoundException;
@@ -12,8 +14,8 @@ public interface DbResult extends Iterable<DbResultEntry<?>> {
 
   /**
    * @param <V> type of the value.
-   * @param i the index of the requested {@link DbResultEntry}. Has to be in the range from {@code 0} to {@link #getSize()
-   *        size-1}.
+   * @param i the index of the requested {@link DbResultEntry}. Has to be in the range from {@code 0} to
+   *        {@link #getSize() size-1}.
    * @return the requested {@link DbResultEntry}.
    */
   <V> DbResultEntry<V> getEntry(int i);
@@ -35,8 +37,8 @@ public interface DbResult extends Iterable<DbResultEntry<?>> {
 
   /**
    * @param <V> type of the value.
-   * @param i the index of the requested {@link DbResultEntry}. Has to be in the range from {@code 0} to {@link #getSize()
-   *        size-1}.
+   * @param i the index of the requested {@link DbResultEntry}. Has to be in the range from {@code 0} to
+   *        {@link #getSize() size-1}.
    * @return the requested result value.
    */
   @SuppressWarnings("unchecked")

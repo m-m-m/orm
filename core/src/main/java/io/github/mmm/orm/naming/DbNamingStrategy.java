@@ -3,8 +3,9 @@
 package io.github.mmm.orm.naming;
 
 import io.github.mmm.base.text.CaseSyntax;
+import io.github.mmm.bean.BeanType;
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.property.ReadableProperty;
+import io.github.mmm.property.WritableProperty;
 
 /**
  * Interface to define the naming strategy to map {@link EntityBean}s to a database.
@@ -16,7 +17,20 @@ import io.github.mmm.property.ReadableProperty;
 public interface DbNamingStrategy {
 
   /**
-   * @param rawColumnName the raw column name to map. May be the {@link ReadableProperty#getName() property name} or
+   * @param property the {@link WritableProperty} to derive the column name from.
+   * @return the column name for the given {@link WritableProperty property}.
+   */
+  default String getColumnName(WritableProperty<?> property) {
+
+    String columnName = property.getMetadata().getMetaInfo().get(EntityBean.META_KEY_COLUMN);
+    if (columnName == null) {
+      columnName = getColumnName(property.getName());
+    }
+    return columnName;
+  }
+
+  /**
+   * @param rawColumnName the raw column name to map. May be the {@link WritableProperty#getName() property name} or
    *        {@link io.github.mmm.value.converter.TypeMapper#mapName(String) remapped and decomposed} from it.
    * @return the final column name.
    */
@@ -31,7 +45,12 @@ public interface DbNamingStrategy {
    */
   default String getTableName(EntityBean bean) {
 
-    return getTableName(bean.getType().getStableName());
+    BeanType type = bean.getType();
+    String tableName = type.getMetaInfo().get(EntityBean.META_KEY_TABLE);
+    if (tableName == null) {
+      tableName = getTableName(type.getSimpleName());
+    }
+    return tableName;
   }
 
   /**

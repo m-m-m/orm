@@ -2,6 +2,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.dialect;
 
+import java.io.IOException;
+
+import io.github.mmm.base.exception.RuntimeIoException;
+import io.github.mmm.orm.naming.DbNamingStrategy;
 import io.github.mmm.orm.statement.DbStatementFormatter;
 
 /**
@@ -14,6 +18,27 @@ public interface DbDialect {
    *         case mismatching.
    */
   String getName();
+
+  /**
+   * @return the {@link DbNamingStrategy}.
+   */
+  DbNamingStrategy getNamingStrategy();
+
+  /**
+   * @param name the name to quote.
+   * @param appendable the {@link Appendable} where to {@link Appendable#append(CharSequence) append} the quoted name
+   *        to.
+   */
+  default void quoteIdentifier(String name, Appendable appendable) {
+
+    try {
+      appendable.append('"');
+      appendable.append(name);
+      appendable.append('"');
+    } catch (IOException e) {
+      throw new RuntimeIoException(e);
+    }
+  }
 
   /**
    * @return a new {@link DbStatementFormatter} using this SQL dialect.

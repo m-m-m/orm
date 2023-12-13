@@ -3,8 +3,8 @@
 package io.github.mmm.orm.type;
 
 /**
- * Implementation of {@link DbType} for simple types that are directly supported by the target database such as
- * {@link Long} or {@link String}.
+ * Abstract base implementation of {@link DbType} for simple types that are directly supported by the target database
+ * such as {@link Long} or {@link String}.
  *
  * @param <V> type of the {@link #getSourceType() Java datatype}.
  */

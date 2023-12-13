@@ -11,7 +11,7 @@ import java.sql.Types;
  * Implementation of {@link DbType} for a {@link Boolean} mapped as {@link Character} like suggested by
  * <a href="https://asktom.oracle.com/pls/apex/asktom.search?tag=boolean-datatype">Tom</a> for older Oracle databases.
  */
-public abstract class DbTypeBoolean2Char extends DbType<Boolean, Character> {
+public class DbTypeBoolean2Char extends DbType<Boolean, Character> {
 
   private static final Character TRUE = Character.valueOf('Y');
 

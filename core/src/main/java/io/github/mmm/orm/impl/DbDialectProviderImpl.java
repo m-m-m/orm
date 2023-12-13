@@ -1,3 +1,5 @@
+/* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.impl;
 
 import java.util.HashMap;
@@ -8,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.mmm.base.exception.ObjectNotFoundException;
+import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
 import io.github.mmm.orm.dialect.DbDialectProvider;
 
@@ -23,7 +26,7 @@ public class DbDialectProviderImpl implements DbDialectProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(DbDialectProviderImpl.class);
 
-  private final Map<String, DbDialect> dialects;
+  private final Map<String, AbstractDbDialect<?>> dialects;
 
   /**
    * The constructor.
@@ -34,11 +37,16 @@ public class DbDialectProviderImpl implements DbDialectProvider {
     this.dialects = new HashMap<>();
     ServiceLoader<DbDialect> loader = ServiceLoader.load(DbDialect.class);
     for (DbDialect dialect : loader) {
-      DbDialect duplicate = this.dialects.put(dialect.getName(), dialect);
-      if (duplicate != null) {
-        LOG.info("Overriding dialect " + dialect.getName() + " from " + duplicate.getClass().getName() + " to "
-            + dialect.getClass().getName());
-      }
+      register((AbstractDbDialect<?>) dialect);
+    }
+  }
+
+  private void register(AbstractDbDialect<?> dialect) {
+
+    AbstractDbDialect<?> duplicate = this.dialects.put(dialect.getName(), dialect);
+    if (duplicate != null) {
+      LOG.info("Overriding dialect " + dialect.getName() + " from " + duplicate.getClass().getName() + " to "
+          + dialect.getClass().getName());
     }
   }
 
@@ -56,6 +64,17 @@ public class DbDialectProviderImpl implements DbDialectProvider {
   public boolean has(String name) {
 
     return this.dialects.containsKey(name);
+  }
+
+  @Override
+  public DbDialect getByDbUrl(String url) {
+
+    for (AbstractDbDialect<?> dialect : this.dialects.values()) {
+      if (dialect.isResponsible(url)) {
+        return dialect;
+      }
+    }
+    throw new ObjectNotFoundException("DbDialect", url);
   }
 
 }

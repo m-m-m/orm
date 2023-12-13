@@ -10,7 +10,7 @@ import java.sql.Types;
 /**
  * Implementation of {@link DbTypeSimple} for a regular {@link String}.
  */
-public abstract class DbTypeString extends DbTypeSimple<String> {
+public class DbTypeString extends DbTypeSimple<String> {
 
   /**
    * The constructor.

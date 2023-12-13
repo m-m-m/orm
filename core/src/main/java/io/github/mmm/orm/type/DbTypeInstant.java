@@ -11,7 +11,7 @@ import java.time.Instant;
 /**
  * Implementation of {@link DbTypeSimple} for a regular {@link Instant}.
  */
-public abstract class DbTypeInstant extends DbTypeSimple<Instant> {
+public class DbTypeInstant extends DbTypeSimple<Instant> {
 
   /**
    * The constructor.

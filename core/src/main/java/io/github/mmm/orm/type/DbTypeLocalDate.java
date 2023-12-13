@@ -11,7 +11,7 @@ import java.time.LocalDate;
 /**
  * Implementation of {@link DbTypeSimple} for a regular {@link LocalDate}.
  */
-public abstract class DbTypeLocalDate extends DbTypeSimple<LocalDate> {
+public class DbTypeLocalDate extends DbTypeSimple<LocalDate> {
 
   /**
    * The constructor.

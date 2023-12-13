@@ -20,6 +20,13 @@ public interface DbDialectProvider {
   DbDialect get(String name);
 
   /**
+   * @param url the database connection URL (e.g. JDBC URL).
+   * @return the {@link DbDialect} that is responsible for this URL.
+   * @throws ObjectNotFoundException if no {@link DbDialect} could be found for the given {@code url}.
+   */
+  DbDialect getByDbUrl(String url);
+
+  /**
    * @param name the {@link DbDialect#getName() name} of the {@link DbDialect} to find.
    * @return {@code true} if the {@link DbDialect} with the given {@link DbDialect#getName() name} is present,
    *         {@code false} otherwise.

@@ -16,8 +16,13 @@ public interface DbInsertAccess {
   void insert(InsertStatement<?> statement);
 
   /**
-   * @param entity the EntityBean to insert.
+   * @param entity the {@link EntityBean} to insert.
    */
   void insert(EntityBean entity);
+
+  /**
+   * @param entities the {@link EntityBean}s to insert as batch operation.
+   */
+  void insertAll(EntityBean... entities);
 
 }

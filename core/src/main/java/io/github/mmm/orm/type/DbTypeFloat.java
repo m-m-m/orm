@@ -10,7 +10,7 @@ import java.sql.Types;
 /**
  * Implementation of {@link DbTypeSimple} for a regular {@link Float}.
  */
-public abstract class DbTypeFloat extends DbTypeSimple<Float> {
+public class DbTypeFloat extends DbTypeSimple<Float> {
 
   /**
    * The constructor.

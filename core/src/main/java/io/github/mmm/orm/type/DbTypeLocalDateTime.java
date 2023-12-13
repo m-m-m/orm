@@ -6,19 +6,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.time.LocalDateTime;
+import java.time.Duration;
 
 /**
- * Implementation of {@link DbType} for a regular {@link LocalDateTime}.
+ * Implementation of {@link DbType} for a regular {@link Duration}.
  */
-public abstract class DbTypeLocalDateTime extends DbTypeSimple<LocalDateTime> {
+public class DbTypeLocalDateTime extends DbTypeSimple<Duration> {
 
   /**
    * The constructor.
    */
   public DbTypeLocalDateTime() {
 
-    this("TIMESTAMP");
+    this("INTERVAL");
   }
 
   /**
@@ -28,7 +28,7 @@ public abstract class DbTypeLocalDateTime extends DbTypeSimple<LocalDateTime> {
    */
   public DbTypeLocalDateTime(String declaration) {
 
-    this(declaration, Types.TIMESTAMP);
+    this(declaration, Types.NULL);
   }
 
   /**
@@ -43,14 +43,14 @@ public abstract class DbTypeLocalDateTime extends DbTypeSimple<LocalDateTime> {
   }
 
   @Override
-  public Class<LocalDateTime> getSourceType() {
+  public Class<Duration> getSourceType() {
 
-    return LocalDateTime.class;
+    return Duration.class;
   }
 
   @SuppressWarnings("exports")
   @Override
-  public void setDbParameter(PreparedStatement statement, int index, LocalDateTime value, Connection connection)
+  public void setDbParameter(PreparedStatement statement, int index, Duration value, Connection connection)
       throws SQLException {
 
     if (value == null) {

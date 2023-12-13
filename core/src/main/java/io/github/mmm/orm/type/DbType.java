@@ -54,6 +54,14 @@ public abstract class DbType<V, D> extends AtomicTypeMapper<V, D> {
   }
 
   /**
+   * @return the number of decimal digits in case of decimal numeric type. Otherwise {@code 0}.
+   */
+  public int getDecimalDigits() {
+
+    return 0;
+  }
+
+  /**
    * This method sets the parameter at the given {@code index} to the given {@code value}. E.g. if this {@link DbType}
    * is for a simple regular {@link String} this method would more or less be equivalent to:
    *

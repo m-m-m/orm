@@ -1,3 +1,5 @@
+/* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.jdbc.access;
 
 import java.sql.Connection;
@@ -8,14 +10,14 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.orm.access.AbstractDbAccess;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
+import io.github.mmm.orm.jdbc.access.session.JdbcSession;
+import io.github.mmm.orm.jdbc.tx.JdbcTransactionExecutor;
 import io.github.mmm.orm.param.AbstractCriteriaParameters;
 
 /**
  * Abstract implementation of {@link io.github.mmm.orm.access.DbAccess} using JDBC.
  */
 public abstract class JdbcDbAccess extends AbstractDbAccess {
-
-  protected abstract Connection getConnection();
 
   @Override
   public void insert(EntityBean entity) {
@@ -49,9 +51,11 @@ public abstract class JdbcDbAccess extends AbstractDbAccess {
   protected long executeSql(String sql, AbstractCriteriaParameters parameters) {
 
     try {
-      Connection connection = getConnection();
+      JdbcSession session = JdbcTransactionExecutor.getSession();
+      Connection connection = session.getConnection();
       PreparedStatement statement = connection.prepareStatement(sql);
       parameters.apply(statement, connection);
+      // TODO support batch updates...
       return statement.executeLargeUpdate();
     } catch (SQLException e) {
       // TODO proper custom runtinme exception class and error message including the SQL

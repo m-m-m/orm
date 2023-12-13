@@ -10,7 +10,7 @@ import java.sql.Types;
 /**
  * Implementation of {@link DbTypeSimple} for a regular {@link Boolean}.
  */
-public abstract class DbTypeBoolean extends DbTypeSimple<Boolean> {
+public class DbTypeBoolean extends DbTypeSimple<Boolean> {
 
   /**
    * The constructor.

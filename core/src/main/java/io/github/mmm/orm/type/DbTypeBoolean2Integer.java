@@ -12,7 +12,7 @@ import java.sql.Types;
  * older Oracle databases that do not support
  * <a href="https://asktom.oracle.com/pls/apex/asktom.search?tag=boolean-datatype">boolean datatype</a> .
  */
-public abstract class DbTypeBoolean2Integer extends DbType<Boolean, Integer> {
+public class DbTypeBoolean2Integer extends DbType<Boolean, Integer> {
 
   private static final Integer TRUE = Integer.valueOf(1);
 

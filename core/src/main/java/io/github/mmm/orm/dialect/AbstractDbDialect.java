@@ -40,11 +40,30 @@ public abstract class AbstractDbDialect<SELF extends AbstractDbDialect<SELF>> im
   }
 
   /**
+   * @param url the database connection URL (e.g. JDBC URL).
+   * @return {@code true} if this {@link DbDialect} is responsible for the given {@code url}.
+   * @see DbDialectProvider#getByDbUrl(String)
+   */
+  public boolean isResponsible(String url) {
+
+    if (url.startsWith("jdbc:" + getName())) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * @return the default {@link DbNamingStrategy}.
    */
   protected DbNamingStrategy getDefaultNamingStrategy() {
 
     return DbNamingStrategy.ofRdbms();
+  }
+
+  @Override
+  public DbNamingStrategy getNamingStrategy() {
+
+    return this.orm.getNamingStrategy();
   }
 
   /**

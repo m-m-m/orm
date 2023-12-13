@@ -7,6 +7,7 @@ import io.github.mmm.entity.bean.repository.AbstractEntityRepository;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.IdGenerator;
 import io.github.mmm.orm.access.DbAccess;
+import io.github.mmm.orm.config.DbSource;
 import io.github.mmm.orm.statement.select.SelectStatement;
 
 /**
@@ -33,10 +34,25 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
     this.dbAccess = dbAccess;
   }
 
-  protected void verifyEntityClass(Class<?> entityClass) {
+  /**
+   * @return the {@link DbSource} of this repository. Typically this is the {@link DbSource#get() default}
+   *         {@link DbSource}. May be overridden to connect your repository to a different {@link DbSource database
+   *         source}.
+   */
+  public DbSource getSource() {
 
-    // TODO
-    assert (entityClass == this.prototype.getType().getClass());
+    return DbSource.get();
+  }
+
+  /**
+   * Verifies that an entity {@link Class} (e.g. from an {@link Id}) is valid for this repository.
+   *
+   * @param entityType the {@link Class} reflecting the {@link EntityBean} to process.
+   */
+  protected void verifyEntityClass(Class<?> entityType) {
+
+    // TODO support inheritance via isAssignableFrom
+    assert (entityType == this.prototype.getJavaClass());
   }
 
   @Override

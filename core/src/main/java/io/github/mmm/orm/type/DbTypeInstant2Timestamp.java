@@ -13,7 +13,7 @@ import java.time.Instant;
  * Implementation of {@link DbType} for a regular {@link Instant}.
  */
 @SuppressWarnings("exports")
-public abstract class DbTypeInstant2Timestamp extends DbType<Instant, Timestamp> {
+public class DbTypeInstant2Timestamp extends DbType<Instant, Timestamp> {
 
   /**
    * The constructor.

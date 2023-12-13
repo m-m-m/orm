@@ -18,6 +18,9 @@ public interface DbCreateAccess {
    */
   void createTable(CreateTableStatement<?> statement);
 
+  /**
+   * @param entity the {@link EntityBean} prototype to create the database table for.
+   */
   default void createTable(EntityBean entity) {
 
     CreateTableStatement<EntityBean> statement = new CreateTable<>(entity).columns().get();

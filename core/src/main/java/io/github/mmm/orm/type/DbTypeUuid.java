@@ -9,9 +9,9 @@ import java.sql.Types;
 import java.util.UUID;
 
 /**
- * Implementation of {@link DbTypeSimple} for a regular {@link String}.
+ * Implementation of {@link DbTypeSimple} for a {@link UUID} if directly supported by DB.
  */
-public abstract class DbTypeUuid extends DbTypeSimple<UUID> {
+public class DbTypeUuid extends DbTypeSimple<UUID> {
 
   /**
    * The constructor.

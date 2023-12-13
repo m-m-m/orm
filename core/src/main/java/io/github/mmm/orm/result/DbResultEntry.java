@@ -1,3 +1,5 @@
+/* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.result;
 
 import java.util.function.Supplier;
@@ -13,8 +15,7 @@ import io.github.mmm.value.converter.TypeMapper;
 public interface DbResultEntry<V> {
 
   /**
-   * @return the {@link Supplier} with the selection from the
-   *         {@link io.github.mmm.orm.statement.DbStatement}.
+   * @return the {@link Supplier} with the selection from the {@link io.github.mmm.orm.statement.DbStatement}.
    */
   CriteriaObject<?> getSelection();
 
