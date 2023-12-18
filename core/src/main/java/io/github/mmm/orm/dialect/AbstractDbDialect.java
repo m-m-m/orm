@@ -46,7 +46,7 @@ public abstract class AbstractDbDialect<SELF extends AbstractDbDialect<SELF>> im
    */
   public boolean isResponsible(String url) {
 
-    if (url.startsWith("jdbc:" + getName())) {
+    if (url.startsWith("jdbc:" + getId())) {
       return true;
     }
     return false;
@@ -97,7 +97,7 @@ public abstract class AbstractDbDialect<SELF extends AbstractDbDialect<SELF>> im
   @Override
   public String toString() {
 
-    return getName() + "[" + getClass().getSimpleName() + "]";
+    return getId() + "[" + getClass().getSimpleName() + "]";
   }
 
 }

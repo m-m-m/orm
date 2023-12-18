@@ -10,14 +10,14 @@ import io.github.mmm.orm.impl.DbDialectProviderImpl;
  *
  * @since 1.0.0
  */
-public interface DbDialectProvider {
+public interface DbDialectProvider extends Iterable<DbDialect> {
 
   /**
-   * @param name the {@link DbDialect#getName() name} of the requested {@link DbDialect}.
+   * @param id the {@link DbDialect#getId() identifier} of the requested {@link DbDialect}.
    * @return the requested {@link DbDialect}.
    * @throws ObjectNotFoundException if no {@link DbDialect} could be found for the given {@code name}.
    */
-  DbDialect get(String name);
+  DbDialect get(String id);
 
   /**
    * @param url the database connection URL (e.g. JDBC URL).
@@ -27,8 +27,8 @@ public interface DbDialectProvider {
   DbDialect getByDbUrl(String url);
 
   /**
-   * @param name the {@link DbDialect#getName() name} of the {@link DbDialect} to find.
-   * @return {@code true} if the {@link DbDialect} with the given {@link DbDialect#getName() name} is present,
+   * @param name the {@link DbDialect#getId() name} of the {@link DbDialect} to find.
+   * @return {@code true} if the {@link DbDialect} with the given {@link DbDialect#getId() name} is present,
    *         {@code false} otherwise.
    */
   boolean has(String name);

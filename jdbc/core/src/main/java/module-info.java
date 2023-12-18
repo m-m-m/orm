@@ -7,10 +7,12 @@
  */
 module io.github.mmm.orm.jdbc {
 
-  requires transitive io.github.mmm.orm;
+  requires transitive io.github.mmm.orm.spi;
 
-  requires java.sql;
+  requires transitive java.sql;
 
   exports io.github.mmm.orm.jdbc.access;
+
+  exports io.github.mmm.orm.jdbc.connection;
 
 }

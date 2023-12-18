@@ -106,7 +106,6 @@ public class JdbcMetaData implements DbMetaData {
    * @param connection the JDBC {@link Connection}.
    * @param dialect the {@link DbDialect} to use.
    */
-  @SuppressWarnings("exports")
   public JdbcMetaData(Connection connection, DbDialect dialect) {
 
     super();

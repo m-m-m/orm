@@ -2,7 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.tx;
 
-import io.github.mmm.orm.config.DbSource;
+import io.github.mmm.orm.source.DbSource;
 
 /**
  * Interface for a transaction.

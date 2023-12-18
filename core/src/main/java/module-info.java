@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -5,7 +6,6 @@
 /**
  * Provides database support for {@code mmm-entity-bean}.
  *
- * @provides io.github.mmm.orm.dialect.DbDialect
  * @uses io.github.mmm.orm.dialect.DbDialect
  */
 module io.github.mmm.orm {
@@ -19,10 +19,6 @@ module io.github.mmm.orm {
   uses io.github.mmm.orm.dialect.DbDialect;
 
   exports io.github.mmm.orm.access;
-
-  exports io.github.mmm.orm.access.session to io.github.mmm.orm.jdbc;
-
-  exports io.github.mmm.orm.config;
 
   exports io.github.mmm.orm.constraint;
 
@@ -41,6 +37,8 @@ module io.github.mmm.orm {
   exports io.github.mmm.orm.repository;
 
   exports io.github.mmm.orm.result;
+
+  exports io.github.mmm.orm.source;
 
   exports io.github.mmm.orm.statement;
 

@@ -15,7 +15,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mmm-orm</artifactId>
+      <artifactId>mmm-orm-spi</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -3,12 +3,14 @@
 package io.github.mmm.orm.impl;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.mmm.base.collection.ReadOnlyIterator;
 import io.github.mmm.base.exception.ObjectNotFoundException;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
@@ -43,9 +45,9 @@ public class DbDialectProviderImpl implements DbDialectProvider {
 
   private void register(AbstractDbDialect<?> dialect) {
 
-    AbstractDbDialect<?> duplicate = this.dialects.put(dialect.getName(), dialect);
+    AbstractDbDialect<?> duplicate = this.dialects.put(dialect.getId(), dialect);
     if (duplicate != null) {
-      LOG.info("Overriding dialect " + dialect.getName() + " from " + duplicate.getClass().getName() + " to "
+      LOG.info("Overriding dialect " + dialect.getId() + " from " + duplicate.getClass().getName() + " to "
           + dialect.getClass().getName());
     }
   }
@@ -75,6 +77,13 @@ public class DbDialectProviderImpl implements DbDialectProvider {
       }
     }
     throw new ObjectNotFoundException("DbDialect", url);
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @Override
+  public Iterator<DbDialect> iterator() {
+
+    return new ReadOnlyIterator<>((Iterator) this.dialects.values());
   }
 
 }

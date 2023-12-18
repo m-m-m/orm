@@ -7,45 +7,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.orm.access.session.DbConnection;
-import io.github.mmm.orm.access.session.DbSession;
-import io.github.mmm.orm.config.DbSource;
-import io.github.mmm.orm.dialect.DbDialect;
-import io.github.mmm.orm.jdbc.impl.metadata.JdbcMetaData;
+import io.github.mmm.orm.jdbc.connection.JdbcConnection;
+import io.github.mmm.orm.session.DbSession;
+import io.github.mmm.orm.source.DbSource;
 import io.github.mmm.orm.tx.DbTransaction;
 
 /**
  * Database session data for a single transaction.
  */
-public class JdbcSession implements DbSession<JdbcEntitySession<?>>, DbConnection, DbTransaction {
+public class JdbcSession implements DbSession<JdbcEntitySession<?>>, DbTransaction {
 
   private Map<String, JdbcEntitySession<?>> entitySessions;
 
   final Connection connection;
 
-  final DbSource source;
-
-  private final DbDialect dialect;
-
-  private JdbcMetaData metaData;
-
-  private boolean open;
+  final JdbcConnection jdbcConnection;
 
   /**
    * The constructor.
    *
-   * @param connection the JDBC {@link Connection}.
-   * @param source the {@link #getSource() source}-
-   * @param dialect the {@link DbDialect}.
+   * @param jdbcConnection the {@link JdbcConnection}.
    */
-  public JdbcSession(Connection connection, DbSource source, DbDialect dialect) {
+  public JdbcSession(JdbcConnection jdbcConnection) {
 
     super();
+    this.jdbcConnection = jdbcConnection;
+    this.connection = jdbcConnection.getConnection();
     this.entitySessions = new HashMap<>();
-    this.connection = connection;
-    this.source = source;
-    this.dialect = dialect;
-    this.open = true;
   }
 
   @Override
@@ -53,18 +41,6 @@ public class JdbcSession implements DbSession<JdbcEntitySession<?>>, DbConnectio
 
     String key = entity.getType().getQualifiedName();
     return this.entitySessions.computeIfAbsent(key, k -> new JdbcEntitySession<>(this.connection));
-  }
-
-  @Override
-  public DbSource getSource() {
-
-    return this.source;
-  }
-
-  @Override
-  public boolean isOpen() {
-
-    return this.open;
   }
 
   /**
@@ -76,18 +52,15 @@ public class JdbcSession implements DbSession<JdbcEntitySession<?>>, DbConnectio
   }
 
   @Override
-  public JdbcMetaData getMetaData() {
+  public boolean isOpen() {
 
-    if (this.metaData == null) {
-      this.metaData = new JdbcMetaData(this.connection, this.dialect);
-    }
-    return this.metaData;
+    return this.jdbcConnection.isOpen();
   }
 
-  void close() {
+  @Override
+  public DbSource getSource() {
 
-    this.open = false;
-    this.entitySessions = null; // help GC and prevent further usage
+    return this.jdbcConnection.getSource();
   }
 
 }

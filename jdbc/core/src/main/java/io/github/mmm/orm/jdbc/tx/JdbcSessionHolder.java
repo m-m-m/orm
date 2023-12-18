@@ -5,8 +5,8 @@ package io.github.mmm.orm.jdbc.tx;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.github.mmm.orm.config.DbSource;
 import io.github.mmm.orm.jdbc.access.session.JdbcSession;
+import io.github.mmm.orm.source.DbSource;
 
 /**
  * Holder for {@link JdbcSession} by {@link DbSource}.
@@ -26,7 +26,8 @@ public class JdbcSessionHolder {
   }
 
   /**
-   * @return session
+   * @param source the {@link DbSource}.
+   * @return the {@link JdbcSession}.
    */
   public JdbcSession getSession(DbSource source) {
 
@@ -36,7 +37,7 @@ public class JdbcSessionHolder {
     if (this.sessionMap == null) {
       return null;
     }
-    return this.sessionMap.get(this.sessionMap.get(source));
+    return this.sessionMap.get(source);
   }
 
   void setSession(DbSource source, JdbcSession session) {

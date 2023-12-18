@@ -6,9 +6,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
 
-import io.github.mmm.orm.access.session.DbConnectionPool;
-import io.github.mmm.orm.jdbc.access.session.JdbcConnectionPool;
+import io.github.mmm.orm.connection.DbConnectionPool;
 import io.github.mmm.orm.jdbc.access.session.JdbcSession;
+import io.github.mmm.orm.jdbc.connection.JdbcConnection;
+import io.github.mmm.orm.jdbc.connection.JdbcConnectionPool;
 import io.github.mmm.orm.tx.DbTransaction;
 import io.github.mmm.orm.tx.DbTransactionExecutor;
 
@@ -37,11 +38,12 @@ public class JdbcTransactionExecutor implements DbTransactionExecutor {
   @Override
   public <R> R doInTx(Callable<R> task) {
 
-    JdbcSession session = null;
     Connection connection = null;
+    JdbcConnection jdbcConnection = null;
     try {
-      session = this.connectionPool.acquire();
+      jdbcConnection = this.connectionPool.acquire();
       // R result = ScopedValue.where(SESSION, session).call(task);
+      JdbcSession session = new JdbcSession(jdbcConnection);
       SESSION.set(session);
       connection = session.getConnection();
       R result = task.call();
@@ -63,7 +65,7 @@ public class JdbcTransactionExecutor implements DbTransactionExecutor {
       throw new IllegalStateException(t);
     } finally {
       SESSION.set(null);
-      this.connectionPool.release(session);
+      this.connectionPool.release(jdbcConnection);
     }
   }
 

@@ -17,7 +17,16 @@ public interface DbDialect {
    * @return the name of the {@link DbDialect} (e.g. "h2", "postgresql", etc.). Should be entirely lower-case to prevent
    *         case mismatching.
    */
-  String getName();
+  String getId();
+
+  /**
+   * @return the database type. This is very similar to the {@link #getId() ID} but for the same database types
+   *         potentially different dialects may exist (e.g. due to different versions of the database product).
+   */
+  default String getType() {
+
+    return getId();
+  }
 
   /**
    * @return the {@link DbNamingStrategy}.

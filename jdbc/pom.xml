@@ -14,9 +14,7 @@
 
   <modules>
     <module>core</module>
-    <module>h2</module>
-    <module>sqlite</module>
-    <module>derby</module>
-    <module>postgresql</module>
+    <module>db</module>
+    <module>pool</module>
   </modules>
 </project>

@@ -5,7 +5,7 @@ package io.github.mmm.orm.jdbc.access.session;
 import java.sql.Connection;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.orm.access.session.DbEntitySession;
+import io.github.mmm.orm.session.DbEntitySession;
 
 /**
  * {@link DbEntitySession} for JDBC.

@@ -7,7 +7,7 @@ import io.github.mmm.entity.bean.repository.AbstractEntityRepository;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.IdGenerator;
 import io.github.mmm.orm.access.DbAccess;
-import io.github.mmm.orm.config.DbSource;
+import io.github.mmm.orm.source.DbSource;
 import io.github.mmm.orm.statement.select.SelectStatement;
 
 /**
