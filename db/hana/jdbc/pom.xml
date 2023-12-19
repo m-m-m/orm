@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.github.m-m-m</groupId>
+    <artifactId>mmm-orm-db-hana-parent</artifactId>
+    <version>${revision}</version>
+  </parent>
+  <artifactId>mmm-orm-db-hana-jdbc</artifactId>
+  <packaging>jar</packaging>
+  <name>${project.artifactId}</name>
+  <description>ORM support for SAP Hana database via JDBC.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mmm-orm-db-hana-dialect</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sap.cloud.db.jdbc</groupId>
+      <artifactId>ngdbc</artifactId>
+      <version>2.18.16</version>
+    </dependency>
+  </dependencies>
+</project>
