@@ -20,7 +20,9 @@
 
   <modules>
     <module>core</module>
+    <module>spi</module>
     <module>jdbc</module>
+    <module>db</module>
   </modules>
 
   <dependencyManagement>

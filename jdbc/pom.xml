@@ -14,7 +14,6 @@
 
   <modules>
     <module>core</module>
-    <module>db</module>
     <module>pool</module>
   </modules>
 </project>
