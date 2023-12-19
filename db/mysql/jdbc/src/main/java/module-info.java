@@ -9,4 +9,8 @@ module io.github.mmm.orm.db.mysql.jdbc {
 
   requires io.github.mmm.orm.db.mysql.dialect;
 
+  requires io.github.mmm.orm.jdbc;
+
+  requires mysql.connector.j;
+
 }

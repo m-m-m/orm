@@ -2,15 +2,18 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.db.oracle.dialect;
 
+import java.util.Map;
+
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
 import io.github.mmm.orm.orm.Orm;
+import io.github.mmm.orm.source.DbSource;
 import io.github.mmm.orm.statement.DbStatementFormatter;
 
 /**
  * Implementation of {@link DbDialect} for Oracle database.
  */
-public final class OracleDialect extends AbstractDbDialect<OracleDialect> {
+public class OracleDialect extends AbstractDbDialect<OracleDialect> {
 
   /**
    * The constructor.
@@ -37,6 +40,12 @@ public final class OracleDialect extends AbstractDbDialect<OracleDialect> {
   }
 
   @Override
+  public String getType() {
+
+    return "oracle";
+  }
+
+  @Override
   protected OracleDialect withOrm(Orm newOrm) {
 
     return new OracleDialect(newOrm);
@@ -46,6 +55,12 @@ public final class OracleDialect extends AbstractDbDialect<OracleDialect> {
   public DbStatementFormatter createFormatter() {
 
     return new OracleFormatter(getOrm());
+  }
+
+  @Override
+  protected String autoConfigureUrl(Map<String, String> config, DbSource source, String kind) {
+
+    return kind + ":oracle:thin:@//localhost:1521/xepdb1";
   }
 
 }

@@ -11,7 +11,6 @@ import io.github.mmm.entity.id.Id;
 import io.github.mmm.orm.access.AbstractDbAccess;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.jdbc.access.session.JdbcSession;
-import io.github.mmm.orm.jdbc.tx.JdbcTransactionExecutor;
 import io.github.mmm.orm.param.AbstractCriteriaParameters;
 
 /**
@@ -51,7 +50,7 @@ public abstract class JdbcDbAccess extends AbstractDbAccess {
   protected long executeSql(String sql, AbstractCriteriaParameters parameters) {
 
     try {
-      JdbcSession session = JdbcTransactionExecutor.getSession();
+      JdbcSession session = null; // JdbcTransactionExecutor.getSession();
       Connection connection = session.getConnection();
       PreparedStatement statement = connection.prepareStatement(sql);
       parameters.apply(statement, connection);

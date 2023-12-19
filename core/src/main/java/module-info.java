@@ -7,6 +7,7 @@
  * Provides database support for {@code mmm-entity-bean}.
  *
  * @uses io.github.mmm.orm.dialect.DbDialect
+ * @uses io.github.mmm.orm.tx.DbTransactionExecutorProvider
  */
 module io.github.mmm.orm {
 
@@ -17,6 +18,8 @@ module io.github.mmm.orm {
   requires java.sql;
 
   uses io.github.mmm.orm.dialect.DbDialect;
+
+  uses io.github.mmm.orm.tx.DbTransactionExecutorProvider;
 
   exports io.github.mmm.orm.access;
 

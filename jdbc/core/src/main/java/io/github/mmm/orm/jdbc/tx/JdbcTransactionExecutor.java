@@ -6,7 +6,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
 
-import io.github.mmm.orm.connection.DbConnectionPool;
+import io.github.mmm.orm.connection.DbConnectionData;
 import io.github.mmm.orm.jdbc.access.session.JdbcSession;
 import io.github.mmm.orm.jdbc.connection.JdbcConnection;
 import io.github.mmm.orm.jdbc.connection.JdbcConnectionPool;
@@ -14,25 +14,28 @@ import io.github.mmm.orm.tx.DbTransaction;
 import io.github.mmm.orm.tx.DbTransactionExecutor;
 
 /**
- *
+ * Implementation of {@link DbTransactionExecutor} for JDBC.
  */
 public class JdbcTransactionExecutor implements DbTransactionExecutor {
 
-  // static final ScopedValue<JdbcSession> SESSION = ScopedValue.newInstance();
+  // private final ScopedValue<JdbcSession> sessionHolder = ScopedValue.newInstance();
 
-  private static final ThreadLocal<JdbcSession> SESSION = new ThreadLocal<>();
+  private final ThreadLocal<JdbcSession> sessionHolder = new ThreadLocal<>();
+
+  private final DbConnectionData connectionData;
 
   private final JdbcConnectionPool connectionPool;
 
   /**
    * The constructor.
    *
-   * @param connectionPool the {@link DbConnectionPool}.
+   * @param connectionData the {@link DbConnectionData}.
    */
-  public JdbcTransactionExecutor(JdbcConnectionPool connectionPool) {
+  public JdbcTransactionExecutor(DbConnectionData connectionData) {
 
     super();
-    this.connectionPool = connectionPool;
+    this.connectionData = connectionData;
+    this.connectionPool = (JdbcConnectionPool) connectionData.getPool();
   }
 
   @Override
@@ -44,7 +47,7 @@ public class JdbcTransactionExecutor implements DbTransactionExecutor {
       jdbcConnection = this.connectionPool.acquire();
       // R result = ScopedValue.where(SESSION, session).call(task);
       JdbcSession session = new JdbcSession(jdbcConnection);
-      SESSION.set(session);
+      this.sessionHolder.set(session);
       connection = session.getConnection();
       R result = task.call();
       connection.commit();
@@ -64,7 +67,7 @@ public class JdbcTransactionExecutor implements DbTransactionExecutor {
       }
       throw new IllegalStateException(t);
     } finally {
-      SESSION.set(null);
+      this.sessionHolder.set(null);
       this.connectionPool.release(jdbcConnection);
     }
   }
@@ -72,15 +75,15 @@ public class JdbcTransactionExecutor implements DbTransactionExecutor {
   @Override
   public DbTransaction getTransaction() {
 
-    return SESSION.get();
+    return this.sessionHolder.get().getJdbcConnection();
   }
 
   /**
    * @return the current {@link JdbcSession} for the running transaction.
    */
-  public static JdbcSession getSession() {
+  public JdbcSession getSession() {
 
-    return SESSION.get();
+    return this.sessionHolder.get();
   }
 
 }

@@ -2,10 +2,14 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.dialect;
 
+import java.util.Map;
+
+import io.github.mmm.base.exception.ObjectNotFoundException;
 import io.github.mmm.entity.bean.typemapping.TypeMapping;
 import io.github.mmm.orm.impl.OrmImpl;
 import io.github.mmm.orm.naming.DbNamingStrategy;
 import io.github.mmm.orm.orm.Orm;
+import io.github.mmm.orm.source.DbSource;
 
 /**
  * Abstract base implementation of {@link DbDialect}.
@@ -37,19 +41,6 @@ public abstract class AbstractDbDialect<SELF extends AbstractDbDialect<SELF>> im
 
     super();
     this.orm = new OrmImpl(typeMapping, getDefaultNamingStrategy());
-  }
-
-  /**
-   * @param url the database connection URL (e.g. JDBC URL).
-   * @return {@code true} if this {@link DbDialect} is responsible for the given {@code url}.
-   * @see DbDialectProvider#getByDbUrl(String)
-   */
-  public boolean isResponsible(String url) {
-
-    if (url.startsWith("jdbc:" + getId())) {
-      return true;
-    }
-    return false;
   }
 
   /**
@@ -93,6 +84,45 @@ public abstract class AbstractDbDialect<SELF extends AbstractDbDialect<SELF>> im
    * @return a new instance of this dialect with the given {@link Orm}.
    */
   protected abstract SELF withOrm(Orm newOrm);
+
+  /**
+   * @param config the {@link Map} with the configuration parameters for the {@link DbSource}.
+   * @param source the {@link DbSource}.
+   */
+  public void autoConfigure(Map<String, String> config, DbSource source) {
+
+    if (config.get(DbSource.KEY_PASSWORD) == null) {
+      String user = config.get(DbSource.KEY_USER);
+      if (user != null) {
+        // convention over configuration for local development environments
+        config.put(DbSource.KEY_PASSWORD, user);
+      }
+    }
+    if (config.get(DbSource.KEY_URL) == null) {
+      String kind = config.get(DbSource.KEY_KIND);
+      if (kind == null) {
+        // would actually be better to discover what is available...
+        kind = "jdbc";
+        config.put(DbSource.KEY_KIND, kind);
+      }
+      String url = autoConfigureUrl(config, source, kind);
+      if (url == null) {
+        throw new ObjectNotFoundException("Property", source.getPropertyKey(DbSource.KEY_URL));
+      }
+      config.put(DbSource.KEY_URL, url);
+    }
+  }
+
+  /**
+   * @param config the {@link Map} with the configuration parameters for the {@link DbSource}.
+   * @param source the {@link DbSource}.
+   * @param kind the {@link DbSource#KEY_KIND kind of database connection}.
+   * @return the auto-configured database connection URL or {@code null} if there is no meaningful default.
+   */
+  protected String autoConfigureUrl(Map<String, String> config, DbSource source, String kind) {
+
+    return null;
+  }
 
   @Override
   public String toString() {

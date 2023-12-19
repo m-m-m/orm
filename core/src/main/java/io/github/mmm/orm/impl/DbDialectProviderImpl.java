@@ -11,7 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.mmm.base.collection.ReadOnlyIterator;
+import io.github.mmm.base.exception.DuplicateObjectException;
 import io.github.mmm.base.exception.ObjectNotFoundException;
+import io.github.mmm.base.service.ServiceHelper;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
 import io.github.mmm.orm.dialect.DbDialectProvider;
@@ -33,23 +35,13 @@ public class DbDialectProviderImpl implements DbDialectProvider {
   /**
    * The constructor.
    */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public DbDialectProviderImpl() {
 
     super();
     this.dialects = new HashMap<>();
-    ServiceLoader<DbDialect> loader = ServiceLoader.load(DbDialect.class);
-    for (DbDialect dialect : loader) {
-      register((AbstractDbDialect<?>) dialect);
-    }
-  }
-
-  private void register(AbstractDbDialect<?> dialect) {
-
-    AbstractDbDialect<?> duplicate = this.dialects.put(dialect.getId(), dialect);
-    if (duplicate != null) {
-      LOG.info("Overriding dialect " + dialect.getId() + " from " + duplicate.getClass().getName() + " to "
-          + dialect.getClass().getName());
-    }
+    ServiceLoader<AbstractDbDialect<?>> serviceLoader = (ServiceLoader) ServiceLoader.load(DbDialect.class);
+    ServiceHelper.all(serviceLoader, this.dialects, AbstractDbDialect::getId);
   }
 
   @Override
@@ -71,19 +63,44 @@ public class DbDialectProviderImpl implements DbDialectProvider {
   @Override
   public DbDialect getByDbUrl(String url) {
 
-    for (AbstractDbDialect<?> dialect : this.dialects.values()) {
-      if (dialect.isResponsible(url)) {
+    String type = getType(url);
+    if (type != null) {
+      DbDialect dialect = null;
+      for (AbstractDbDialect<?> currentDialect : this.dialects.values()) {
+        if (type.equals(currentDialect.getType())) {
+          if (dialect == null) {
+            dialect = currentDialect;
+          } else {
+            throw new DuplicateObjectException("DbDialect", dialect.getId(), currentDialect.getId());
+          }
+        }
+      }
+      if (dialect != null) {
         return dialect;
       }
     }
     throw new ObjectNotFoundException("DbDialect", url);
   }
 
+  private String getType(String url) {
+
+    int start = url.indexOf(':');
+    if (start > 0) {
+      start++;
+      int end = url.indexOf(':', start);
+      if (end > start) {
+        return url.substring(start, end);
+      }
+    }
+    LOG.warn("Could not determine database type from connection URL '{}'", url);
+    return null;
+  }
+
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public Iterator<DbDialect> iterator() {
 
-    return new ReadOnlyIterator<>((Iterator) this.dialects.values());
+    return new ReadOnlyIterator<>((Iterator) this.dialects.values().iterator());
   }
 
 }

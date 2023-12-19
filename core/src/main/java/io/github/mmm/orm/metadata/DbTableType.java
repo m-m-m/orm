@@ -2,6 +2,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.metadata;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -9,20 +12,24 @@ import java.util.Objects;
  */
 public final class DbTableType {
 
+  private static final Map<String, DbTableType> STANDARD_TYPES = new HashMap<>();
+
   /** {@link DbTableType} for a regular {@link DbTable database table}. */
-  public static final DbTableType TABLE = new DbTableType("TABLE");
+  public static final DbTableType TABLE = new DbTableType("TABLE", true);
 
   /** {@link DbTableType} for a view that selects from other {@link DbTable}(s). */
-  public static final DbTableType VIEW = new DbTableType("VIEW");
+  public static final DbTableType VIEW = new DbTableType("VIEW", true);
 
   /** {@link DbTableType} for a synonym that imports a {@link DbTable} from a different catalog/schema. */
-  public static final DbTableType SYNONYM = new DbTableType("SYNONYM");
+  public static final DbTableType SYNONYM = new DbTableType("SYNONYM", true);
 
-  private static final DbTableType[] STANDARD_TYPES = { TABLE, VIEW, SYNONYM };
+  static {
+    STANDARD_TYPES.put("BASE TABLE", TABLE); // workaround for h2
+  }
 
   private final String type;
 
-  private DbTableType(String type) {
+  private DbTableType(String type, boolean standard) {
 
     super();
     Objects.requireNonNull(type);
@@ -98,12 +105,12 @@ public final class DbTableType {
     if (type.isEmpty()) {
       return null;
     }
-    for (DbTableType standardType : STANDARD_TYPES) {
-      if (type.equalsIgnoreCase(standardType.type)) {
-        return standardType;
-      }
+    type = type.toUpperCase(Locale.ROOT);
+    DbTableType result = STANDARD_TYPES.get(type);
+    if (result == null) {
+      result = new DbTableType(type, false);
     }
-    return new DbTableType(type);
+    return result;
   }
 
 }

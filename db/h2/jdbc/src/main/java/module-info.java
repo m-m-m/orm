@@ -9,6 +9,8 @@ module io.github.mmm.orm.db.h2.jdbc {
 
   requires io.github.mmm.orm.db.h2.dialect;
 
+  requires io.github.mmm.orm.jdbc;
+
   requires com.h2database;
 
 }

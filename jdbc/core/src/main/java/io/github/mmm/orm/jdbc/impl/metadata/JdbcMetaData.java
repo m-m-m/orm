@@ -173,7 +173,7 @@ public class JdbcMetaData implements DbMetaData {
   @Override
   public Iterable<DbTableData> getTables(String name) {
 
-    return getTables(DbName.getName(getCurrentSchema()), DbName.getName(getCurrentSchema()), name);
+    return getTables(DbName.getName(getCurrentCatalog()), DbName.getName(getCurrentSchema()), name);
   }
 
   @Override

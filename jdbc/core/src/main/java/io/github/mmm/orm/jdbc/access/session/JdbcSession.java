@@ -51,6 +51,14 @@ public class JdbcSession implements DbSession<JdbcEntitySession<?>>, DbTransacti
     return this.connection;
   }
 
+  /**
+   * @return the {@link JdbcConnection}.
+   */
+  public JdbcConnection getJdbcConnection() {
+
+    return this.jdbcConnection;
+  }
+
   @Override
   public boolean isOpen() {
 

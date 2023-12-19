@@ -23,7 +23,6 @@ public abstract class JdbcConnectionPoolProvider implements DbConnectionPoolProv
     return "jdbc";
   }
 
-  @SuppressWarnings("exports")
   @Override
   public DbConnectionPool<JdbcConnection> create(DbSource source, MetaInfo config, DbDialect dialect) {
 

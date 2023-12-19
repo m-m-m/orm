@@ -26,6 +26,38 @@ public interface DbConnectionData {
   MetaInfo getConfig();
 
   /**
+   * @return the {@link DbSource#KEY_URL database connection URL}.
+   */
+  default String getUrl() {
+
+    return getConfig().getRequired(DbSource.KEY_URL);
+  }
+
+  /**
+   * @return the {@link DbSource#KEY_USER database connection user login}.
+   */
+  default String getUser() {
+
+    return getConfig().getRequired(DbSource.KEY_USER);
+  }
+
+  /**
+   * @return the {@link DbSource#KEY_USER database connection user password}.
+   */
+  default String getPassword() {
+
+    return getConfig().getRequired(DbSource.KEY_PASSWORD);
+  }
+
+  /**
+   * @return the {@link DbSource#KEY_KIND kind of database connection}.
+   */
+  default String getKind() {
+
+    return getConfig().get(DbSource.KEY_KIND);
+  }
+
+  /**
    * @return the {@link DbConnectionPool} used to manage {@link io.github.mmm.orm.connection.DbConnection connections}.
    */
   DbConnectionPool<?> getPool();

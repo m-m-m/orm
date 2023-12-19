@@ -4,9 +4,6 @@ package io.github.mmm.orm.source;
 
 import java.util.Set;
 
-import io.github.mmm.base.metainfo.MetaInfo;
-import io.github.mmm.entity.repository.EntityRepository;
-
 /**
  * A {@link DbSource} identifies a database to connect to as a tenant. It is just a wrapper for a {@link String} used as
  * {@link #getId() identifier}. Most applications only need to talk to a single database and schema. There is always a
@@ -36,8 +33,8 @@ import io.github.mmm.entity.repository.EntityRepository;
  * db.h2.pool=hikari
  * </pre>
  *
- * Now, in your {@link EntityRepository} implementation you may override the {@link DbSource} to
- * {@link DbSource#of(String) DbSource.of}("h2") to work on the secondary database.
+ * Now, in your {@link io.github.mmm.entity.repository.EntityRepository repository} implementation you may override the
+ * {@link DbSource} to {@link DbSource#of(String) DbSource.of}("h2") to work on the secondary database.
  *
  * @see io.github.mmm.orm.repository.AbstractDbRepository#getSource()
  */
@@ -47,37 +44,41 @@ public final class DbSource {
 
   private final String id;
 
-  /** {@link MetaInfo} {@link MetaInfo#get(String) key} for the database connection URL. */
+  /** The static part of the {@link #getPropertyPrefix() property prefix}. */
+  public static final String PROPERTY_PREFIX_DB = "db.";
+
+  /** {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the database connection URL. */
   public static final String KEY_URL = "url";
 
-  /** {@link MetaInfo} {@link MetaInfo#get(String) key} for the user login of the database connection. */
+  /** {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the user login of the database connection. */
   public static final String KEY_USER = "user";
 
-  /** {@link MetaInfo} {@link MetaInfo#get(String) key} for the user password of the database connection. */
+  /** {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the user password of the database connection. */
   public static final String KEY_PASSWORD = "password";
 
   /**
-   * {@link MetaInfo} {@link MetaInfo#get(String) key} for the {@link io.github.mmm.orm.dialect.DbDialect#getId() name}
-   * of the {@link io.github.mmm.orm.dialect.DbDialect database dialect}. Will be auto-configured if undefined.
+   * {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the
+   * {@link io.github.mmm.orm.dialect.DbDialect#getId() name} of the {@link io.github.mmm.orm.dialect.DbDialect database
+   * dialect}. Will be auto-configured if undefined.
    */
   public static final String KEY_DIALECT = "dialect";
 
   /**
-   * {@link MetaInfo} {@link MetaInfo#get(String) key} for the type of database. This is very similar to the
+   * {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the type of database. This is very similar to the
    * {@link #KEY_DIALECT dialect} but for the same database type potentially different dialects may exist (e.g. due to
    * different versions of the database product). Will be auto-configured if undefined.
    */
   public static final String KEY_TYPE = "type";
 
   /**
-   * {@link MetaInfo} {@link MetaInfo#get(String) key} for the ID of the connection pool to use (e.g. "hikari", "c3po",
-   * or "dbcp"). Will be auto-configured if undefined.
+   * {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the ID of the connection pool to use (e.g.
+   * "hikari", "c3po", or "dbcp"). Will be auto-configured if undefined.
    */
   public static final String KEY_POOL = "pool";
 
   /**
-   * {@link MetaInfo} {@link MetaInfo#get(String) key} for the kind of database connection (e.g. "jdbc" or "r2dbc").
-   * Will be auto-configured if undefined.
+   * {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the kind of database connection (e.g. "jdbc" or
+   * "r2dbc"). Will be auto-configured if undefined.
    */
   public static final String KEY_KIND = "kind";
 
@@ -100,6 +101,25 @@ public final class DbSource {
   public String getId() {
 
     return this.id;
+  }
+
+  /**
+   * @return the property prefix as "db.«id»." (e.g. "db.default." for the {@link #get() default source}).
+   * @see #PROPERTY_PREFIX_DB
+   * @see io.github.mmm.base.metainfo.MetaInfo#with(String)
+   */
+  public String getPropertyPrefix() {
+
+    return PROPERTY_PREFIX_DB + this.id + ".";
+  }
+
+  /**
+   * @param key the unqualified property key.
+   * @return the {@link #getPropertyPrefix() qualified} property key.
+   */
+  public String getPropertyKey(String key) {
+
+    return PROPERTY_PREFIX_DB + this.id + "." + key;
   }
 
   /**

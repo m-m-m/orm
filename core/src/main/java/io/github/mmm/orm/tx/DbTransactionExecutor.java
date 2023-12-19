@@ -4,6 +4,9 @@ package io.github.mmm.orm.tx;
 
 import java.util.concurrent.Callable;
 
+import io.github.mmm.orm.source.DbSource;
+import io.github.mmm.orm.tx.impl.DbTransactionExceutorProviderAdapter;
+
 /**
  * Interface to execute a {@link Runnable} or {@link Callable} within a transaction. Unlike JTA, Spring's
  * {@code PlatformTransactionManager}, or other overkill this is a simple API that prevents pitfalls:
@@ -59,5 +62,22 @@ public interface DbTransactionExecutor {
    * @return the {@link DbTransaction} or {@code null} if no transaction is currently active for this executor.
    */
   DbTransaction getTransaction();
+
+  /**
+   * @return the {@link DbTransactionExecutor} for the {@link DbSource#get() default} {@link DbSource}.
+   */
+  static DbTransactionExecutor get() {
+
+    return get(DbSource.get());
+  }
+
+  /**
+   * @param source the {@link DbSource}.
+   * @return the corresponding {@link DbTransactionExecutor}.
+   */
+  static DbTransactionExecutor get(DbSource source) {
+
+    return DbTransactionExceutorProviderAdapter.INSTANCE.create(source);
+  }
 
 }

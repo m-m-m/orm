@@ -14,6 +14,7 @@ import io.github.mmm.orm.connection.DbConnectionData;
 import io.github.mmm.orm.connection.DbConnectionPool;
 import io.github.mmm.orm.connection.DbConnectionPoolProvider;
 import io.github.mmm.orm.connection.DbConnectionPoolProviderManager;
+import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
 import io.github.mmm.orm.dialect.DbDialectProvider;
 import io.github.mmm.orm.source.DbSource;
@@ -26,8 +27,6 @@ import io.github.mmm.orm.source.DbSource;
 public final class DbConnectionDataManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(DbConnectionDataManager.class);
-
-  private static final String PROPERTY_PREFIX_DB = "db.";
 
   /** The singleton instance. */
   public static final DbConnectionDataManager INSTANCE = new DbConnectionDataManager();
@@ -61,10 +60,11 @@ public final class DbConnectionDataManager {
 
   private DbConnectionDataImpl create(DbSource source) {
 
-    MetaInfo config = MetaInfo.config().with(PROPERTY_PREFIX_DB + source.getId() + ".");
+    MetaInfo config = MetaInfo.config().with(source.getPropertyPrefix());
     Map<String, String> map = config.asMap();
     config = MetaInfo.empty().with(map);
-    DbDialect dialect = getDialect(map, source);
+    AbstractDbDialect<?> dialect = getDialect(map, source);
+    dialect.autoConfigure(map, source);
     DbConnectionPool<?> pool = createPool(config, source, dialect, map);
     return new DbConnectionDataImpl(source, dialect, config, pool);
   }
@@ -82,8 +82,8 @@ public final class DbConnectionDataManager {
             provider = currentProvider;
           } else {
             LOG.warn(
-                "Connection pool provider is ambiguous: already found {} but also found {}. Please specify property db.{}.pool explicitly.",
-                provider.getId(), currentProvider.getId(), source.getId());
+                "Connection pool provider is ambiguous: already found {} but also found {}. Please specify property {} explicitly.",
+                provider.getId(), currentProvider.getId(), source.getPropertyKey(DbSource.KEY_POOL));
           }
         }
       }
@@ -99,31 +99,32 @@ public final class DbConnectionDataManager {
     return provider.create(source, config, dialect);
   }
 
-  private DbDialect getDialect(Map<String, String> config, DbSource source) {
+  private AbstractDbDialect<?> getDialect(Map<String, String> config, DbSource source) {
 
     DbDialectProvider provider = DbDialectProvider.get();
-    String dialectId = config.get(DbSource.KEY_DIALECT);
-    if (dialectId != null) {
-      return provider.get(dialectId);
-    }
-    String url = config.get(DbSource.KEY_URL);
     DbDialect dialect = null;
-    if (url == null) {
-      for (DbDialect d : provider) {
-        if (dialect != null) {
-          dialect = null;
-          break; // force ObjectNotFoundException because dialect is ambiguous (multiple dialects present)
+    String dialectId = config.get(DbSource.KEY_DIALECT);
+    if (dialectId == null) {
+      String url = config.get(DbSource.KEY_URL);
+      if (url == null) {
+        for (DbDialect d : provider) {
+          if (dialect != null) {
+            dialect = null;
+            break; // force ObjectNotFoundException because dialect is ambiguous (multiple dialects present)
+          }
+          dialect = d;
         }
-        dialect = d;
+      } else {
+        dialect = provider.getByDbUrl(url);
       }
+      if (dialect == null) {
+        throw new ObjectNotFoundException("Property", source.getPropertyKey(DbSource.KEY_DIALECT));
+      }
+      config.put(DbSource.KEY_DIALECT, dialect.getId());
     } else {
-      dialect = provider.getByDbUrl(url);
+      dialect = provider.get(dialectId);
     }
-    if (dialect == null) {
-      throw new ObjectNotFoundException("Property", PROPERTY_PREFIX_DB + source.getId() + ".dialect");
-    }
-    config.put(DbSource.KEY_DIALECT, dialect.getId());
-    return dialect;
+    return (AbstractDbDialect<?>) dialect;
   }
 
 }
