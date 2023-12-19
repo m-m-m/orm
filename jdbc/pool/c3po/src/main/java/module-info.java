@@ -16,6 +16,8 @@ module io.github.mmm.orm.jdbc.pool.hikari {
 
   requires c3p0;
 
+  requires java.naming;
+
   provides io.github.mmm.orm.connection.DbConnectionPoolProvider
       with io.github.mmm.orm.jdbc.pool.c3po.C3poConnectionPoolProvider;
 
