@@ -9,6 +9,8 @@ module io.github.mmm.orm.db.mariadb.jdbc {
 
   requires io.github.mmm.orm.db.mariadb.dialect;
 
+  requires io.github.mmm.orm.jdbc;
+
   requires org.mariadb.jdbc;
 
 }

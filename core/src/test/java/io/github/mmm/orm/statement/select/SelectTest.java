@@ -11,10 +11,6 @@ import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
 import io.github.mmm.orm.statement.Result;
 import io.github.mmm.orm.statement.Song;
-import io.github.mmm.orm.statement.select.Select;
-import io.github.mmm.orm.statement.select.SelectEntity;
-import io.github.mmm.orm.statement.select.SelectProjection;
-import io.github.mmm.orm.statement.select.SelectStatement;
 import io.github.mmm.property.criteria.CriteriaFormatter;
 
 /**
@@ -28,17 +24,12 @@ public class SelectTest extends DbStatementTest {
 
     // given
     Person p = Person.of();
-    String json = "{\"select\":{}," //
-        + "\"from\":{\"entity\":\"Person\",\"as\":\"p\"}," //
-        + "\"where\":{\"and\":[{\"op\":\">=\",\"args\":[{\"path\":\"p.Age\"},18]},"
-        + "{\"op\":\"OR\",\"args\":[{\"op\":\"LIKE\",\"args\":[{\"path\":\"p.Name\"},\"John*\"]},{\"op\":\"=\",\"args\":[{\"path\":\"p.Single\"},true]}]}]}," //
-        + "\"orderBy\":{\"o\":[{\"path\":\"p.Name\",\"order\":\"ASC\"}]}}";
     String sql = "SELECT p FROM Person p WHERE p.Age >= 18 AND (p.Name LIKE 'John%' OR p.Single = TRUE) ORDER BY p.Name ASC";
     // when
     SelectStatement<Person> query = new SelectEntity<>(p).from().as("p")
         .where(p.Age().ge(18).and(p.Name().like("John*").or(p.Single().eq(true)))).orderBy(p.Name().asc()).get();
     // then
-    check(query, sql, json);
+    check(query, sql, '"' + sql + '"');
     // and when
     DbStatementFormatter sqlFormatter = new DbStatementFormatter(
         CriteriaFormatter.of(new CriteriaParametersNamed(true))) {
@@ -89,14 +80,6 @@ public class SelectTest extends DbStatementTest {
   public void testSelectComplex() {
 
     // given
-    String json = "{\"select\":{\"result\":\"Result\",\"sel\":[" //
-        + "{\"pp\":\"song.Genre\",\"as\":\"Genre\"}," //
-        + "{\"pe\":{\"op\":\"COUNT\",\"args\":[{\"path\":\"song.Id\"}]},\"as\":\"Count\"}," //
-        + "{\"pe\":{\"op\":\"AVG\",\"args\":[{\"path\":\"song.Duration\"}]},\"as\":\"Duration\"}]}," //
-        + "\"from\":{\"entity\":\"Song\",\"as\":\"song\",\"and\":[{\"entity\":\"Person\",\"as\":\"p\"}]}," //
-        + "\"where\":{\"and\":[{\"op\":\"=\",\"args\":[{\"path\":\"song.Composer\"},{\"path\":\"p.Id\"}]},"
-        + "{\"op\":\"<=\",\"args\":[{\"path\":\"song.Duration\"},10800]}]},\"groupBy\":{\"p\":[\"song.Genre\"]}," //
-        + "\"orderBy\":{\"o\":[{\"path\":\"song.Genre\",\"order\":\"ASC\"}]}}";
     Person p = Person.of();
     Song s = Song.of();
     Result r = Result.of();
@@ -108,7 +91,7 @@ public class SelectTest extends DbStatementTest {
         .where(s.Composer().eq(p.Id()).and(s.Duration().le(3 * 60 * 60L))) //
         .groupBy(s.Genre()).orderBy(s.Genre().asc()).get();
     // then
-    check(query, sql, json);
+    check(query, sql, '"' + sql + '"');
   }
 
   /** Test creation of {@link SelectStatement} and verifying resulting pseudo-SQL. */

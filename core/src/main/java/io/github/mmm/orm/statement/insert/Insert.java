@@ -14,7 +14,7 @@ import io.github.mmm.orm.statement.StartClause;
 public final class Insert extends AbstractDbClause implements StartClause {
 
   /** Name of {@link Insert} for marshaling. */
-  public static final String NAME_INSERT = "insert";
+  public static final String NAME_INSERT = "INSERT";
 
   /**
    * The constructor.
@@ -34,9 +34,4 @@ public final class Insert extends AbstractDbClause implements StartClause {
     return new InsertInto<>(this, entity);
   }
 
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_INSERT;
-  }
 }

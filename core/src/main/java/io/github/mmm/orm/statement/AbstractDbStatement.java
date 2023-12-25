@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.github.mmm.marshall.AbstractMarshallingObject;
+import io.github.mmm.marshall.MarshallingConfig;
 import io.github.mmm.marshall.StructuredReader;
 import io.github.mmm.marshall.StructuredWriter;
-import io.github.mmm.marshall.id.StructuredIdMapping;
 
 /**
  * Abstract base implementation of an SQL {@link DbStatement} that may be executed to the database.
@@ -17,7 +16,7 @@ import io.github.mmm.marshall.id.StructuredIdMapping;
  * @param <E> type of the {@link AbstractEntityClause#getEntity() entity}.
  * @since 1.0.0
  */
-public abstract class AbstractDbStatement<E> extends AbstractMarshallingObject implements DbStatement<E> {
+public abstract class AbstractDbStatement<E> implements DbStatement<E> {
 
   private List<AbstractDbClause> clauses;
 
@@ -39,47 +38,23 @@ public abstract class AbstractDbStatement<E> extends AbstractMarshallingObject i
   protected abstract void addClauses(List<AbstractDbClause> list);
 
   @Override
-  protected void writeProperties(StructuredWriter writer) {
+  public void write(StructuredWriter writer) {
 
-    getClauses(); // lazy init
-    for (AbstractDbClause clause : this.clauses) {
-      if (!clause.isOmit()) {
-        String name = clause.getMarshallingName();
-        writer.writeName(name);
-        clause.write(writer);
-      }
-    }
+    String indendation = writer.getFormat().getConfig().get(MarshallingConfig.VAR_INDENTATION);
+    DbStatementFormatter formatter = new DbStatementFormatter(indendation);
+    writer.writeValueAsString(formatter.onStatement(this).toString());
   }
 
   @Override
-  protected void readProperty(StructuredReader reader, String name) {
+  public DbStatement<?> read(StructuredReader reader) {
 
-    getClauses(); // lazy init
-    for (AbstractDbClause clause : this.clauses) {
-      String clauseName = clause.getMarshallingName();
-      if (reader.isNameMatching(name, clauseName)) {
-        clause.read(reader);
-        return;
-      }
-    }
-    reader.skipValue();
+    return DbStatementMarshalling.read(reader);
   }
 
   /**
    * @return the {@link AliasMap} of this statement.
    */
   protected abstract AliasMap getAliasMap();
-
-  @Override
-  public StructuredIdMapping defineIdMapping() {
-
-    String[] names = new String[getClauses().size()];
-    int i = 0;
-    for (AbstractDbClause clause : this.clauses) {
-      names[i++] = clause.getMarshallingName();
-    }
-    return StructuredIdMapping.of(names);
-  }
 
   @Override
   public String toString() {

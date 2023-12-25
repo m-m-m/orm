@@ -1,9 +1,11 @@
 /* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0 */
-package io.github.mmm.orm.orm;
+package io.github.mmm.orm.mapping;
 
 import io.github.mmm.bean.WritableBean;
+import io.github.mmm.orm.naming.DbNamingStrategy;
 import io.github.mmm.orm.result.DbResult;
+import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.ProjectionProperty;
 import io.github.mmm.value.converter.AtomicTypeMapper;
@@ -32,7 +34,7 @@ public interface Orm {
    * @return the {@link AtomicTypeMapper} to map from the {@link WritableBean} to {@link DbResult} and vice-versa.
    */
   <B extends WritableBean> DbBeanMapper<B> createBeanMapping(B bean,
-      Iterable<? extends WritableProperty<?>> properties);
+      Iterable<? extends ReadableProperty<?>> properties);
 
   /**
    * @param <B> type of the {@link WritableBean} to map.
@@ -42,5 +44,10 @@ public interface Orm {
    */
   <B extends WritableBean> DbBeanMapper<B> createBeanMappingProjection(B bean,
       Iterable<? extends ProjectionProperty<?>> properties);
+
+  /**
+   * @return the {@link DbNamingStrategy}.
+   */
+  DbNamingStrategy getNamingStrategy();
 
 }

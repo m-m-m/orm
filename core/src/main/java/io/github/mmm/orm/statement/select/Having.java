@@ -14,7 +14,7 @@ import io.github.mmm.orm.statement.PredicateClause;
 public class Having<R> extends PredicateClause<R, Having<R>> implements ClauseWithOrderBy<R> {
 
   /** Name of {@link Having} for marshaling. */
-  public static final String NAME_HAVING = "having";
+  public static final String NAME_HAVING = "HAVING";
 
   private final SelectStatement<R> statement;
 
@@ -27,12 +27,6 @@ public class Having<R> extends PredicateClause<R, Having<R>> implements ClauseWi
 
     super();
     this.statement = statement;
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_HAVING;
   }
 
   @Override

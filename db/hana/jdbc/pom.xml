@@ -18,6 +18,10 @@
       <artifactId>mmm-orm-db-hana-dialect</artifactId>
     </dependency>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mmm-orm-jdbc</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.sap.cloud.db.jdbc</groupId>
       <artifactId>ngdbc</artifactId>
       <version>2.18.16</version>

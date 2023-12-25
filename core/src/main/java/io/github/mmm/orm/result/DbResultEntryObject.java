@@ -2,6 +2,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.result;
 
+import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.criteria.CriteriaExpression;
 import io.github.mmm.value.CriteriaObject;
 import io.github.mmm.value.PropertyPath;
@@ -69,8 +71,14 @@ public class DbResultEntryObject<V> implements DbResultEntry<V> {
 
   private static void computeDbName(CriteriaObject<?> selection, StringBuilder sb) {
 
-    if (selection instanceof PropertyPath) {
-      sb.append(((PropertyPath<?>) selection).getName());
+    if (selection instanceof ReadableProperty<?> p) {
+      String column = p.getMetadata().getMetaInfo().get(EntityBean.META_KEY_COLUMN);
+      if (column == null) {
+        column = toDbName(p.getName());
+      }
+      sb.append(column);
+    } else if (selection instanceof PropertyPath<?> pp) {
+      sb.append(toDbName(pp.getName()));
     } else if (selection instanceof CriteriaExpression) {
       CriteriaExpression<?> expression = (CriteriaExpression<?>) selection;
       String op = expression.getOperator().getName();
@@ -94,6 +102,12 @@ public class DbResultEntryObject<V> implements DbResultEntry<V> {
     } else {
       sb.append(selection.toString());
     }
+  }
+
+  private static String toDbName(String javaName) {
+
+    // TODO use naming strategy, therefore non static, refactor all
+    return javaName;
   }
 
   @Override

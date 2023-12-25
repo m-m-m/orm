@@ -7,8 +7,8 @@ import java.util.Map;
 import io.github.mmm.base.exception.ObjectNotFoundException;
 import io.github.mmm.entity.bean.typemapping.TypeMapping;
 import io.github.mmm.orm.impl.OrmImpl;
+import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.naming.DbNamingStrategy;
-import io.github.mmm.orm.orm.Orm;
 import io.github.mmm.orm.source.DbSource;
 
 /**

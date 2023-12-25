@@ -14,7 +14,7 @@ import io.github.mmm.orm.statement.StartClause;
 public final class Delete extends AbstractDbClause implements StartClause {
 
   /** Name of {@link Delete} for marshaling. */
-  public static final String NAME_DELETE = "delete";
+  public static final String NAME_DELETE = "DELETE";
 
   /**
    * The constructor.
@@ -32,12 +32,6 @@ public final class Delete extends AbstractDbClause implements StartClause {
   public <E extends EntityBean> DeleteFrom<E> from(E entity) {
 
     return new DeleteFrom<>(this, entity);
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_DELETE;
   }
 
 }

@@ -2,8 +2,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.db.mysql.dialect;
 
+import io.github.mmm.orm.ddl.constraint.DbConstraint;
+import io.github.mmm.orm.ddl.operation.TableOperationType;
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
-import io.github.mmm.orm.orm.Orm;
 import io.github.mmm.property.criteria.CriteriaFormatter;
 
 /**
@@ -16,22 +17,43 @@ public class MySqlFormatter extends DbDialectStatementFormatter {
   /**
    * The constructor.
    *
-   * @param orm the {@link Orm}.
+   * @param dialect the {@link MySqlDialect}.
    */
-  public MySqlFormatter(Orm orm) {
+  public MySqlFormatter(MySqlDialect dialect) {
 
-    super(orm);
+    super(dialect);
   }
 
   /**
    * The constructor.
    *
-   * @param orm the {@link Orm}.
+   * @param dialect the {@link MySqlDialect}.
    * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to database syntax (SQL).
+   * @param indentation the {@link #getIndentation() indentation}.
    */
-  public MySqlFormatter(Orm orm, CriteriaFormatter criteriaFormatter) {
+  public MySqlFormatter(MySqlDialect dialect, CriteriaFormatter criteriaFormatter, String indentation) {
 
-    super(orm, criteriaFormatter);
+    super(dialect, criteriaFormatter, indentation);
+  }
+
+  @Override
+  protected void writeConstraintKeywordWithName(TableOperationType type, DbConstraint constraint) {
+
+    if (type == TableOperationType.DROP) {
+      write("INDEX ");
+    } else {
+      super.writeConstraintKeywordWithName(type, constraint);
+    }
+  }
+
+  @Override
+  protected void writeAlterTableColumn(TableOperationType type) {
+
+    if (type == TableOperationType.MODIFY) {
+      write("COLUMN ");
+    } else {
+      super.writeAlterTableColumn(type);
+    }
   }
 
 }

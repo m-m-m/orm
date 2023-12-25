@@ -24,7 +24,7 @@ import io.github.mmm.orm.type.DbTypeZonedDateTime;
 import io.github.mmm.orm.typemapping.DbTypeMapping;
 
 /**
- * {@link DbTypeMapping} for <a href="https://www.postgresql.org/docs/9.5/datatype.html">PostgreSQL</a>.
+ * {@link DbTypeMapping} for SQLite.
  *
  * @since 1.0.0
  */

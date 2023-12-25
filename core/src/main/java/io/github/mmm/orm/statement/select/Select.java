@@ -4,18 +4,13 @@ package io.github.mmm.orm.statement.select;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.marshall.StructuredReader;
-import io.github.mmm.marshall.StructuredState;
-import io.github.mmm.marshall.StructuredWriter;
 import io.github.mmm.orm.statement.AbstractDbClause;
-import io.github.mmm.orm.statement.DbStatementMarshalling;
 import io.github.mmm.orm.statement.StartClause;
 import io.github.mmm.property.criteria.CriteriaExpression;
-import io.github.mmm.property.criteria.CriteriaMarshalling;
 import io.github.mmm.value.CriteriaObject;
 import io.github.mmm.value.PropertyPath;
 
@@ -26,11 +21,12 @@ import io.github.mmm.value.PropertyPath;
  * {@link Select} to start your query (typing {@code Select.} and starting code completion). However, you are still free
  * to use regular instantiation like for other statements (typing {@code new Select} and starting code completion).
  *
- * <b>ATTENTION:</b> Please note that after {@link DbStatementMarshalling#readObject(StructuredReader) unmarshalling} or
- * parsing a {@link SelectStatement} the {@link SelectStatement#getSelect() select} clause may not be of any of the
- * expected sub-classes such as {@link SelectEntity}, {@link SelectSingle}, {@link SelectResult}, or
- * {@link SelectProjection}. Use {@code isSelect*} methods like {@link #isSelectEntity()} to determine the actual
- * selection type.
+ * <b>ATTENTION:</b> Please note that after
+ * {@link io.github.mmm.orm.statement.DbStatementMarshalling#readObject(StructuredReader) unmarshalling} or
+ * {@link io.github.mmm.orm.statement.DbStatementParser#parse(String) parsing} a {@link SelectStatement} the
+ * {@link SelectStatement#getSelect() select} clause may not be of any of the expected sub-classes such as
+ * {@link SelectEntity}, {@link SelectSingle}, {@link SelectResult}, or {@link SelectProjection}. Use {@code isSelect*}
+ * methods like {@link #isSelectEntity()} to determine the actual selection type.
  *
  * @param <R> type of the result of the selection.
  * @since 1.0.0
@@ -38,10 +34,10 @@ import io.github.mmm.value.PropertyPath;
 public abstract class Select<R> extends AbstractDbClause implements StartClause {
 
   /** Name of {@link Select} for marshaling. */
-  public static final String NAME_SELECT = "select";
+  public static final String NAME_SELECT = "SELECT";
 
   /** Name of property {@link #isDistinct()} for marshaling. */
-  public static final String NAME_DISTINCT = "distinct";
+  public static final String NAME_DISTINCT = "DISTINCT";
 
   /** Name of property {@link #getResultName()} for marshaling. */
   public static final String NAME_RESULT = "result";
@@ -78,12 +74,6 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
     super();
     this.selections = new ArrayList<>();
     setResultBean(resultBean);
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_SELECT;
   }
 
   /**
@@ -254,56 +244,6 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
   protected <E extends EntityBean> SelectFrom<R, E> from(E entity) {
 
     return new SelectFrom<>(this, entity);
-  }
-
-  @Override
-  protected void writeProperties(StructuredWriter writer) {
-
-    if (!Objects.equals(VALUE_RESULT_ENTITY, this.resultName)) {
-      writer.writeName(NAME_RESULT);
-      if (isSelectEntity()) {
-        writer.writeValueAsString(VALUE_RESULT_ENTITY);
-      } else if (isSelectSingle()) {
-        writer.writeValueAsString(VALUE_RESULT_SINLGE);
-      } else if (isSelectResult()) {
-        writer.writeValueAsString(VALUE_RESULT_RESULT);
-      } else {
-        writer.writeValueAsString(this.resultName);
-      }
-    }
-    if (isDistinct()) {
-      writer.writeName(NAME_DISTINCT);
-      writer.writeValueAsBoolean(Boolean.TRUE);
-    }
-    if (!this.selections.isEmpty()) {
-      writer.writeName(NAME_SELECTIONS);
-      writer.writeStartArray();
-      CriteriaMarshalling marshalling = CriteriaMarshalling.get();
-      for (CriteriaObject<?> selection : this.selections) {
-        marshalling.writeArg(writer, selection);
-      }
-      writer.writeEnd();
-    }
-    super.writeProperties(writer);
-  }
-
-  @Override
-  protected void readProperty(StructuredReader reader, String name) {
-
-    if (reader.isNameMatching(name, NAME_DISTINCT)) {
-      this.distinct = Boolean.TRUE.equals(reader.readValueAsBoolean());
-    } else if (reader.isNameMatching(name, NAME_RESULT)) {
-      this.resultName = reader.readValueAsString();
-    } else if (reader.isNameMatching(name, NAME_SELECTIONS)) {
-      reader.require(StructuredState.START_ARRAY, true);
-      CriteriaMarshalling marshalling = CriteriaMarshalling.get();
-      while (!reader.readEnd()) {
-        CriteriaObject<?> selection = marshalling.readArg(reader);
-        add(selection);
-      }
-    } else {
-      super.readProperty(reader, name);
-    }
   }
 
   /**

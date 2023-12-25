@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
-import io.github.mmm.orm.statement.delete.Delete;
-import io.github.mmm.orm.statement.delete.DeleteStatement;
 
 /**
  * Test of {@link Delete} and {@link DeleteStatement}.

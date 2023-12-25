@@ -39,6 +39,13 @@ public interface DbMetaData {
   DbTable getTable(DbQualifiedName name);
 
   /**
+   * @param name the {@link DbTable#getQualifiedName() qualified table name}.
+   * @return the {@link DbTable} with the given {@link DbTable#getQualifiedName() name} or {@code null} if no such table
+   *         exists.
+   */
+  DbTable getTable(DbName name);
+
+  /**
    * @param tableData the {@link DbTableData} (from {@link #getTables(String, String, String)}).
    * @return the {@link DbTable} populated with additional information.
    */

@@ -2,8 +2,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.db.sqlserver.dialect;
 
+import io.github.mmm.orm.ddl.operation.TableOperationType;
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
-import io.github.mmm.orm.orm.Orm;
 import io.github.mmm.property.criteria.CriteriaFormatter;
 
 /**
@@ -16,22 +16,33 @@ public class SqlServerFormatter extends DbDialectStatementFormatter {
   /**
    * The constructor.
    *
-   * @param orm the {@link Orm}.
-   * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to database syntax (SQL).
+   * @param dialect the {@link SqlServerDialect}.
    */
-  public SqlServerFormatter(Orm orm, CriteriaFormatter criteriaFormatter) {
+  public SqlServerFormatter(SqlServerDialect dialect) {
 
-    super(orm, criteriaFormatter);
+    super(dialect);
   }
 
   /**
    * The constructor.
    *
-   * @param orm the {@link Orm}.
+   * @param dialect the {@link SqlServerDialect}.
+   * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to database syntax (SQL).
+   * @param indentation the {@link #getIndentation() indentation}.
    */
-  public SqlServerFormatter(Orm orm) {
+  public SqlServerFormatter(SqlServerDialect dialect, CriteriaFormatter criteriaFormatter, String indentation) {
 
-    super(orm);
+    super(dialect, criteriaFormatter, indentation);
+  }
+
+  @Override
+  protected void writeAlterTableOperationType(TableOperationType type) {
+
+    if (type == TableOperationType.MODIFY) {
+      write("ALTER");
+    } else {
+      super.writeAlterTableOperationType(type);
+    }
   }
 
 }

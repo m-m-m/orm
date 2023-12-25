@@ -14,7 +14,7 @@ import io.github.mmm.orm.statement.PropertyClause;
 public class GroupBy<R> extends PropertyClause<R, GroupBy<R>> implements ClauseWithHaving<R>, ClauseWithOrderBy<R> {
 
   /** Name of {@link GroupBy} for marshaling. */
-  public static final String NAME_GROUP_BY = "groupBy";
+  public static final String NAME_GROUP_BY = "GROUP BY";
 
   /** @see #get() */
   private final SelectStatement<R> statement;
@@ -28,12 +28,6 @@ public class GroupBy<R> extends PropertyClause<R, GroupBy<R>> implements ClauseW
 
     super();
     this.statement = statement;
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_GROUP_BY;
   }
 
   @Override

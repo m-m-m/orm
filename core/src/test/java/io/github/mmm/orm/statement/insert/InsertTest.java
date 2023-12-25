@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import io.github.mmm.entity.id.LongId;
 import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
-import io.github.mmm.orm.statement.insert.Insert;
-import io.github.mmm.orm.statement.insert.InsertStatement;
 
 /**
  * Test of {@link Insert} and {@link InsertStatement}.

@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Objects;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.marshall.StructuredReader;
-import io.github.mmm.marshall.StructuredState;
-import io.github.mmm.marshall.StructuredWriter;
 
 /**
  * A {@link AbstractEntitiesClause} is a {@link DbClause} of an SQL {@link DbStatement} that specifies the
@@ -100,36 +97,6 @@ public abstract class AbstractEntitiesClause<R, E extends EntityBean, SELF exten
   public List<EntitySubClause<?, ?>> getAdditionalEntities() {
 
     return this.additionalEntities;
-  }
-
-  @Override
-  protected void writeProperties(StructuredWriter writer) {
-
-    super.writeProperties(writer);
-    if (!this.additionalEntities.isEmpty()) {
-      writer.writeName(NAME_ADDITIONAL_ENTITIES);
-      writer.writeStartArray();
-      for (EntitySubClause<?, ?> additionalEntity : this.additionalEntities) {
-        additionalEntity.write(writer);
-      }
-      writer.writeEnd();
-    }
-  }
-
-  @SuppressWarnings("rawtypes")
-  @Override
-  protected void readProperty(StructuredReader reader, String name) {
-
-    if (reader.isNameMatching(name, NAME_ADDITIONAL_ENTITIES)) {
-      reader.require(StructuredState.START_ARRAY, true);
-      while (!reader.readEnd()) {
-        EntitySubClause additionalEntity = new EntitySubClause<>(getAliasMap(), null);
-        additionalEntity.read(reader);
-        this.additionalEntities.add(additionalEntity);
-      }
-    } else {
-      super.readProperty(reader, name);
-    }
   }
 
 }

@@ -13,7 +13,7 @@ import io.github.mmm.orm.statement.StartClause;
 public final class Upsert extends AbstractDbClause implements StartClause {
 
   /** Name of {@link Upsert} for marshaling. */
-  public static final String NAME_UPSERT = "upsert";
+  public static final String NAME_UPSERT = "UPSERT";
 
   /**
    * The constructor.
@@ -23,9 +23,4 @@ public final class Upsert extends AbstractDbClause implements StartClause {
     super();
   }
 
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_UPSERT;
-  }
 }

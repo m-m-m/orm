@@ -21,9 +21,6 @@ import io.github.mmm.value.PropertyPath;
 public abstract class IntoClause<E extends EntityBean, SELF extends IntoClause<E, SELF>>
     extends AbstractEntityClause<E, E, SELF> {
 
-  /** Name of {@link IntoClause} for marshaling. */
-  public static final String NAME_INTO = "into";
-
   /**
    * The constructor.
    *
@@ -34,12 +31,6 @@ public abstract class IntoClause<E extends EntityBean, SELF extends IntoClause<E
   protected IntoClause(AliasMap aliasMap, E entity, String entityName) {
 
     super(aliasMap, entity, entityName);
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_INTO;
   }
 
   /**

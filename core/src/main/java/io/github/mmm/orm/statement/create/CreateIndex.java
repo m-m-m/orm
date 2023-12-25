@@ -17,7 +17,7 @@ import io.github.mmm.orm.statement.delete.DeleteStatement;
 public class CreateIndex extends AbstractDbClause implements StartClause {
 
   /** Name of {@link CreateIndex} for marshaling. */
-  public static final String NAME_CREATE_INDEX = "createIndex";
+  public static final String NAME_CREATE_INDEX = "CREATE INDEX";
 
   private String name;
 
@@ -46,12 +46,6 @@ public class CreateIndex extends AbstractDbClause implements StartClause {
   public void setName(String name) {
 
     this.name = name;
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_CREATE_INDEX;
   }
 
   /**

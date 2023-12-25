@@ -11,10 +11,8 @@ import io.github.mmm.entity.bean.EntityBean;
  * @param <SELF> type of this class itself.
  * @since 1.0.0
  */
-public abstract class WhereClause<E, SELF extends WhereClause<E, SELF>> extends PredicateClause<E, SELF> implements MainDbClause<E> {
-
-  /** Name of {@link WhereClause} for marshaling. */
-  public static final String NAME_WHERE = "where";
+public abstract class WhereClause<E, SELF extends WhereClause<E, SELF>> extends PredicateClause<E, SELF>
+    implements MainDbClause<E> {
 
   /**
    * The constructor.
@@ -22,12 +20,6 @@ public abstract class WhereClause<E, SELF extends WhereClause<E, SELF>> extends 
   public WhereClause() {
 
     super();
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_WHERE;
   }
 
 }

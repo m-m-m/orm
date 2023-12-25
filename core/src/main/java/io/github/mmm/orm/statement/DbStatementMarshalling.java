@@ -3,7 +3,6 @@
 package io.github.mmm.orm.statement;
 
 import io.github.mmm.marshall.Marshalling;
-import io.github.mmm.marshall.StructuredState;
 import io.github.mmm.marshall.StructuredReader;
 import io.github.mmm.marshall.StructuredWriter;
 import io.github.mmm.orm.impl.GenericSelect;
@@ -41,22 +40,20 @@ public class DbStatementMarshalling implements Marshalling<DbStatement<?>> {
       writer.writeValueAsNull();
       return;
     }
-    statement.write(writer);
+    writer.writeValueAsString(statement.toString());
   }
 
   @Override
   public DbStatement<?> readObject(StructuredReader reader) {
 
-    reader.require(StructuredState.START_OBJECT, true);
-    AbstractDbStatement<?> statement = null;
-    while (!reader.readEnd()) {
-      String name = reader.readName();
-      if (statement == null) {
-        statement = createStatement(name);
-      }
-      statement.readProperty(reader, name);
-    }
-    return statement;
+    return read(reader);
+  }
+
+  static DbStatement<?> read(StructuredReader reader) {
+
+    DbStatementParser parser = DbStatementParser.get();
+    String statementString = reader.readValueAsString();
+    return parser.parse(statementString);
   }
 
   /**

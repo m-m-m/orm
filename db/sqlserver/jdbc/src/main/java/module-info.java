@@ -9,5 +9,7 @@ module io.github.mmm.orm.db.sqlserver.jdbc {
 
   requires io.github.mmm.orm.db.sqlserver.dialect;
 
+  requires io.github.mmm.orm.jdbc;
+
   requires com.microsoft.sqlserver.jdbc;
 }

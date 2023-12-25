@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.marshall.StructuredReader;
-import io.github.mmm.marshall.StructuredWriter;
 
 /**
  * A {@link AbstractEntityClause} is a {@link DbClause} of an SQL {@link DbStatement} that specifies the
@@ -133,30 +131,6 @@ public abstract class AbstractEntityClause<R, E extends EntityBean, SELF extends
     }
     if (this.entity != null) {
       this.entity.pathSegment(entityAlias);
-    }
-  }
-
-  @Override
-  protected void writeProperties(StructuredWriter writer) {
-
-    writer.writeName(NAME_ENTITY);
-    writer.writeValueAsString(this.entityName);
-    if (this.alias != null) {
-      writer.writeName(NAME_ALIAS);
-      writer.writeValueAsString(this.alias);
-    }
-    super.writeProperties(writer);
-  }
-
-  @Override
-  protected void readProperty(StructuredReader reader, String name) {
-
-    if (reader.isNameMatching(name, NAME_ENTITY)) {
-      this.entityName = reader.readValueAsString();
-    } else if (reader.isNameMatching(name, NAME_ALIAS)) {
-      this.alias = reader.readValueAsString();
-    } else {
-      super.readProperty(reader, name);
     }
   }
 

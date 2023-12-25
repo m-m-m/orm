@@ -5,6 +5,8 @@ package io.github.mmm.orm.naming;
 import io.github.mmm.base.text.CaseSyntax;
 import io.github.mmm.bean.BeanType;
 import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.orm.statement.AbstractEntityClause;
+import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 
 /**
@@ -17,10 +19,10 @@ import io.github.mmm.property.WritableProperty;
 public interface DbNamingStrategy {
 
   /**
-   * @param property the {@link WritableProperty} to derive the column name from.
-   * @return the column name for the given {@link WritableProperty property}.
+   * @param property the {@link ReadableProperty} to derive the column name from.
+   * @return the column name for the given {@link ReadableProperty property}.
    */
-  default String getColumnName(WritableProperty<?> property) {
+  default String getColumnName(ReadableProperty<?> property) {
 
     String columnName = property.getMetadata().getMetaInfo().get(EntityBean.META_KEY_COLUMN);
     if (columnName == null) {
@@ -51,6 +53,19 @@ public interface DbNamingStrategy {
       tableName = getTableName(type.getSimpleName());
     }
     return tableName;
+  }
+
+  /**
+   * @param entityClause the {@link AbstractEntityClause}.
+   * @return the physical table name.
+   */
+  default String getTableName(AbstractEntityClause<?, ?, ?> entityClause) {
+
+    EntityBean entity = entityClause.getEntity();
+    if (entity != null) {
+      return getTableName(entity);
+    }
+    return entityClause.getEntityName();
   }
 
   /**

@@ -8,9 +8,6 @@ import io.github.mmm.entity.id.LongId;
 import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
 import io.github.mmm.orm.statement.Song;
-import io.github.mmm.orm.statement.update.Update;
-import io.github.mmm.orm.statement.update.UpdateStatement;
-import io.github.mmm.orm.statement.update.UpdateWhere;
 
 /**
  * Test of {@link Update} and {@link UpdateStatement}.

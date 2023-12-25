@@ -23,17 +23,21 @@ module io.github.mmm.orm {
 
   exports io.github.mmm.orm.access;
 
-  exports io.github.mmm.orm.constraint;
+  exports io.github.mmm.orm.ddl;
+
+  exports io.github.mmm.orm.ddl.constraint;
+
+  exports io.github.mmm.orm.ddl.operation;
 
   exports io.github.mmm.orm.dialect;
+
+  exports io.github.mmm.orm.mapping;
 
   exports io.github.mmm.orm.metadata;
 
   exports io.github.mmm.orm.metadata.impl to io.github.mmm.orm.jdbc;
 
   exports io.github.mmm.orm.naming;
-
-  exports io.github.mmm.orm.orm;
 
   exports io.github.mmm.orm.param;
 

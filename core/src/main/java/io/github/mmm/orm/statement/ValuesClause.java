@@ -11,10 +11,8 @@ import io.github.mmm.entity.bean.EntityBean;
  * @param <SELF> type of this class itself.
  * @since 1.0.0
  */
-public abstract class ValuesClause<E extends EntityBean, SELF extends ValuesClause<E, SELF>> extends AssignmentClause<E, SELF> {
-
-  /** Name of {@link ValuesClause} for marshaling. */
-  public static final String NAME_VALUES = "values";
+public abstract class ValuesClause<E extends EntityBean, SELF extends ValuesClause<E, SELF>>
+    extends AssignmentClause<E, SELF> {
 
   /**
    * The constructor.
@@ -22,12 +20,6 @@ public abstract class ValuesClause<E extends EntityBean, SELF extends ValuesClau
   public ValuesClause() {
 
     super();
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_VALUES;
   }
 
 }

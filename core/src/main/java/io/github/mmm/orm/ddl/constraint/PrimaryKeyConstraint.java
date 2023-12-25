@@ -1,9 +1,8 @@
 /* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0 */
-package io.github.mmm.orm.constraint;
+package io.github.mmm.orm.ddl.constraint;
 
-import io.github.mmm.property.ReadableProperty;
-import io.github.mmm.value.PropertyPath;
+import io.github.mmm.orm.ddl.DbColumnSpec;
 
 /**
  * Foreign key {@link DbConstraint} uniquely identifying a different {@link io.github.mmm.entity.bean.EntityBean entity}
@@ -22,28 +21,40 @@ public final class PrimaryKeyConstraint extends DbConstraint {
   /**
    * The constructor.
    *
-   * @param name the {@link #getName() name}.
-   * @param column the (first) {@link #getColumns() column}.
+   * @param column the {@link DbColumnSpec column}.
    */
-  public PrimaryKeyConstraint(String name, PropertyPath<?> column) {
+  public PrimaryKeyConstraint(DbColumnSpec column) {
 
-    super(name, column);
+    this(null, column);
   }
 
   /**
    * The constructor.
    *
-   * @param column the (first) {@link #getColumns() column}.
+   * @param name the {@link #getName() name}.
+   * @param column the {@link DbColumnSpec column}.
    */
-  public PrimaryKeyConstraint(ReadableProperty<?> column) {
+  public PrimaryKeyConstraint(String name, DbColumnSpec column) {
 
-    super(createName(PREFIX, column, false), column);
+    super(name, column);
+  }
+
+  @Override
+  public String getNamePrefix() {
+
+    return PREFIX;
   }
 
   @Override
   public String getType() {
 
     return TYPE;
+  }
+
+  @Override
+  protected boolean isAddColumnToName() {
+
+    return false;
   }
 
 }

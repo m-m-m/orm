@@ -4,12 +4,9 @@ package io.github.mmm.orm.statement;
 
 import org.assertj.core.api.Assertions;
 
-import io.github.mmm.marshall.StandardFormat;
 import io.github.mmm.marshall.MarshallingConfig;
+import io.github.mmm.marshall.StandardFormat;
 import io.github.mmm.marshall.StructuredTextFormat;
-import io.github.mmm.orm.statement.DbStatement;
-import io.github.mmm.orm.statement.DbStatementMarshalling;
-import io.github.mmm.orm.statement.DbStatementParser;
 
 /**
  * Abstract base class for tests of {@link DbStatement}s.

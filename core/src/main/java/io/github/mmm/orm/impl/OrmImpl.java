@@ -6,14 +6,15 @@ import io.github.mmm.bean.WritableBean;
 import io.github.mmm.entity.bean.typemapping.TypeMapping;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.IdMapper;
+import io.github.mmm.orm.mapping.DbBeanMapper;
+import io.github.mmm.orm.mapping.DbBeanMapperImpl;
+import io.github.mmm.orm.mapping.DbPropertyMapper;
+import io.github.mmm.orm.mapping.DbPropertyMapperImpl;
+import io.github.mmm.orm.mapping.DbSegmentMapper;
+import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.naming.DbNamingStrategy;
-import io.github.mmm.orm.orm.DbBeanMapper;
-import io.github.mmm.orm.orm.DbBeanMapperImpl;
-import io.github.mmm.orm.orm.DbPropertyMapper;
-import io.github.mmm.orm.orm.DbPropertyMapperImpl;
-import io.github.mmm.orm.orm.DbSegmentMapper;
-import io.github.mmm.orm.orm.Orm;
 import io.github.mmm.orm.result.DbResultEntryObjectWithDeclaration;
+import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.ProjectionProperty;
 import io.github.mmm.value.CriteriaObject;
@@ -52,9 +53,7 @@ public class OrmImpl implements Orm {
     return this.typeMapping;
   }
 
-  /**
-   * @return the {@link DbNamingStrategy}.
-   */
+  @Override
   public DbNamingStrategy getNamingStrategy() {
 
     return this.namingStrategy;
@@ -63,11 +62,11 @@ public class OrmImpl implements Orm {
   @Override
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public <B extends WritableBean> DbBeanMapper<B> createBeanMapping(B bean,
-      Iterable<? extends WritableProperty<?>> properties) {
+      Iterable<? extends ReadableProperty<?>> properties) {
 
     DbBeanMapperImpl<B> beanMapper = new DbBeanMapperImpl<>(bean);
-    for (WritableProperty<?> property : properties) {
-      if (!property.isReadOnly()) {
+    for (ReadableProperty<?> property : properties) {
+      if (!property.isTransient()) {
         DbSegmentMapper valueMapper = createSegmentMapper(property);
         DbPropertyMapper propertyMapper = new DbPropertyMapperImpl<>(property.getName(), valueMapper);
         beanMapper.add(propertyMapper);
@@ -100,7 +99,7 @@ public class OrmImpl implements Orm {
     return beanMapper;
   }
 
-  private <V> DbSegmentMapper<V, ?> createSegmentMapper(WritableProperty<V> property) {
+  private <V> DbSegmentMapper<V, ?> createSegmentMapper(ReadableProperty<V> property) {
 
     String columnName = property.getName();
     return createSegmentMapper(property, columnName, property.getValueClass(), property);
@@ -108,7 +107,7 @@ public class OrmImpl implements Orm {
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   private <V> DbSegmentMapper<V, ?> createSegmentMapper(CriteriaObject<?> selection, String columnName,
-      Class<V> valueClass, WritableProperty<V> property) {
+      Class<V> valueClass, ReadableProperty<V> property) {
 
     TypeMapper<V, ?> typeMapper = this.typeMapping.getTypeMapper(valueClass);
     if ((typeMapper == null) && (property != null)) {

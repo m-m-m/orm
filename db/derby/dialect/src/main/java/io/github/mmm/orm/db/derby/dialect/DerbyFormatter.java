@@ -3,7 +3,6 @@
 package io.github.mmm.orm.db.derby.dialect;
 
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
-import io.github.mmm.orm.orm.Orm;
 import io.github.mmm.property.criteria.CriteriaFormatter;
 
 /**
@@ -16,22 +15,23 @@ public class DerbyFormatter extends DbDialectStatementFormatter {
   /**
    * The constructor.
    *
-   * @param orm the {@link Orm}.
+   * @param dialect the {@link DerbyDialect}.
    */
-  public DerbyFormatter(Orm orm) {
+  public DerbyFormatter(DerbyDialect dialect) {
 
-    super(orm);
+    super(dialect);
   }
 
   /**
    * The constructor.
    *
-   * @param orm the {@link Orm}.
+   * @param dialect the {@link DerbyDialect}.
    * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to database syntax (SQL).
+   * @param indentation the {@link #getIndentation() indentation}.
    */
-  public DerbyFormatter(Orm orm, CriteriaFormatter criteriaFormatter) {
+  public DerbyFormatter(DerbyDialect dialect, CriteriaFormatter criteriaFormatter, String indentation) {
 
-    super(orm, criteriaFormatter);
+    super(dialect, criteriaFormatter, indentation);
   }
 
 }

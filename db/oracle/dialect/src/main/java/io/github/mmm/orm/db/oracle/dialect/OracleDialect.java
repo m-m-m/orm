@@ -6,7 +6,7 @@ import java.util.Map;
 
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
-import io.github.mmm.orm.orm.Orm;
+import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.source.DbSource;
 import io.github.mmm.orm.statement.DbStatementFormatter;
 
@@ -54,7 +54,7 @@ public class OracleDialect extends AbstractDbDialect<OracleDialect> {
   @Override
   public DbStatementFormatter createFormatter() {
 
-    return new OracleFormatter(getOrm());
+    return new OracleFormatter(this);
   }
 
   @Override

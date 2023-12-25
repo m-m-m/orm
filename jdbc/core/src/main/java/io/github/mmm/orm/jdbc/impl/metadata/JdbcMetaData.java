@@ -213,6 +213,17 @@ public class JdbcMetaData implements DbMetaData {
     }
   }
 
+  @Override
+  public DbTable getTable(DbName name) {
+
+    try {
+      return getTable(DbName.getName(getCurrentCatalog()), DbName.getName(getCurrentSchema()), format(name));
+    } catch (SQLException e) {
+      // TODO
+      throw new IllegalStateException(e);
+    }
+  }
+
   private DbTable getTable(String catalog, String schema, String name) throws SQLException {
 
     DbTableData tableData = null;

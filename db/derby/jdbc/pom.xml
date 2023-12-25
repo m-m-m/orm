@@ -18,6 +18,10 @@
       <artifactId>mmm-orm-db-derby-dialect</artifactId>
     </dependency>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mmm-orm-jdbc</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
       <version>10.17.1.0</version>

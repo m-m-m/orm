@@ -9,6 +9,8 @@ module io.github.mmm.orm.db.hana.jdbc {
 
   requires io.github.mmm.orm.db.hana.dialect;
 
+  requires io.github.mmm.orm.jdbc;
+
   requires ngdbc;
 
 }

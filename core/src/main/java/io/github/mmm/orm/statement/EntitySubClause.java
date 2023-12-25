@@ -5,8 +5,8 @@ package io.github.mmm.orm.statement;
 import io.github.mmm.entity.bean.EntityBean;
 
 /**
- * A fragment for an additional {@link #getEntity() entity} selection. It is a sub-{@link DbClause clause} and shall never
- * be part of {@link DbStatement#getClauses()}.
+ * A fragment for an additional {@link #getEntity() entity} selection. It is a sub-{@link DbClause clause} and shall
+ * never be part of {@link DbStatement#getClauses()}.
  *
  * @param <R> type of the result. Only different from {@literal <E>} for complex selects.
  * @param <E> type of the {@link #getEntity() entity}.
@@ -51,12 +51,6 @@ public class EntitySubClause<R, E extends EntityBean> extends AbstractEntityClau
     if (alias != null) {
       as(alias);
     }
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    throw new IllegalStateException("Not a top-level clause!");
   }
 
 }

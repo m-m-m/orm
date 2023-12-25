@@ -2,10 +2,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement;
 
+import io.github.mmm.orm.ddl.operation.TableOperation;
+import io.github.mmm.orm.statement.alter.AlterTable;
+import io.github.mmm.orm.statement.alter.AlterTableOperations;
 import io.github.mmm.orm.statement.create.CreateIndex;
 import io.github.mmm.orm.statement.create.CreateIndexColumns;
 import io.github.mmm.orm.statement.create.CreateTable;
-import io.github.mmm.orm.statement.create.CreateTableColumns;
+import io.github.mmm.orm.statement.create.CreateTableContents;
 import io.github.mmm.orm.statement.delete.Delete;
 import io.github.mmm.orm.statement.insert.Insert;
 import io.github.mmm.orm.statement.merge.Merge;
@@ -58,24 +61,26 @@ public interface DbClauseVisitor {
    */
   default DbClauseVisitor onMainClause(MainDbClause<?> clause) {
 
-    if (clause instanceof FromClause) {
-      onFrom((FromClause<?, ?, ?>) clause);
-    } else if (clause instanceof WhereClause) {
-      onWhere((WhereClause<?, ?>) clause);
-    } else if (clause instanceof GroupBy) {
-      onGroupBy((GroupBy<?>) clause);
-    } else if (clause instanceof Having) {
-      onHaving((Having<?>) clause);
-    } else if (clause instanceof OrderBy) {
-      onOrderBy((OrderBy<?>) clause);
-    } else if (clause instanceof ValuesClause) {
-      onValues((ValuesClause<?, ?>) clause);
-    } else if (clause instanceof SetClause) {
-      onSet((SetClause<?, ?>) clause);
-    } else if (clause instanceof CreateTableColumns) {
-      onColumns((CreateTableColumns<?>) clause);
-    } else if (clause instanceof CreateIndexColumns) {
-      onColumns((CreateIndexColumns<?>) clause);
+    if (clause instanceof FromClause<?, ?, ?> from) {
+      onFrom(from);
+    } else if (clause instanceof WhereClause<?, ?> where) {
+      onWhere(where);
+    } else if (clause instanceof GroupBy<?> groupBy) {
+      onGroupBy(groupBy);
+    } else if (clause instanceof Having<?> having) {
+      onHaving(having);
+    } else if (clause instanceof OrderBy<?> orderBy) {
+      onOrderBy(orderBy);
+    } else if (clause instanceof ValuesClause<?, ?> values) {
+      onValues(values);
+    } else if (clause instanceof SetClause<?, ?> set) {
+      onSet(set);
+    } else if (clause instanceof CreateTableContents<?> columns) {
+      onCreateTableContents(columns);
+    } else if (clause instanceof CreateIndexColumns<?> columns) {
+      onColumns(columns);
+    } else if (clause instanceof AlterTableOperations<?> addColumns) {
+      onAlterTableOperations(addColumns);
     }
     return this;
   }
@@ -87,20 +92,22 @@ public interface DbClauseVisitor {
 
     if (start instanceof Select) {
       onSelect((Select<?>) start);
-    } else if (start instanceof Update) {
-      onUpdate((Update<?>) start);
-    } else if (start instanceof Insert) {
-      onInsert((Insert) start);
-    } else if (start instanceof Delete) {
-      onDelete((Delete) start);
-    } else if (start instanceof Merge) {
-      onMerge((Merge) start);
-    } else if (start instanceof Upsert) {
-      onUpsert((Upsert) start);
-    } else if (start instanceof CreateTable) {
-      onCreateTable((CreateTable<?>) start);
-    } else if (start instanceof CreateIndex) {
-      onCreateIndex((CreateIndex) start);
+    } else if (start instanceof Update update) {
+      onUpdate(update);
+    } else if (start instanceof Insert insert) {
+      onInsert(insert);
+    } else if (start instanceof Delete delete) {
+      onDelete(delete);
+    } else if (start instanceof Merge merge) {
+      onMerge(merge);
+    } else if (start instanceof Upsert upsert) {
+      onUpsert(upsert);
+    } else if (start instanceof CreateTable<?> createTable) {
+      onCreateTable(createTable);
+    } else if (start instanceof CreateIndex createIndex) {
+      onCreateIndex(createIndex);
+    } else if (start instanceof AlterTable<?> alterTable) {
+      onAlterTable(alterTable);
     }
   }
 
@@ -161,6 +168,13 @@ public interface DbClauseVisitor {
   }
 
   /**
+   * @param alterTable the {@link AlterTable}-{@link DbClause} to visit.
+   */
+  default void onAlterTable(AlterTable<?> alterTable) {
+
+  }
+
+  /**
    * @param from the {@link FromClause}-{@link DbClause} to visit.
    */
   default void onFrom(FromClause<?, ?, ?> from) {
@@ -210,9 +224,9 @@ public interface DbClauseVisitor {
   }
 
   /**
-   * @param columns the {@link CreateTableColumns}-{@link DbClause} to visit.
+   * @param contents the {@link CreateTableContents}-{@link DbClause} to visit.
    */
-  default void onColumns(CreateTableColumns<?> columns) {
+  default void onCreateTableContents(CreateTableContents<?> contents) {
 
   }
 
@@ -230,4 +244,20 @@ public interface DbClauseVisitor {
 
   }
 
+  /**
+   * @param operations the {@link AlterTableOperations}-{@link DbClause} to visit.
+   */
+  default void onAlterTableOperations(AlterTableOperations<?> operations) {
+
+    for (TableOperation operation : operations.getOperations()) {
+      onAlterTableOperation(operation);
+    }
+  }
+
+  /**
+   * @param operation the {@link TableOperation} to visit.
+   */
+  default void onAlterTableOperation(TableOperation operation) {
+
+  }
 }

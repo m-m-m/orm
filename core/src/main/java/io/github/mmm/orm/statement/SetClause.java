@@ -25,10 +25,4 @@ public abstract class SetClause<E extends EntityBean, SELF extends SetClause<E, 
     super();
   }
 
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_SET;
-  }
-
 }

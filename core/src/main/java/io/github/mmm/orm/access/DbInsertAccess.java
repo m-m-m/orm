@@ -23,6 +23,11 @@ public interface DbInsertAccess {
   /**
    * @param entities the {@link EntityBean}s to insert as batch operation.
    */
-  void insertAll(EntityBean... entities);
+  default void insertAll(EntityBean... entities) {
+
+    for (EntityBean entity : entities) {
+      insert(entity);
+    }
+  }
 
 }

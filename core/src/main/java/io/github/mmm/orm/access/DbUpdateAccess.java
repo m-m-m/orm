@@ -24,6 +24,11 @@ public interface DbUpdateAccess {
   /**
    * @param entities the {@link EntityBean}s to update as batch operation.
    */
-  void updateAll(EntityBean... entities);
+  default void updateAll(EntityBean... entities) {
+
+    for (EntityBean entity : entities) {
+      update(entity);
+    }
+  }
 
 }

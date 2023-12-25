@@ -1,3 +1,5 @@
+/* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.create;
 
 import io.github.mmm.entity.bean.EntityBean;
@@ -15,7 +17,7 @@ import io.github.mmm.value.PropertyPath;
 public class CreateIndexOn<E extends EntityBean> extends AbstractEntityClause<E, E, CreateTable<E>> {
 
   /** Name of {@link CreateIndexOn} for marshaling. */
-  public static final String NAME_ON = "on";
+  public static final String NAME_ON = "ON";
 
   private final CreateIndexStatement<E> statement;
 
@@ -63,12 +65,6 @@ public class CreateIndexOn<E extends EntityBean> extends AbstractEntityClause<E,
     CreateIndexColumns<E> column = this.statement.getColumn();
     column.and(properties);
     return column;
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_ON;
   }
 
   @Override

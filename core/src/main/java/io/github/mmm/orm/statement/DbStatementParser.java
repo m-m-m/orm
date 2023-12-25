@@ -6,22 +6,30 @@ import static io.github.mmm.base.filter.CharFilter.NEWLINE_OR_SPACE;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import io.github.mmm.base.filter.CharFilter;
 import io.github.mmm.base.sort.SortOrder;
 import io.github.mmm.bean.BeanFactory;
+import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.bean.mapping.ClassNameMapper;
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.orm.constraint.CheckConstraint;
-import io.github.mmm.orm.constraint.DbConstraint;
-import io.github.mmm.orm.constraint.ForeignKeyConstraint;
-import io.github.mmm.orm.constraint.NotNullConstraint;
-import io.github.mmm.orm.constraint.PrimaryKeyConstraint;
-import io.github.mmm.orm.constraint.UniqueConstraint;
+import io.github.mmm.orm.ddl.DbColumnSpec;
+import io.github.mmm.orm.ddl.constraint.CheckConstraint;
+import io.github.mmm.orm.ddl.constraint.DbConstraint;
+import io.github.mmm.orm.ddl.constraint.ForeignKeyConstraint;
+import io.github.mmm.orm.ddl.constraint.NotNullConstraint;
+import io.github.mmm.orm.ddl.constraint.PrimaryKeyConstraint;
+import io.github.mmm.orm.ddl.constraint.UniqueConstraint;
+import io.github.mmm.orm.ddl.operation.TableOperationKind;
+import io.github.mmm.orm.ddl.operation.TableOperationType;
+import io.github.mmm.orm.statement.alter.AlterTable;
+import io.github.mmm.orm.statement.alter.AlterTableOperations;
+import io.github.mmm.orm.statement.alter.AlterTableStatement;
 import io.github.mmm.orm.statement.create.CreateTable;
-import io.github.mmm.orm.statement.create.CreateTableColumns;
+import io.github.mmm.orm.statement.create.CreateTableContents;
 import io.github.mmm.orm.statement.create.CreateTableStatement;
 import io.github.mmm.orm.statement.delete.Delete;
 import io.github.mmm.orm.statement.delete.DeleteFrom;
@@ -49,7 +57,6 @@ import io.github.mmm.orm.statement.upsert.Upsert;
 import io.github.mmm.orm.statement.upsert.UpsertInto;
 import io.github.mmm.orm.statement.upsert.UpsertStatement;
 import io.github.mmm.property.ReadableProperty;
-import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.CriteriaExpression;
 import io.github.mmm.property.criteria.CriteriaObjectParser;
 import io.github.mmm.property.criteria.CriteriaOperator;
@@ -68,7 +75,7 @@ import io.github.mmm.value.PropertyPath;
 /**
  * {@link CharScannerParser} for {@link DbStatement}s.<br>
  * <b>ATTENTION:</b> This is NOT a generic SQL parser. It will only support the exact syntax produced by
- * {@link DbStatementFormatter} wit the defaults (as used by {@link DbStatement#toString()}).
+ * {@link DbStatementFormatter} with the defaults (as used by {@link DbStatement#toString()}).
  *
  * @since 1.0.0
  */
@@ -100,24 +107,24 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
     try {
       DbStatement<?> statement;
       scanner.skipWhile(NEWLINE_OR_SPACE);
-      String name = scanner.readWhile(CharFilter.LATIN_LETTER);
+      String name = scanner.readWhile(CharFilter.LATIN_LETTER).toUpperCase(Locale.ROOT);
       scanner.requireOneOrMore(NEWLINE_OR_SPACE);
-      if (Select.NAME_SELECT.equalsIgnoreCase(name)) {
+      if (Select.NAME_SELECT.equals(name)) {
         statement = parseSelectStatement(scanner);
-      } else if (Update.NAME_UPDATE.equalsIgnoreCase(name)) {
+      } else if (matchesKeyword(Update.NAME_UPDATE, name, scanner)) {
         statement = parseUpdateStatement(scanner);
-      } else if (Insert.NAME_INSERT.equalsIgnoreCase(name)) {
+      } else if (matchesKeyword(Insert.NAME_INSERT, name, scanner)) {
         statement = parseInsertStatement(scanner);
-      } else if (Delete.NAME_DELETE.equalsIgnoreCase(name)) {
+      } else if (matchesKeyword(Delete.NAME_DELETE, name, scanner)) {
         statement = parseDeleteStatement(scanner);
-      } else if ("CREATE".equalsIgnoreCase(name)) {
-        scanner.require("TABLE", true);
-        scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+      } else if (matchesKeyword(CreateTable.NAME_CREATE_TABLE, name, scanner)) {
         statement = parseCreateTableStatement(scanner);
-      } else if (Upsert.NAME_UPSERT.equalsIgnoreCase(name)) {
+      } else if (matchesKeyword(Upsert.NAME_UPSERT, name, scanner)) {
         statement = parseUsertStatement(scanner);
-      } else if (Merge.NAME_MERGE.equalsIgnoreCase(name)) {
+      } else if (matchesKeyword(Merge.NAME_MERGE, name, scanner)) {
         statement = parseMergeStatement(scanner);
+      } else if (matchesKeyword(AlterTable.NAME_ALTER_TABLE, name, scanner)) {
+        statement = parseAlterTableStatement(scanner);
       } else {
         throw new IllegalStateException("Unknown statement: " + name);
       }
@@ -132,69 +139,121 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
     }
   }
 
-  private CreateTableStatement<?> parseCreateTableStatement(CharStreamScanner scanner) {
+  private boolean matchesKeyword(String keyword, String tokenUpper, CharStreamScanner scanner) {
 
-    CreateTable<?> createTable = parseCreateTable(scanner);
-    CreateTableColumns<?> columns = parseCreateTableColumns(scanner, createTable);
-    return columns.get();
+    if (keyword.equals(tokenUpper)) {
+      return true;
+    }
+    int space = keyword.indexOf(' ');
+    if (space > 0) {
+      String first = keyword.substring(0, space);
+      if (tokenUpper.equals(first)) {
+        String second = keyword.substring(space + 1);
+        scanner.require(second, true);
+        scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+        return true;
+      }
+    }
+    return false;
   }
 
-  private CreateTableColumns<?> parseCreateTableColumns(CharStreamScanner scanner, CreateTable<?> createTable) {
+  private AlterTableStatement<?> parseAlterTableStatement(CharStreamScanner scanner) {
 
-    CreateTableColumns<?> columns = createTable.column(WritableProperty.NO_PROPERTIES);
-    EntityBean entity = createTable.getEntity();
-    scanner.skipWhile(NEWLINE_OR_SPACE);
-    scanner.requireOne('(');
+    AlterTable<?> alterTable = parseAlterTable(scanner);
+    AlterTableOperations<?> operation = parseAlterTableOperations(scanner, alterTable);
+    return operation.get();
+  }
+
+  private AlterTable<?> parseAlterTable(CharStreamScanner scanner) {
+
+    AlterTable<?> alterTable = new AlterTable<>(null);
+    parseEntityClause(scanner, alterTable);
+    return alterTable;
+  }
+
+  private AlterTableOperations<?> parseAlterTableOperations(CharStreamScanner scanner, AlterTable<?> alterTable) {
+
+    AlterTableOperations<?> operations = alterTable.addColumns(DbColumnSpec.NO_COLUMNS);
+    EntityBean entity = alterTable.getEntity();
     do {
       scanner.skipWhile(NEWLINE_OR_SPACE);
-      if (scanner.expect("CONSTRAINT")) {
-        DbConstraint constraint = parseConstraint(scanner, entity);
-        columns.constraint(constraint);
-      } else {
-        WritableProperty<?> column = EntityPathParser.parsePath(scanner, entity);
-        columns.and(column, false);
-        scanner.requireOne(NEWLINE_OR_SPACE);
-        String columnType = scanner.readWhile(CharFilter.IDENTIFIER);
-        Class<?> columnClass = this.classNameMapper.getClass(columnType);
-        assert (columnClass == column.getValueClass());
-      }
+      TableOperationType type = parseAlterTableOperationType(scanner);
       scanner.skipWhile(NEWLINE_OR_SPACE);
+      TableOperationKind kind = TableOperationKind.COLUMN;
+      if (scanner.expect("CONSTRAINT", true)) {
+        kind = TableOperationKind.CONSTRAINT;
+        scanner.skipWhile(NEWLINE_OR_SPACE);
+      } else if (scanner.expect("COLUMN", true)) {
+        scanner.skipWhile(NEWLINE_OR_SPACE);
+      }
+      String name = parseSegment(scanner);
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+      switch (type) {
+        case ADD -> {
+          if (kind == TableOperationKind.COLUMN) {
+            DbColumnSpec column = parseColumn(name, entity, true, scanner);
+            operations.addColumn(column);
+          } else {
+            DbConstraint constraint = parseConstraint(name, entity, scanner);
+            operations.addConstraint(constraint);
+          }
+        }
+        case DROP -> {
+          if (kind == TableOperationKind.COLUMN) {
+            DbColumnSpec column = parseColumn(name, entity, false, scanner);
+            operations.dropColumn(column);
+          } else {
+            operations.dropConstraint(name);
+          }
+        }
+        case MODIFY -> {
+          if (kind == TableOperationKind.COLUMN) {
+
+          } else {
+            throw new IllegalStateException("ALTER TABLE MODIFY is only allowed on COLUMN");
+          }
+        }
+        case RENAME -> {
+          if (kind == TableOperationKind.COLUMN) {
+            DbColumnSpec column = parseColumn(name, entity, false, scanner);
+            scanner.require("TO", true);
+            scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+            DbColumnSpec newColumn = parseColumn(null, entity, false, scanner);
+            operations.renameColumn(column, newColumn);
+          } else {
+            scanner.require("TO", true);
+            scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+            String newName = scanner.readWhile(CharFilter.IDENTIFIER, 1, 128);
+            operations.renameConstraint(name, newName);
+          }
+        }
+      }
     } while (scanner.expectOne(','));
-    scanner.requireOne(')');
-    return columns;
+    return operations;
   }
 
-  private DbConstraint parseConstraint(CharStreamScanner scanner, EntityBean entity) {
+  private DbConstraint parseConstraint(String constraintName, ReadableBean entity, CharStreamScanner scanner) {
 
-    scanner.requireOneOrMore(NEWLINE_OR_SPACE);
-    String constraintName = parseSegment(scanner);
-    scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+    if (constraintName == null) {
+      constraintName = parseSegment(scanner);
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+    }
     DbConstraint constraint = null;
     if (scanner.expect(ForeignKeyConstraint.TYPE, true)) {
-      ReadableProperty<?> column = parseColumn(scanner, entity);
+      DbColumnSpec column = parseColumn(scanner, entity);
       scanner.require("REFERENCES", true);
       scanner.requireOneOrMore(NEWLINE_OR_SPACE);
-      String referenceTable = PropertyPathParser.readSegment(scanner, null);
-      scanner.skipWhile(NEWLINE_OR_SPACE);
-      scanner.requireOne('(');
-      scanner.skipWhile(NEWLINE_OR_SPACE);
-      String referenceColumn = PropertyPathParser.readSegment(scanner, null);
-      scanner.skipWhile(NEWLINE_OR_SPACE);
-      scanner.requireOne(')');
-      constraint = new ForeignKeyConstraint(constraintName, column, referenceTable, referenceColumn);
+      DbColumnSpec referenceColumn = parseColumn(scanner);
+      constraint = new ForeignKeyConstraint(constraintName, column, referenceColumn);
     } else if (scanner.expect(PrimaryKeyConstraint.TYPE, true)) {
-      ReadableProperty<?> column = parseColumn(scanner, entity);
+      DbColumnSpec column = parseColumn(scanner, entity);
       constraint = new PrimaryKeyConstraint(constraintName, column);
     } else if (scanner.expect(NotNullConstraint.TYPE, true)) {
-      ReadableProperty<?> column = parseColumn(scanner, entity);
+      DbColumnSpec column = parseColumn(scanner, entity);
       constraint = new NotNullConstraint(constraintName, column);
     } else if (scanner.expect(UniqueConstraint.TYPE, true)) {
-      List<WritableProperty<?>> columns = parseColumns(scanner, entity, 1);
-      constraint = new UniqueConstraint(constraintName, columns.get(0));
-      List<WritableProperty<?>> list = (List<WritableProperty<?>>) constraint.getColumns();
-      for (int i = 1; i < columns.size(); i++) {
-        list.add(columns.get(i));
-      }
+      DbColumnSpec[] columns = parseColumns(scanner, entity, 1);
+      constraint = new UniqueConstraint(constraintName, columns);
     } else if (scanner.expect(CheckConstraint.TYPE, true)) {
       PropertyPathParser pathParser = new EntityPathParser(entity);
       CriteriaPredicate predicate = this.criteriaSelectionParser.parsePredicate(scanner, pathParser);
@@ -203,34 +262,115 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
     return constraint;
   }
 
-  private WritableProperty<?> parseColumn(CharStreamScanner scanner, EntityBean entity) {
+  private DbColumnSpec parseColumn(String name, ReadableBean bean, boolean withDeclaration, CharStreamScanner scanner) {
 
-    scanner.skipWhile(NEWLINE_OR_SPACE);
-    scanner.requireOne('(');
-    scanner.skipWhile(NEWLINE_OR_SPACE);
-    WritableProperty<?> column = EntityPathParser.parsePath(scanner, entity);
-    scanner.skipWhile(NEWLINE_OR_SPACE);
-    scanner.requireOne(')');
-    scanner.skipWhile(NEWLINE_OR_SPACE);
-    return column;
+    if (name == null) {
+      name = scanner.readWhile(CharFilter.IDENTIFIER, 1, 128);
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+    }
+    ReadableProperty<?> property = bean.getProperty(name);
+    if (property != null) {
+      name = null;
+    }
+    String declaration = null;
+    if (withDeclaration) {
+      declaration = scanner.readWhile(CharFilter.IDENTIFIER);
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+      if (property != null) {
+        Class<?> valueClass = property.getValueClass();
+        String type = ClassNameMapper.get().getNameOrQualified(valueClass);
+        if (declaration.equals(type)) {
+          declaration = null;
+        }
+      }
+    }
+    return new DbColumnSpec(name, property, null, declaration);
   }
 
-  private List<WritableProperty<?>> parseColumns(CharStreamScanner scanner, EntityBean entity, int min) {
+  private TableOperationType parseAlterTableOperationType(CharStreamScanner scanner) {
 
-    List<WritableProperty<?>> columns = new ArrayList<>();
+    String type = scanner.readWhile(CharFilter.LATIN_LETTER).toUpperCase(Locale.ROOT);
+    return TableOperationType.valueOf(type);
+  }
+
+  private CreateTableStatement<?> parseCreateTableStatement(CharStreamScanner scanner) {
+
+    CreateTable<?> createTable = parseCreateTable(scanner);
+    CreateTableContents<?> contents = parseCreateTableContents(scanner, createTable);
+    return contents.get();
+  }
+
+  private CreateTableContents<?> parseCreateTableContents(CharStreamScanner scanner, CreateTable<?> createTable) {
+
+    CreateTableContents<?> contents = createTable.columns(DbColumnSpec.NO_COLUMNS);
+    EntityBean entity = createTable.getEntity();
     scanner.skipWhile(NEWLINE_OR_SPACE);
     scanner.requireOne('(');
     do {
       scanner.skipWhile(NEWLINE_OR_SPACE);
-      WritableProperty<?> column = EntityPathParser.parsePath(scanner, entity);
-      columns.add(column);
+      if (scanner.expect("CONSTRAINT", true)) {
+        scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+        DbConstraint constraint = parseConstraint(null, entity, scanner);
+        contents.constraint(constraint);
+      } else {
+        ReadableProperty<?> columnProperty = EntityPathParser.parsePath(scanner, entity);
+        contents.column(columnProperty);
+        scanner.requireOne(NEWLINE_OR_SPACE);
+        String columnType = parseSegment(scanner);
+        Class<?> columnClass = this.classNameMapper.getClass(columnType);
+        assert (columnClass == columnProperty.getValueClass());
+      }
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+    } while (scanner.expectOne(','));
+    scanner.requireOne(')');
+    return contents;
+  }
+
+  private DbColumnSpec parseColumn(CharStreamScanner scanner) {
+
+    String entityName = PropertyPathParser.readSegment(scanner, null);
+    scanner.skipWhile(NEWLINE_OR_SPACE);
+    scanner.requireOne('(');
+    scanner.skipWhile(NEWLINE_OR_SPACE);
+    String propertyName = PropertyPathParser.readSegment(scanner, null);
+    scanner.skipWhile(NEWLINE_OR_SPACE);
+    scanner.requireOne(')');
+    // rebuild original property
+    Class entityClass = ClassNameMapper.get().getClass(entityName);
+    WritableBean entity = BeanFactory.get().create(entityClass);
+    // propertyName could be qualified with an alias...
+    ReadableProperty<?> property = entity.getProperty(propertyName);
+    return new DbColumnSpec(property);
+  }
+
+  private DbColumnSpec parseColumn(CharStreamScanner scanner, ReadableBean entity) {
+
+    scanner.skipWhile(NEWLINE_OR_SPACE);
+    scanner.requireOne('(');
+    scanner.skipWhile(NEWLINE_OR_SPACE);
+    ReadableProperty<?> column = EntityPathParser.parsePath(scanner, entity);
+    scanner.skipWhile(NEWLINE_OR_SPACE);
+    scanner.requireOne(')');
+    scanner.skipWhile(NEWLINE_OR_SPACE);
+    return new DbColumnSpec(column);
+  }
+
+  private DbColumnSpec[] parseColumns(CharStreamScanner scanner, ReadableBean entity, int min) {
+
+    List<DbColumnSpec> columns = new ArrayList<>();
+    scanner.skipWhile(NEWLINE_OR_SPACE);
+    scanner.requireOne('(');
+    do {
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+      ReadableProperty<?> column = EntityPathParser.parsePath(scanner, entity);
+      columns.add(new DbColumnSpec(column));
       scanner.skipWhile(NEWLINE_OR_SPACE);
     } while (scanner.expectOne(','));
     scanner.requireOne(')');
     if (columns.size() < min) {
       throw new IllegalArgumentException("Requires " + min + " column(s) but found only " + columns.size() + ".");
     }
-    return columns;
+    return columns.toArray(new DbColumnSpec[columns.size()]);
   }
 
   private MergeStatement<?> parseMergeStatement(CharStreamScanner scanner) {
@@ -576,11 +716,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
 
   private String parseSegment(CharStreamScanner scanner) {
 
-    String segment = scanner.readWhile(CharFilter.SEGMENT);
-    if (segment.isEmpty()) {
-      throw new IllegalArgumentException("Expected segment not found.");
-    }
-    return segment;
+    return scanner.readWhile(CharFilter.SEGMENT, 1, 128);
   }
 
   private void parseHaving(CharStreamScanner scanner, Having having) {

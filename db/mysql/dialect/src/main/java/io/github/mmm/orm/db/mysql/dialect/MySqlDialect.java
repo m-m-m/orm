@@ -4,7 +4,7 @@ package io.github.mmm.orm.db.mysql.dialect;
 
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
-import io.github.mmm.orm.orm.Orm;
+import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.statement.DbStatementFormatter;
 
 /**
@@ -45,7 +45,7 @@ public final class MySqlDialect extends AbstractDbDialect<MySqlDialect> {
   @Override
   public DbStatementFormatter createFormatter() {
 
-    return new MySqlFormatter(getOrm());
+    return new MySqlFormatter(this);
   }
 
 }

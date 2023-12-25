@@ -2,14 +2,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement;
 
-import io.github.mmm.marshall.MarshallingObject;
-
 /**
  * A {@link DbClause} is a top-level fragment (part) of an SQL {@link DbStatement}.
  *
  * @since 1.0.0
  */
-public abstract interface DbClause extends MarshallingObject {
+public abstract interface DbClause {
 
   /**
    * @return {@code true} if this {@link DbClause} should be omitted as it is optional and entirely empty, {@code false}

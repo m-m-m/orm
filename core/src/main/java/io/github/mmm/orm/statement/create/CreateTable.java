@@ -3,11 +3,13 @@
 package io.github.mmm.orm.statement.create;
 
 import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.orm.ddl.DbColumnSpec;
+import io.github.mmm.orm.ddl.constraint.DbConstraint;
 import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.StartClause;
-import io.github.mmm.value.PropertyPath;
+import io.github.mmm.property.ReadableProperty;
 
 /**
  * A {@link CreateTable}-{@link DbClause} of an SQL {@link CreateTableStatement}.
@@ -16,10 +18,10 @@ import io.github.mmm.value.PropertyPath;
  * @since 1.0.0
  */
 public class CreateTable<E extends EntityBean> extends AbstractEntityClause<E, E, CreateTable<E>>
-    implements StartClause {
+    implements StartClause, CreateTableFragment<E> {
 
   /** Name of {@link CreateTable} for marshaling. */
-  public static final String NAME_CREATE_TABLE = "createTable";
+  public static final String NAME_CREATE_TABLE = "CREATE TABLE";
 
   private final CreateTableStatement<E> statement;
 
@@ -46,70 +48,41 @@ public class CreateTable<E extends EntityBean> extends AbstractEntityClause<E, E
   }
 
   @Override
-  protected String getMarshallingName() {
+  public CreateTableContents<E> column(DbColumnSpec column) {
 
-    return NAME_CREATE_TABLE;
+    return this.statement.getContents().column(column);
+  }
+
+  @Override
+  public CreateTableContents<E> constraint(DbConstraint constraint) {
+
+    return this.statement.getContents().constraint(constraint);
   }
 
   /**
-   * @param property the {@link PropertyPath property} to add as column.
-   * @return the {@link CreateTableColumns} for fluent API calls.
+   * @param columns the {@link DbColumnSpec column}s.
+   * @return the {@link CreateTableContents} for fluent API calls.
    */
-  public CreateTableColumns<E> column(PropertyPath<?> property) {
+  public CreateTableContents<E> columns(DbColumnSpec... columns) {
 
-    CreateTableColumns<E> columns = this.statement.getColumns();
-    columns.and(property);
-    return columns;
-  }
-
-  /**
-   * @param property the {@link PropertyPath property} to add as column with
-   *        {@link io.github.mmm.orm.constraint.NotNullConstraint}.
-   * @return the {@link CreateTableColumns} for fluent API calls.
-   */
-  public CreateTableColumns<E> columnNotNull(PropertyPath<?> property) {
-
-    CreateTableColumns<E> columns = this.statement.getColumns();
-    columns.andNotNull(property);
-    return columns;
-  }
-
-  /**
-   * @param property the {@link PropertyPath property} to add as column with
-   *        {@link io.github.mmm.orm.constraint.UniqueConstraint}.
-   * @return the {@link CreateTableColumns} for fluent API calls.
-   */
-  public CreateTableColumns<E> columnUnique(PropertyPath<?> property) {
-
-    CreateTableColumns<E> columns = this.statement.getColumns();
-    columns.andUnique(property);
-    return columns;
-  }
-
-  /**
-   * @param properties the {@link PropertyPath properties} to add as columns.
-   * @return the {@link CreateTableColumns} for fluent API calls.
-   */
-  public CreateTableColumns<E> column(PropertyPath<?>... properties) {
-
-    CreateTableColumns<E> columns = this.statement.getColumns();
-    for (PropertyPath<?> property : properties) {
-      columns.and(property);
+    CreateTableContents<E> contents = this.statement.getContents();
+    for (DbColumnSpec column : columns) {
+      contents.column(column);
     }
-    return columns;
+    return contents;
   }
 
   /**
-   * Creates {@link #column(PropertyPath) columns} for all {@link EntityBean#getProperties() properties} of the
+   * Creates {@link #column(ReadableProperty) columns} for all {@link EntityBean#getProperties() properties} of the
    * {@link #getEntity() entity}.
    *
-   * @return the {@link CreateTableColumns} for fluent API calls.
+   * @return the {@link CreateTableContents} for fluent API calls.
    */
-  public CreateTableColumns<E> columns() {
+  public CreateTableContents<E> columns() {
 
-    CreateTableColumns<E> columns = this.statement.getColumns();
-    for (PropertyPath<?> property : getEntity().getProperties()) {
-      columns.and(property);
+    CreateTableContents<E> columns = this.statement.getContents();
+    for (ReadableProperty<?> property : getEntity().getProperties()) {
+      columns.column(property, true);
     }
     return columns;
   }

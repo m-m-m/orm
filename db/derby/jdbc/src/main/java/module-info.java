@@ -9,6 +9,8 @@ module io.github.mmm.orm.db.derby.jdbc {
 
   requires io.github.mmm.orm.db.derby.dialect;
 
+  requires io.github.mmm.orm.jdbc;
+
   requires org.apache.derby.engine;
 
 }

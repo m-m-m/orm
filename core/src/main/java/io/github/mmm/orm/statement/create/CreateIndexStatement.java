@@ -12,10 +12,9 @@ import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.StartClause;
-import io.github.mmm.orm.statement.delete.Delete;
 
 /**
- * {@link DbStatement} to {@link Delete}
+ * {@link DbStatement} to {@link CreateIndex create an index}
  *
  * @param <E> type of the {@link AbstractEntityClause#getEntity() entity}.
  * @since 1.0.0

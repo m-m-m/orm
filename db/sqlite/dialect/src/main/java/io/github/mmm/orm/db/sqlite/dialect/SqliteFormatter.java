@@ -3,11 +3,10 @@
 package io.github.mmm.orm.db.sqlite.dialect;
 
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
-import io.github.mmm.orm.orm.Orm;
 import io.github.mmm.property.criteria.CriteriaFormatter;
 
 /**
- * {@link DbDialectStatementFormatter} for PostgreSQL Database.
+ * {@link DbDialectStatementFormatter} for SQLite Database.
  *
  * @since 1.0.0
  */
@@ -16,22 +15,23 @@ public class SqliteFormatter extends DbDialectStatementFormatter {
   /**
    * The constructor.
    *
-   * @param orm the {@link Orm}.
-   * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to database syntax (SQL).
+   * @param dialect the {@link SqliteDialect}.
    */
-  public SqliteFormatter(Orm orm, CriteriaFormatter criteriaFormatter) {
+  public SqliteFormatter(SqliteDialect dialect) {
 
-    super(orm, criteriaFormatter);
+    super(dialect);
   }
 
   /**
    * The constructor.
    *
-   * @param orm the {@link Orm}.
+   * @param dialect the {@link SqliteDialect}.
+   * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to database syntax (SQL).
+   * @param indentation the {@link #getIndentation() indentation}.
    */
-  public SqliteFormatter(Orm orm) {
+  public SqliteFormatter(SqliteDialect dialect, CriteriaFormatter criteriaFormatter, String indentation) {
 
-    super(orm);
+    super(dialect, criteriaFormatter, indentation);
   }
 
 }

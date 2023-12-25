@@ -12,10 +12,9 @@ import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.StartClause;
-import io.github.mmm.orm.statement.delete.Delete;
 
 /**
- * {@link DbStatement} to {@link Delete}
+ * {@link DbStatement} to {@link CreateTable create a table}.
  *
  * @param <E> type of the {@link AbstractEntityClause#getEntity() entity}.
  * @since 1.0.0
@@ -24,7 +23,7 @@ public class CreateTableStatement<E extends EntityBean> extends AbstractDbStatem
 
   private final CreateTable<E> createTable;
 
-  private final CreateTableColumns<E> columns;
+  private final CreateTableContents<E> contents;
 
   /**
    * The constructor.
@@ -35,7 +34,7 @@ public class CreateTableStatement<E extends EntityBean> extends AbstractDbStatem
 
     super();
     this.createTable = createTable;
-    this.columns = new CreateTableColumns<>(this);
+    this.contents = new CreateTableContents<>(this);
   }
 
   /**
@@ -59,16 +58,16 @@ public class CreateTableStatement<E extends EntityBean> extends AbstractDbStatem
   /**
    * @return columns
    */
-  public CreateTableColumns<E> getColumns() {
+  public CreateTableContents<E> getContents() {
 
-    return this.columns;
+    return this.contents;
   }
 
   @Override
   protected void addClauses(List<AbstractDbClause> list) {
 
     list.add(this.createTable);
-    list.add(this.columns);
+    list.add(this.contents);
   }
 
   @Override

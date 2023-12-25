@@ -6,12 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.marshall.StructuredReader;
-import io.github.mmm.marshall.StructuredState;
-import io.github.mmm.marshall.StructuredWriter;
 import io.github.mmm.orm.statement.select.Having;
 import io.github.mmm.orm.statement.select.SelectWhere;
-import io.github.mmm.property.criteria.CriteriaMarshalling;
 import io.github.mmm.property.criteria.CriteriaPredicate;
 import io.github.mmm.property.criteria.PredicateOperator;
 
@@ -89,35 +85,6 @@ public abstract class PredicateClause<E, SELF extends PredicateClause<E, SELF>> 
   public boolean isOmit() {
 
     return this.predicates.isEmpty();
-  }
-
-  @Override
-  protected void writeProperties(StructuredWriter writer) {
-
-    if (!this.predicates.isEmpty()) {
-      writer.writeName(NAME_PREDICATES);
-      writer.writeStartArray();
-      CriteriaMarshalling marshalling = CriteriaMarshalling.get();
-      for (CriteriaPredicate predicate : this.predicates) {
-        marshalling.writeObject(writer, predicate);
-      }
-      writer.writeEnd();
-    }
-    super.writeProperties(writer);
-  }
-
-  @Override
-  protected void readProperty(StructuredReader reader, String name) {
-
-    if (reader.isNameMatching(name, NAME_PREDICATES)) {
-      reader.require(StructuredState.START_ARRAY, true);
-      CriteriaMarshalling marshalling = CriteriaMarshalling.get();
-      while (!reader.readEnd()) {
-        this.predicates.add(marshalling.readPredicate(reader));
-      }
-    } else {
-      super.readProperty(reader, name);
-    }
   }
 
 }

@@ -21,7 +21,7 @@ public final class Update<E extends EntityBean> extends AbstractEntitiesClause<E
     implements StartClause, MainDbClause<E> {
 
   /** Name of {@link Update} for marshaling. */
-  public static final String NAME_UPDATE = "update";
+  public static final String NAME_UPDATE = "UPDATE";
 
   private final UpdateStatement<E> statement;
 
@@ -88,6 +88,19 @@ public final class Update<E extends EntityBean> extends AbstractEntitiesClause<E
 
   /**
    * Convenience method for
+   * <code>{@link #set(PropertyAssignment) set}({@link PropertyAssignment}.{@link PropertyAssignment#ofValue(PropertyPath) ofValue}(property)).</code>
+   *
+   * @param <V> type of the {@link PropertyPath#get() value}.
+   * @param property the {@link PropertyPath property} to set.
+   * @return the {@link UpdateSet} for fluent API.
+   */
+  public <V> UpdateSet<E> set(PropertyPath<V> property) {
+
+    return set(PropertyAssignment.ofValue(property));
+  }
+
+  /**
+   * Convenience method for
    * <code>{@link #set(PropertyAssignment) set}({@link PropertyAssignment}.{@link PropertyAssignment#of(PropertyPath, Object) of}(property, value)).</code>
    *
    * @param <V> type of the {@link PropertyPath#get() value}.
@@ -112,12 +125,6 @@ public final class Update<E extends EntityBean> extends AbstractEntitiesClause<E
   public <V> UpdateSet<E> set(PropertyPath<V> property, PropertyPath<V> valueProperty) {
 
     return set(PropertyAssignment.of(property, valueProperty));
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_UPDATE;
   }
 
   @Override

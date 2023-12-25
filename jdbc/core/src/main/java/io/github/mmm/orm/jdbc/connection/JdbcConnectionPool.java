@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 
 import io.github.mmm.orm.connection.DbConnectionPool;
 import io.github.mmm.orm.dialect.DbDialect;
-import io.github.mmm.orm.jdbc.access.session.JdbcSession;
+import io.github.mmm.orm.jdbc.session.JdbcSession;
 import io.github.mmm.orm.source.DbSource;
 
 /**

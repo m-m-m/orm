@@ -6,7 +6,7 @@ import java.util.Map;
 
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
-import io.github.mmm.orm.orm.Orm;
+import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.source.DbSource;
 import io.github.mmm.orm.statement.DbStatementFormatter;
 
@@ -48,7 +48,7 @@ public final class H2Dialect extends AbstractDbDialect<H2Dialect> {
   @Override
   public DbStatementFormatter createFormatter() {
 
-    return new H2Formatter(getOrm());
+    return new H2Formatter(this);
   }
 
   @Override

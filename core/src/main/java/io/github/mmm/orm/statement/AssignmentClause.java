@@ -9,10 +9,7 @@ import java.util.Objects;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.LongId;
-import io.github.mmm.marshall.StructuredReader;
-import io.github.mmm.marshall.StructuredState;
-import io.github.mmm.marshall.StructuredWriter;
-import io.github.mmm.property.criteria.CriteriaMarshalling;
+import io.github.mmm.orm.statement.update.UpdateSet;
 import io.github.mmm.property.criteria.PropertyAssignment;
 import io.github.mmm.value.PropertyPath;
 
@@ -50,6 +47,19 @@ public abstract class AssignmentClause<E extends EntityBean, SELF extends Assign
     Objects.requireNonNull(assignment, "assignment");
     this.assignments.add(assignment);
     return self();
+  }
+
+  /**
+   * Convenience method for
+   * <code>{@link #and(PropertyAssignment) and}({@link PropertyAssignment}.{@link PropertyAssignment#ofValue(PropertyPath) ofValue}(property)).</code>
+   *
+   * @param <V> type of the {@link PropertyPath#get() value}.
+   * @param property the {@link PropertyPath property} to set.
+   * @return the {@link UpdateSet} for fluent API.
+   */
+  public <V> SELF and(PropertyPath<V> property) {
+
+    return and(PropertyAssignment.ofValue(property));
   }
 
   /**
@@ -114,36 +124,6 @@ public abstract class AssignmentClause<E extends EntityBean, SELF extends Assign
   public List<PropertyAssignment<?>> getAssignments() {
 
     return this.assignments;
-  }
-
-  @Override
-  protected void writeProperties(StructuredWriter writer) {
-
-    if (this.assignments.isEmpty()) {
-      writer.writeName(NAME_ASSIGNMENTS);
-      writer.writeStartArray();
-      CriteriaMarshalling marshalling = CriteriaMarshalling.get();
-      for (PropertyAssignment<?> assignment : this.assignments) {
-        marshalling.writeAssignment(writer, assignment);
-      }
-      writer.writeEnd();
-    }
-    super.writeProperties(writer);
-  }
-
-  @Override
-  protected void readProperty(StructuredReader reader, String name) {
-
-    if (reader.isNameMatching(name, NAME_ASSIGNMENTS)) {
-      reader.require(StructuredState.START_ARRAY, true);
-      CriteriaMarshalling marshalling = CriteriaMarshalling.get();
-      while (!reader.readEnd()) {
-        PropertyAssignment<?> assignment = marshalling.readAssignment(reader);
-        this.assignments.add(assignment);
-      }
-    } else {
-      super.readProperty(reader, name);
-    }
   }
 
 }

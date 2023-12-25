@@ -6,13 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import io.github.mmm.marshall.StructuredReader;
-import io.github.mmm.marshall.StructuredState;
-import io.github.mmm.marshall.StructuredWriter;
 import io.github.mmm.orm.statement.AbstractTypedClause;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.MainDbClause;
-import io.github.mmm.property.criteria.CriteriaMarshalling;
 import io.github.mmm.property.criteria.CriteriaOrdering;
 
 /**
@@ -24,10 +20,7 @@ import io.github.mmm.property.criteria.CriteriaOrdering;
 public class OrderBy<R> extends AbstractTypedClause<R, OrderBy<R>> implements MainDbClause<R> {
 
   /** Name of {@link OrderBy} for marshaling. */
-  public static final String NAME_ORDER_BY = "orderBy";
-
-  /** Name of {@link #getOrderings()} for marshaling. */
-  public static final String NAME_ORDERINGS = "o";
+  public static final String NAME_ORDER_BY = "ORDER BY";
 
   private final SelectStatement<R> statement;
 
@@ -46,12 +39,6 @@ public class OrderBy<R> extends AbstractTypedClause<R, OrderBy<R>> implements Ma
   }
 
   @Override
-  protected String getMarshallingName() {
-
-    return NAME_ORDER_BY;
-  }
-
-  @Override
   public boolean isOmit() {
 
     return this.orderings.isEmpty();
@@ -63,7 +50,7 @@ public class OrderBy<R> extends AbstractTypedClause<R, OrderBy<R>> implements Ma
    */
   public OrderBy<R> and(CriteriaOrdering ordering) {
 
-    Objects.requireNonNull(ordering, "ordering");
+    Objects.requireNonNull(ordering);
     this.orderings.add(ordering);
     return this;
   }
@@ -92,36 +79,6 @@ public class OrderBy<R> extends AbstractTypedClause<R, OrderBy<R>> implements Ma
   public SelectStatement<R> get() {
 
     return this.statement;
-  }
-
-  @Override
-  protected void writeProperties(StructuredWriter writer) {
-
-    if (!this.orderings.isEmpty()) {
-      writer.writeName(NAME_ORDERINGS);
-      writer.writeStartArray();
-      CriteriaMarshalling marshalling = CriteriaMarshalling.get();
-      for (CriteriaOrdering ordering : this.orderings) {
-        marshalling.writeOrdering(writer, ordering);
-      }
-      writer.writeEnd();
-
-    }
-    super.writeProperties(writer);
-  }
-
-  @Override
-  protected void readProperty(StructuredReader reader, String name) {
-
-    if (reader.isNameMatching(name, NAME_ORDERINGS)) {
-      reader.require(StructuredState.START_ARRAY, true);
-      CriteriaMarshalling marshalling = CriteriaMarshalling.get();
-      while (!reader.readEnd()) {
-        this.orderings.add(marshalling.readOrdering(reader));
-      }
-    } else {
-      super.readProperty(reader, name);
-    }
   }
 
 }

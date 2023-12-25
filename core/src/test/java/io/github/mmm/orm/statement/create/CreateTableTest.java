@@ -9,8 +9,6 @@ import io.github.mmm.entity.link.Link;
 import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
 import io.github.mmm.orm.statement.Song;
-import io.github.mmm.orm.statement.create.CreateTable;
-import io.github.mmm.orm.statement.create.CreateTableStatement;
 
 /**
  * Test of {@link CreateTable} and {@link CreateTableStatement}.
@@ -29,10 +27,10 @@ public class CreateTableTest extends DbStatementTest {
     CreateTableStatement<Song> createTableStatement = new CreateTable<>(s).columns().get();
     // then
     check(createTableStatement, "CREATE TABLE Song (\n" //
-        + "  Composer Link,\n" //
+        + "  Composer Link,\n" // types (Link, Long, String, etc.) are mapped to proper DB types if dialect is used
         + "  Duration Long,\n" //
         + "  Genre String,\n" //
-        + "  Id Id,\n" //
+        + "  Id Id,\n" // will actually be ID and REV columns in regular SQL (if dialect is used)
         + "  Title String,\n" //
         + "  TrackNo Integer,\n" //
         + "  CONSTRAINT FK_Song_Composer FOREIGN KEY (Composer) REFERENCES Person(Id),\n" //
@@ -40,33 +38,5 @@ public class CreateTableTest extends DbStatementTest {
         + "  CONSTRAINT PK_Song PRIMARY KEY (Id)\n" //
         + ")");
   }
-
-  // /** Test of {@link CreateTable} that automatically creates all columns for H2 database. */
-  // @Test
-  // public void testAutoWithH2Dialect() {
-  //
-  // // given
-  // Song s = Song.of();
-  // // temporary workaround
-  // s.Composer().set(Link.of(LongId.of(4711L, Person.class)));
-  // DbDialect h2Dialect = DbDialectProvider.get().get("h2");
-  // DbStatementFormatter formatter = h2Dialect.createFormatter();
-  // // when
-  // CreateTableStatement<Song> createTableStatement = new CreateTable<>(s).columns().get();
-  //
-  // // then
-  // assertThat(formatter.onStatement(createTableStatement)).hasToString("CREATE TABLE Song (\n" //
-  // + " COMPOSER BIGINT,\n" //
-  // + " DURATION BIGINT,\n" //
-  // + " GENRE VARCHAR,\n" //
-  // + " ID BIGINT,\n" //
-  // + " REV BIGINT,\n" //
-  // + " TITLE VARCHAR,\n" //
-  // + " TRACK_NO INTEGER,\n" //
-  // + " CONSTRAINT FK_Song_Composer FOREIGN KEY (Composer) REFERENCES Person(Id),\n" //
-  // + " CONSTRAINT NN_Song_Title NOT NULL (Title),\n" //
-  // + " CONSTRAINT PK_Song PRIMARY KEY (Id)\n" //
-  // + ")");
-  // }
 
 }

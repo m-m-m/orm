@@ -1,9 +1,10 @@
 package io.github.mmm.orm.statement;
 
+import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.bean.property.BeanProperty;
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.property.WritableProperty;
+import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.criteria.PropertyPathParser;
 import io.github.mmm.scanner.CharStreamScanner;
 import io.github.mmm.value.PropertyPath;
@@ -17,9 +18,9 @@ import io.github.mmm.value.ReadablePath;
  */
 class EntityPathParser implements PropertyPathParser {
 
-  private final EntityBean entity;
+  private final ReadableBean entity;
 
-  EntityPathParser(EntityBean entity) {
+  EntityPathParser(ReadableBean entity) {
 
     super();
     this.entity = entity;
@@ -31,12 +32,12 @@ class EntityPathParser implements PropertyPathParser {
     return parsePath(scanner, this.entity, segment);
   }
 
-  static WritableProperty<?> resolvePath(WritableBean bean, ReadablePath path) {
+  static ReadableProperty<?> resolvePath(ReadableBean bean, ReadablePath path) {
 
     return resolvePath(bean, path, false);
   }
 
-  static WritableProperty<?> resolvePath(WritableBean bean, ReadablePath path, boolean withoutAlias) {
+  static ReadableProperty<?> resolvePath(ReadableBean bean, ReadablePath path, boolean withoutAlias) {
 
     ReadablePath parent = path.parentPath();
     if (parent == null) {
@@ -47,7 +48,7 @@ class EntityPathParser implements PropertyPathParser {
       }
     } else {
       String segment = path.pathSegment();
-      WritableProperty<?> property = resolvePath(bean, parent, withoutAlias);
+      ReadableProperty<?> property = resolvePath(bean, parent, withoutAlias);
       if (property == null) {
         assert (!withoutAlias);
         return bean.getRequiredProperty(segment);
@@ -57,14 +58,14 @@ class EntityPathParser implements PropertyPathParser {
     }
   }
 
-  static WritableProperty<?> parsePath(CharStreamScanner scanner, WritableBean bean) {
+  static ReadableProperty<?> parsePath(CharStreamScanner scanner, ReadableBean bean) {
 
     return parsePath(scanner, bean, null);
   }
 
-  static WritableProperty<?> parsePath(CharStreamScanner scanner, WritableBean bean, String segment) {
+  static ReadableProperty<?> parsePath(CharStreamScanner scanner, ReadableBean bean, String segment) {
 
-    WritableProperty<?> p = null;
+    ReadableProperty<?> p = null;
     do {
       if (segment == null) {
         segment = PropertyPathParser.parseSegment(scanner);
@@ -79,7 +80,7 @@ class EntityPathParser implements PropertyPathParser {
     return p;
   }
 
-  static WritableProperty<?> traverseProperty(WritableProperty<?> property, String segment) {
+  static ReadableProperty<?> traverseProperty(ReadableProperty<?> property, String segment) {
 
     WritableBean childBean = null;
     if (property instanceof BeanProperty) {

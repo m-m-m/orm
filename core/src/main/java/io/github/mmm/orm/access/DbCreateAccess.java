@@ -28,6 +28,15 @@ public interface DbCreateAccess {
   }
 
   /**
+   * Synchronized the database table for the given {@link EntityBean}. If the table does not exist, it will be
+   * {@link #createTable(EntityBean) created}, otherwise missing columns will be added. If all is up-to-date, nothing
+   * needs to be done.
+   *
+   * @param entity the {@link EntityBean} prototype to sync the database table for.
+   */
+  void syncTable(EntityBean entity);
+
+  /**
    * @param statement the {@link CreateIndexStatement} to execute.
    */
   void createIndex(CreateIndexStatement<?> statement);

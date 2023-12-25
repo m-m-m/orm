@@ -6,8 +6,7 @@ import io.github.mmm.entity.bean.EntityBean;
 
 /**
  * A {@code FROM}-{@link DbClause clause} of a {@link DbStatement} such as
- * {@link io.github.mmm.orm.statement.select.Select} or
- * {@link io.github.mmm.orm.statement.delete.Delete}.
+ * {@link io.github.mmm.orm.statement.select.Select} or {@link io.github.mmm.orm.statement.delete.Delete}.
  *
  * @param <R> type of the result. Only different from {@literal <E>} for complex selects.
  * @param <E> type of the {@link #getEntity() entity}.
@@ -16,9 +15,6 @@ import io.github.mmm.entity.bean.EntityBean;
  */
 public abstract class FromClause<R, E extends EntityBean, SELF extends FromClause<R, E, SELF>>
     extends AbstractEntitiesClause<R, E, SELF> implements MainDbClause<R>, TypedClauseWithWhere<R> {
-
-  /** Name of {@link FromClause} for marshaling. */
-  public static final String NAME_FROM = "from";
 
   /**
    * The constructor.
@@ -30,12 +26,6 @@ public abstract class FromClause<R, E extends EntityBean, SELF extends FromClaus
   protected FromClause(AliasMap aliasMap, E entity, String entityName) {
 
     super(aliasMap, entity, entityName);
-  }
-
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_FROM;
   }
 
 }

@@ -7,8 +7,9 @@ import java.util.Map;
 
 import io.github.mmm.base.exception.DuplicateObjectException;
 import io.github.mmm.base.text.CaseHelper;
-import io.github.mmm.bean.WritableBean;
+import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.PropertyPathParser;
 import io.github.mmm.scanner.CharStreamScanner;
@@ -128,8 +129,8 @@ public class AliasMap implements PropertyPathParser {
       segment = PropertyPathParser.parseSegment(scanner);
       scanner.requireOne('.');
     }
-    WritableBean bean = getRequiredEntity(segment);
-    WritableProperty<?> property = null;
+    ReadableBean bean = getRequiredEntity(segment);
+    ReadableProperty<?> property = null;
     do {
       segment = PropertyPathParser.parseSegment(scanner);
       if (property == null) {
@@ -147,14 +148,14 @@ public class AliasMap implements PropertyPathParser {
    * @return the {@link WritableProperty} traversed from the given {@link ReadablePath path} from its root segment as
    *         alias.
    */
-  public WritableProperty<?> resolvePath(ReadablePath path) {
+  public ReadableProperty<?> resolvePath(ReadablePath path) {
 
     ReadablePath parent = path.parentPath();
     if (parent == null) {
       return null;
     } else {
       String segment = path.pathSegment();
-      WritableProperty<?> property = resolvePath(parent);
+      ReadableProperty<?> property = resolvePath(parent);
       if (property == null) {
         EntityBean entity = getRequiredEntity(parent.pathSegment());
         return entity.getRequiredProperty(segment);

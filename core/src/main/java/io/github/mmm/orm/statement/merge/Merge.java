@@ -14,7 +14,7 @@ import io.github.mmm.orm.statement.StartClause;
 public final class Merge extends AbstractDbClause implements StartClause {
 
   /** Name of {@link Merge} for marshaling. */
-  public static final String NAME_MERGE = "merge";
+  public static final String NAME_MERGE = "MERGE";
 
   /**
    * The constructor.
@@ -24,9 +24,4 @@ public final class Merge extends AbstractDbClause implements StartClause {
     super();
   }
 
-  @Override
-  protected String getMarshallingName() {
-
-    return NAME_MERGE;
-  }
 }

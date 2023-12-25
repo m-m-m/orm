@@ -5,7 +5,7 @@ package io.github.mmm.orm.jdbc.tx;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.github.mmm.orm.jdbc.access.session.JdbcSession;
+import io.github.mmm.orm.jdbc.session.JdbcSession;
 import io.github.mmm.orm.source.DbSource;
 
 /**
