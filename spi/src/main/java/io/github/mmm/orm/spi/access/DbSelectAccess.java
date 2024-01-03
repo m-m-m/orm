@@ -4,6 +4,7 @@ package io.github.mmm.orm.spi.access;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
+import io.github.mmm.orm.statement.NonUniqueResultException;
 import io.github.mmm.orm.statement.select.SelectStatement;
 
 /**
@@ -12,20 +13,20 @@ import io.github.mmm.orm.statement.select.SelectStatement;
 public interface DbSelectAccess {
 
   /**
-   * @param <E> type of the {@link EntityBean} to select.
-   * @param statement the {@link SelectStatement} to query the requested entities.
-   * @return an {@link Iterable} with the matching {@link EntityBean entities}.
+   * @param <R> type of the result objects to select.
+   * @param statement the {@link SelectStatement} to query the requested objects.
+   * @return an {@link Iterable} with the matching objects.
    */
-  <E extends EntityBean> Iterable<E> select(SelectStatement<E> statement);
+  <R> Iterable<R> select(SelectStatement<R> statement);
 
   /**
-   * @param <E> type of the {@link EntityBean} to select.
-   * @param statement the {@link SelectStatement} to query the requested entity. Should produce a single result or no
+   * @param <R> type of the result object to select.
+   * @param statement the {@link SelectStatement} to query the requested object. Should produce a single result or no
    *        result.
-   * @return the matching {@link EntityBean entity} or {@code null} if not found.
-   * @throws RuntimeException if the given {@code query} produced multiple results (matched to more than one entity).
+   * @return the matching object or {@code null} if not found.
+   * @throws NonUniqueResultException if the given {@link SelectStatement} produced more than one result.
    */
-  <E extends EntityBean> E selectOne(SelectStatement<E> statement);
+  <R> R selectOne(SelectStatement<R> statement);
 
   /**
    * @param <E> type of the {@link EntityBean} to select.

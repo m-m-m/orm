@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.type.DbType;
 import io.github.mmm.property.criteria.CriteriaExpression;
 import io.github.mmm.property.criteria.CriteriaParameters;
@@ -30,11 +31,12 @@ public class CriteriaParametersNamed extends AbstractCriteriaParameters {
   /**
    * The constructor.
    *
+   * @param dialect the {@link AbstractDbDialect}.
    * @param merge the {@link #isMerge() merge flag}.
    */
-  public CriteriaParametersNamed(boolean merge) {
+  public CriteriaParametersNamed(AbstractDbDialect<?> dialect, boolean merge) {
 
-    super();
+    super(dialect);
     this.parameters = new HashMap<>();
     this.merge = merge;
   }

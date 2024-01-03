@@ -61,16 +61,18 @@ public abstract class AbstractEntityRepository<E extends EntityBean> implements 
   }
 
   @Override
-  public void save(E entity) {
+  public Id<E> save(E entity) {
 
-    Id<?> id = entity.getId();
+    Id<E> id = Id.from(entity);
     if (id.isTransient()) {
       id = this.idGenerator.generate(id);
       entity.setId(id);
       insert(entity);
     } else {
       update(entity);
+      id = Id.from(entity);
     }
+    return id;
   }
 
   /**

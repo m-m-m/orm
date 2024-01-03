@@ -39,20 +39,14 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
   /** Name of property {@link #isDistinct()} for marshaling. */
   public static final String NAME_DISTINCT = "DISTINCT";
 
-  /** Name of property {@link #getResultName()} for marshaling. */
-  public static final String NAME_RESULT = "result";
-
-  /** Value of property {@link #NAME_RESULT} for {@link SelectEntity}. */
+  /** {@link #getResultName() Result name} for {@link SelectEntity}. */
   public static final String VALUE_RESULT_ENTITY = "entity";
 
-  /** Value of property {@link #NAME_RESULT} for {@link SelectSingle}. */
+  /** {@link #getResultName() Result name} for {@link SelectSingle}. */
   public static final String VALUE_RESULT_SINLGE = "1";
 
-  /** Value of property {@link #NAME_RESULT} for {@link SelectResult}. */
+  /** {@link #getResultName() Result name} for {@link SelectResult}. */
   public static final String VALUE_RESULT_RESULT = "result";
-
-  /** Name of property {@link #getSelections() selections} for marshaling. */
-  public static final String NAME_SELECTIONS = "sel";
 
   private SelectStatement<R> statement;
 
@@ -244,42 +238,6 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
   protected <E extends EntityBean> SelectFrom<R, E> from(E entity) {
 
     return new SelectFrom<>(this, entity);
-  }
-
-  /**
-   * Alternative for {@code new SelectSingle(selection)}.
-   *
-   * @param <R> type of the result of the selection.
-   * @param selection the single {@link CriteriaObject} to select.
-   * @return the new {@link SelectSingle} clause.
-   */
-  public static <R> SelectSingle<R> single(CriteriaObject<R> selection) {
-
-    return new SelectSingle<>(selection);
-  }
-
-  /**
-   * Alternative for {@code new SelectEntity(entity)}.
-   *
-   * @param <R> type of the {@link EntityBean} to select.
-   * @param entity the {@link EntityBean} to select.
-   * @return the new {@link SelectEntity} clause.
-   */
-  public static <R extends EntityBean> SelectEntity<R> entity(R entity) {
-
-    return new SelectEntity<>(entity);
-  }
-
-  /**
-   * Alternative for {@code new SelectProjection(bean)}.
-   *
-   * @param <R> type of the {@link WritableBean} to select.
-   * @param bean the {@link WritableBean} to select.
-   * @return the new {@link SelectProjection} clause.
-   */
-  public static <R extends WritableBean> SelectProjection<R> projection(R bean) {
-
-    return new SelectProjection<>(bean);
   }
 
   /**

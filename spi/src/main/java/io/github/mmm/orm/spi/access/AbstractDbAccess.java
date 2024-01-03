@@ -2,20 +2,17 @@ package io.github.mmm.orm.spi.access;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import io.github.mmm.base.exception.DuplicateObjectException;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
-import io.github.mmm.orm.mapping.DbBeanMapper;
+import io.github.mmm.orm.mapping.DbMapper;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.param.AbstractCriteriaParameters;
 import io.github.mmm.orm.result.DbResult;
-import io.github.mmm.orm.result.DbResultRow;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.DbStatementFormatter;
 import io.github.mmm.orm.statement.create.CreateIndexStatement;
@@ -37,11 +34,17 @@ public abstract class AbstractDbAccess implements DbAccess {
   /**
    * @return the {@link DbDialect}.
    */
-  protected abstract DbDialect getDialect();
+  protected abstract AbstractDbDialect<?> getDialect();
 
-  protected abstract long executeSql(String sql, AbstractCriteriaParameters parameters, Consumer<DbResult> receiver);
+  protected abstract long executeSql(String sql, AbstractCriteriaParameters parameters, Consumer<DbResult> receiver,
+      boolean unique);
 
-  protected long executeStatement(DbStatement<?> statement, Consumer<DbResult> receiver) {
+  protected long executeStatement(DbStatement<?> statement) {
+
+    return executeStatement(statement, null, true);
+  }
+
+  protected long executeStatement(DbStatement<?> statement, Consumer<DbResult> receiver, boolean unique) {
 
     DbStatementFormatter formatter = getDialect().createFormatter();
     String sql = formatter.onStatement(statement).toString();
@@ -50,25 +53,25 @@ public abstract class AbstractDbAccess implements DbAccess {
     if (statement.getType().isQuery()) {
       Objects.requireNonNull(receiver);
     }
-    return executeSql(sql, parameters, receiver);
+    return executeSql(sql, parameters, receiver, unique);
   }
 
   @Override
   public void createIndex(CreateIndexStatement<?> statement) {
 
-    executeStatement(statement, null);
+    executeStatement(statement);
   }
 
   @Override
   public void createTable(CreateTableStatement<?> statement) {
 
-    executeStatement(statement, null);
+    executeStatement(statement);
   }
 
   @Override
   public long delete(DeleteStatement<?> statement) {
 
-    return executeStatement(statement, null);
+    return executeStatement(statement);
   }
 
   @Override
@@ -108,7 +111,7 @@ public abstract class AbstractDbAccess implements DbAccess {
       return 0;
     }
     DeleteStatement<E> statement = new Delete().from(prototype).where(prototype.Id().in(idCollection)).get();
-    long count = executeStatement(statement, null);
+    long count = executeStatement(statement);
     assert (count >= 0) && (count < Integer.MAX_VALUE);
     return (int) count;
   }
@@ -116,56 +119,47 @@ public abstract class AbstractDbAccess implements DbAccess {
   @Override
   public void insert(InsertStatement<?> statement) {
 
-    executeStatement(statement, null);
+    executeStatement(statement);
   }
 
   @Override
   public long execute(MergeStatement<?> statement) {
 
-    return executeStatement(statement, null);
+    return executeStatement(statement);
   }
 
   @Override
   public long update(UpdateStatement<?> statement) {
 
-    return executeStatement(statement, null);
+    return executeStatement(statement);
   }
 
   @Override
   public long execute(UpsertStatement<?> statement) {
 
-    return executeStatement(statement, null);
+    return executeStatement(statement);
   }
 
   @Override
-  public <E extends EntityBean> Iterable<E> select(SelectStatement<E> statement) {
+  public <R> Iterable<R> select(SelectStatement<R> statement) {
 
-    Orm orm = ((AbstractDbDialect<?>) getDialect()).getOrm();
-    Select<E> select = statement.getSelect();
-    DbBeanMapper<E> beanMapping = orm.createBeanMapping(select.getResultBean());
-    Consumer<DbResult> receiver = r -> {
-    };
-    executeStatement(statement, receiver);
-    DbResultRow dbResult = null;
-    E entity = beanMapping.db2java(dbResult);
-    return null;
+    Orm orm = getDialect().getOrm();
+    Select<R> select = statement.getSelect();
+    DbMapper<R> mapper = orm.createMapper(select);
+    DbResultReceiverMultiple<R> receiver = new DbResultReceiverMultiple<>(mapper);
+    executeStatement(statement, receiver, false);
+    return receiver.getResults();
   }
 
   @Override
-  public <E extends EntityBean> E selectOne(SelectStatement<E> statement) {
+  public <R> R selectOne(SelectStatement<R> statement) {
 
-    Iterator<E> entities = select(statement).iterator();
-    E entity = null;
-    while (entities.hasNext()) {
-      E next = entities.next();
-      Objects.requireNonNull(next);
-      if (entity == null) {
-        entity = next;
-      } else {
-        throw new DuplicateObjectException(entity, statement, next);
-      }
-    }
-    return entity;
+    Orm orm = getDialect().getOrm();
+    Select<R> select = statement.getSelect();
+    DbMapper<R> mapper = orm.createMapper(select);
+    DbResultReceiverSingle<R> receiver = new DbResultReceiverSingle<>(mapper);
+    executeStatement(statement, receiver, true);
+    return receiver.getResult();
   }
 
 }

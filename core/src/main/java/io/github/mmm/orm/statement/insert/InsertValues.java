@@ -4,7 +4,6 @@ package io.github.mmm.orm.statement.insert;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.DbClause;
-import io.github.mmm.orm.statement.MainDbClause;
 import io.github.mmm.orm.statement.ValuesClause;
 
 /**
@@ -13,7 +12,7 @@ import io.github.mmm.orm.statement.ValuesClause;
  * @param <E> type of the {@link InsertInto#getEntity() entity}.
  * @since 1.0.0
  */
-public class InsertValues<E extends EntityBean> extends ValuesClause<E, InsertValues<E>> implements MainDbClause<E> {
+public class InsertValues<E extends EntityBean> extends ValuesClause<E, InsertValues<E>> {
 
   private final InsertStatement<E> statement;
 

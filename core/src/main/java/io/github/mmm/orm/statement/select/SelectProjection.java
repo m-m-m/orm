@@ -2,6 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.select;
 
+import java.util.List;
 import java.util.Objects;
 
 import io.github.mmm.bean.WritableBean;
@@ -132,6 +133,13 @@ public final class SelectProjection<R extends WritableBean> extends Select<R> {
 
     super.distinct();
     return this;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<ProjectionProperty<?>> getSelections() {
+
+    return (List<ProjectionProperty<?>>) super.getSelections();
   }
 
   @Override

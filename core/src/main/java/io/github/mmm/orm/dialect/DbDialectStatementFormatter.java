@@ -7,17 +7,17 @@ import java.util.Objects;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.mapping.DbBeanMapper;
 import io.github.mmm.orm.param.CriteriaParametersIndexed;
-import io.github.mmm.orm.result.DbResultCell;
-import io.github.mmm.orm.result.DbResultRow;
+import io.github.mmm.orm.result.DbResult;
+import io.github.mmm.orm.result.DbResultValue;
 import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.orm.statement.DbStatementFormatter;
 import io.github.mmm.orm.statement.select.SelectFrom;
 import io.github.mmm.property.criteria.CriteriaFormatter;
 
 /**
- * Abstract base class of {@link DbStatementFormatter} for any real {@link DbDialect database dialect}.
+ * {@link DbStatementFormatter} for any real {@link DbDialect database dialect}.
  */
-public abstract class DbDialectStatementFormatter extends DbStatementFormatter {
+public class DbDialectStatementFormatter extends DbStatementFormatter {
 
   /**
    * The constructor.
@@ -26,7 +26,7 @@ public abstract class DbDialectStatementFormatter extends DbStatementFormatter {
    */
   public DbDialectStatementFormatter(AbstractDbDialect<?> dialect) {
 
-    this(dialect, CriteriaFormatter.of(new CriteriaParametersIndexed()), INDENTATION);
+    this(dialect, CriteriaFormatter.of(new CriteriaParametersIndexed(dialect)), INDENTATION);
   }
 
   /**
@@ -55,16 +55,15 @@ public abstract class DbDialectStatementFormatter extends DbStatementFormatter {
   protected void onSelectAll(SelectFrom<?, ?> selectFrom) {
 
     EntityBean entity = selectFrom.getEntity();
-    DbBeanMapper<EntityBean> mapping = this.dialect.getOrm().createBeanMapping(entity, entity.getProperties());
-    DbResultRow result = mapping.java2db(entity);
+    DbBeanMapper<EntityBean> mapping = this.dialect.getOrm().createBeanMapper(entity, entity.getProperties());
+    DbResult dbResult = mapping.java2db(entity);
     String s = "";
-    for (DbResultCell<?> cell : result.getCells()) {
+    for (DbResultValue<?> dbValue : dbResult) {
       write(s);
-      String columnName = cell.getDbName();
+      String columnName = dbValue.getName();
       write(columnName);
       s = ", ";
     }
-    super.onSelectAll(selectFrom);
   }
 
 }

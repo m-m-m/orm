@@ -3,26 +3,13 @@
 package io.github.mmm.orm.mapping;
 
 import io.github.mmm.bean.WritableBean;
-import io.github.mmm.orm.result.DbResultRow;
 
 /**
- * Interface to map a {@link WritableBean} to the database and vice-versa.
+ * {@link DbMapper} to map a {@link WritableBean} to the database and vice-versa.
  *
  * @param <B> type of the {@link WritableBean} to map.
  * @since 1.0.0
  */
-public interface DbBeanMapper<B extends WritableBean> {
-
-  /**
-   * @param javaBean the {@link WritableBean} to map.
-   * @return the mapped {@link DbResultRow}.
-   */
-  DbResultRow java2db(B javaBean);
-
-  /**
-   * @param dbResult the {@link DbResultRow} to map.
-   * @return the mapped Java {@link WritableBean bean}.
-   */
-  B db2java(DbResultRow dbResult);
+public interface DbBeanMapper<B extends WritableBean> extends DbMapper<B> {
 
 }

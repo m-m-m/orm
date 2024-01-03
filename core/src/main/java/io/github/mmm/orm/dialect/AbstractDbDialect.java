@@ -10,6 +10,7 @@ import io.github.mmm.orm.impl.OrmImpl;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.naming.DbNamingStrategy;
 import io.github.mmm.orm.source.DbSource;
+import io.github.mmm.orm.statement.DbStatementFormatter;
 
 /**
  * Abstract base implementation of {@link DbDialect}.
@@ -84,6 +85,12 @@ public abstract class AbstractDbDialect<SELF extends AbstractDbDialect<SELF>> im
    * @return a new instance of this dialect with the given {@link Orm}.
    */
   protected abstract SELF withOrm(Orm newOrm);
+
+  @Override
+  public DbStatementFormatter createFormatter() {
+
+    return new DbDialectStatementFormatter(this);
+  }
 
   /**
    * @param config the {@link Map} with the configuration parameters for the {@link DbSource}.

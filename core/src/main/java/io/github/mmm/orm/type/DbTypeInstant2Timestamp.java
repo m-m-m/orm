@@ -13,7 +13,7 @@ import java.time.Instant;
  * Implementation of {@link DbType} for a regular {@link Instant}.
  */
 @SuppressWarnings("exports")
-public class DbTypeInstant2Timestamp extends DbType<Instant, Timestamp> {
+public class DbTypeInstant2Timestamp extends DbTypeJdbcSupport<Instant, Timestamp> {
 
   /**
    * The constructor.
@@ -30,7 +30,18 @@ public class DbTypeInstant2Timestamp extends DbType<Instant, Timestamp> {
    */
   public DbTypeInstant2Timestamp(String declaration) {
 
-    this(declaration, Types.TIMESTAMP);
+    this(declaration, true);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param declaration the database type {@link #getDeclaration() declaration}.
+   * @param jdbcSupport the {@link #isJdbcSupport() JDBC support}.
+   */
+  public DbTypeInstant2Timestamp(String declaration, boolean jdbcSupport) {
+
+    this(declaration, jdbcSupport, Types.TIMESTAMP);
   }
 
   /**
@@ -38,10 +49,11 @@ public class DbTypeInstant2Timestamp extends DbType<Instant, Timestamp> {
    *
    * @param declaration the database type {@link #getDeclaration() declaration}.
    * @param sqlType the {@link #getSqlType() SQL type}.
+   * @param jdbcSupport the {@link #isJdbcSupport() JDBC support}.
    */
-  public DbTypeInstant2Timestamp(String declaration, int sqlType) {
+  public DbTypeInstant2Timestamp(String declaration, boolean jdbcSupport, int sqlType) {
 
-    super(declaration, sqlType);
+    super(declaration, sqlType, jdbcSupport);
   }
 
   @Override

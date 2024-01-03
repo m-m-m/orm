@@ -1,13 +1,13 @@
 /* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0 */
-package io.github.mmm.orm.mapping;
+package io.github.mmm.orm.mapping.impl;
 
 import java.util.Iterator;
 
 import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.bean.WritableBean;
-import io.github.mmm.orm.result.DbResultCell;
-import io.github.mmm.orm.result.DbResultRowPojo;
+import io.github.mmm.orm.result.DbResultValue;
+import io.github.mmm.orm.result.impl.DbResultPojo;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 
@@ -44,13 +44,13 @@ public class DbPropertyMapperImpl<V> implements DbPropertyMapper<V> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public void java2db(ReadableBean javaBean, DbResultRowPojo dbResult) {
+  public void java2db(ReadableBean javaBean, DbResultPojo dbResult) {
 
     java2db((ReadableProperty<V>) javaBean.getProperty(this.propertyName), dbResult);
   }
 
   @Override
-  public void java2db(ReadableProperty<V> javaProperty, DbResultRowPojo dbResult) {
+  public void java2db(ReadableProperty<V> javaProperty, DbResultPojo dbResult) {
 
     V value = null;
     if (javaProperty != null) {
@@ -60,15 +60,15 @@ public class DbPropertyMapperImpl<V> implements DbPropertyMapper<V> {
   }
 
   @Override
-  public void java2dbValue(V javaValue, DbResultRowPojo dbResult) {
+  public void java2dbValue(V javaValue, DbResultPojo dbResult) {
 
     this.valueMapper.java2db(javaValue, dbResult);
   }
 
   @Override
-  public void db2java(Iterator<DbResultCell<?>> dbEntryIterator, WritableBean javaBean) {
+  public void db2java(Iterator<DbResultValue<?>> dbIterator, WritableBean javaBean) {
 
-    V value = this.valueMapper.db2java(dbEntryIterator, null);
+    V value = this.valueMapper.db2java(dbIterator, null);
     javaBean.setDynamic(this.propertyName, value);
   }
 

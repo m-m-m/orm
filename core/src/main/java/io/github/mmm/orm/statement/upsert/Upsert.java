@@ -2,6 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.upsert;
 
+import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
 import io.github.mmm.orm.statement.StartClause;
 
@@ -21,6 +22,16 @@ public final class Upsert extends AbstractDbClause implements StartClause {
   public Upsert() {
 
     super();
+  }
+
+  /**
+   * @param <E> type of the {@link EntityBean}.
+   * @param entity the {@link EntityBean entity} to upsert into.
+   * @return the {@link UpsertInto} for fluent API calls.
+   */
+  public <E extends EntityBean> UpsertInto<E> into(E entity) {
+
+    return new UpsertInto<>(this, entity);
   }
 
 }

@@ -13,14 +13,14 @@ import java.time.LocalDate;
  * Implementation of {@link DbType} for a regular {@link LocalDate}.
  */
 @SuppressWarnings("exports")
-public class DbTypeLocalDate2Date extends DbType<LocalDate, Date> {
+public class DbTypeLocalDate2Date extends DbTypeJdbcSupport<LocalDate, Date> {
 
   /**
    * The constructor.
    */
   public DbTypeLocalDate2Date() {
 
-    this("DATE");
+    this("DATE", true);
   }
 
   /**
@@ -30,7 +30,18 @@ public class DbTypeLocalDate2Date extends DbType<LocalDate, Date> {
    */
   public DbTypeLocalDate2Date(String declaration) {
 
-    this(declaration, Types.DATE);
+    this(declaration, true);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param declaration the database type {@link #getDeclaration() declaration}.
+   * @param jdbcSupport the {@link #isJdbcSupport() JDBC support}.
+   */
+  public DbTypeLocalDate2Date(String declaration, boolean jdbcSupport) {
+
+    this(declaration, Types.DATE, jdbcSupport);
   }
 
   /**
@@ -38,10 +49,11 @@ public class DbTypeLocalDate2Date extends DbType<LocalDate, Date> {
    *
    * @param declaration the database type {@link #getDeclaration() declaration}.
    * @param sqlType the {@link #getSqlType() SQL type}.
+   * @param jdbcSupport the {@link #isJdbcSupport() JDBC support}.
    */
-  public DbTypeLocalDate2Date(String declaration, int sqlType) {
+  public DbTypeLocalDate2Date(String declaration, int sqlType, boolean jdbcSupport) {
 
-    super(declaration, sqlType);
+    super(declaration, sqlType, jdbcSupport);
   }
 
   @Override
@@ -69,6 +81,17 @@ public class DbTypeLocalDate2Date extends DbType<LocalDate, Date> {
       return null;
     }
     return target.toLocalDate();
+  }
+
+  @Override
+  public void setJavaParameter(PreparedStatement statement, int index, LocalDate value, Connection connection)
+      throws SQLException {
+
+    if (value == null) {
+      statement.setNull(index, this.sqlType);
+    } else {
+      statement.setObject(index, value);
+    }
   }
 
   @Override

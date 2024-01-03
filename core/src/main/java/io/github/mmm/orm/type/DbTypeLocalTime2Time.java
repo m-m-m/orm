@@ -13,7 +13,7 @@ import java.time.LocalTime;
  * Implementation of {@link DbType} for a regular {@link LocalTime}.
  */
 @SuppressWarnings("exports")
-public class DbTypeLocalTime2Time extends DbType<LocalTime, Time> {
+public class DbTypeLocalTime2Time extends DbTypeJdbcSupport<LocalTime, Time> {
 
   /**
    * The constructor.
@@ -30,18 +30,30 @@ public class DbTypeLocalTime2Time extends DbType<LocalTime, Time> {
    */
   public DbTypeLocalTime2Time(String declaration) {
 
-    this(declaration, Types.TIME);
+    this(declaration, true);
   }
 
   /**
    * The constructor.
    *
    * @param declaration the database type {@link #getDeclaration() declaration}.
+   * @param jdbcSupport the {@link #isJdbcSupport() JDBC support}.
+   */
+  public DbTypeLocalTime2Time(String declaration, boolean jdbcSupport) {
+
+    this(declaration, jdbcSupport, Types.TIME);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param declaration the database type {@link #getDeclaration() declaration}.
+   * @param jdbcSupport the {@link #isJdbcSupport() JDBC support}.
    * @param sqlType the {@link #getSqlType() SQL type}.
    */
-  public DbTypeLocalTime2Time(String declaration, int sqlType) {
+  public DbTypeLocalTime2Time(String declaration, boolean jdbcSupport, int sqlType) {
 
-    super(declaration, sqlType);
+    super(declaration, sqlType, jdbcSupport);
   }
 
   @Override

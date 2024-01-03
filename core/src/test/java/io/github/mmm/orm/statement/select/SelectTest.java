@@ -4,6 +4,7 @@ package io.github.mmm.orm.statement.select;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.param.CriteriaParametersNamed;
 import io.github.mmm.orm.statement.City;
 import io.github.mmm.orm.statement.DbStatementFormatter;
@@ -11,6 +12,7 @@ import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
 import io.github.mmm.orm.statement.Result;
 import io.github.mmm.orm.statement.Song;
+import io.github.mmm.orm.test.TestDialect;
 import io.github.mmm.property.criteria.CriteriaFormatter;
 
 /**
@@ -30,9 +32,10 @@ public class SelectTest extends DbStatementTest {
         .where(p.Age().ge(18).and(p.Name().like("John*").or(p.Single().eq(true)))).orderBy(p.Name().asc()).get();
     // then
     check(query, sql, '"' + sql + '"');
+    AbstractDbDialect<?> dialect = new TestDialect();
     // and when
     DbStatementFormatter sqlFormatter = new DbStatementFormatter(
-        CriteriaFormatter.of(new CriteriaParametersNamed(true))) {
+        CriteriaFormatter.of(new CriteriaParametersNamed(dialect, true))) {
 
       @Override
       public boolean isUseAsBeforeAlias() {

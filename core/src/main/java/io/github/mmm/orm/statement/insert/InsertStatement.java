@@ -6,11 +6,11 @@ import java.util.List;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
-import io.github.mmm.orm.statement.AbstractDbStatement;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.DbStatementType;
+import io.github.mmm.orm.statement.IntoValuesStatement;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
@@ -25,7 +25,7 @@ import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 // FROM table1 p
 // INNER JOIN table2 c ON c.Id = p.Id
 // INNER JOIN table3 n ON p.Id = n.Id
-public class InsertStatement<E extends EntityBean> extends AbstractDbStatement<E> {
+public class InsertStatement<E extends EntityBean> extends IntoValuesStatement<E> {
 
   private final Insert insert;
 
@@ -68,6 +68,7 @@ public class InsertStatement<E extends EntityBean> extends AbstractDbStatement<E
   /**
    * @return the {@link InsertInto Into}-{@link DbClause}.
    */
+  @Override
   public InsertInto<E> getInto() {
 
     return this.into;

@@ -31,6 +31,7 @@ import io.github.mmm.orm.naming.DbNamingStrategy;
 import io.github.mmm.orm.param.AbstractCriteriaParameters;
 import io.github.mmm.orm.result.DbResult;
 import io.github.mmm.orm.spi.access.AbstractDbAccess;
+import io.github.mmm.orm.statement.NonUniqueResultException;
 import io.github.mmm.orm.statement.insert.Insert;
 import io.github.mmm.orm.statement.insert.InsertStatement;
 import io.github.mmm.orm.statement.select.SelectEntity;
@@ -56,7 +57,7 @@ public class JdbcAccess extends AbstractDbAccess {
 
   private static final PropertyPath<Object> COLUMN_REVISION = SimplePath.of("REV"); // see PkMapper
 
-  protected JdbcSession getSession() {
+  private JdbcSession getSession() {
 
     return JdbcSession.get();
   }
@@ -154,8 +155,10 @@ public class JdbcAccess extends AbstractDbAccess {
   }
 
   @Override
-  protected long executeSql(String sql, AbstractCriteriaParameters parameters, Consumer<DbResult> receiver) {
+  protected long executeSql(String sql, AbstractCriteriaParameters parameters, Consumer<DbResult> receiver,
+      boolean unique) {
 
+    LOG.debug(sql);
     Connection connection = getSession().getConnection();
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       parameters.apply(statement, connection);
@@ -175,7 +178,14 @@ public class JdbcAccess extends AbstractDbAccess {
               } else {
                 jdbcResult.setResultSet(resultSet);
               }
-              receiver.accept(jdbcResult);
+              while (resultSet.next()) {
+                receiver.accept(jdbcResult);
+                if (!unique) {
+                  resultSet.last();
+                  int size = resultSet.getRow();
+                  throw new NonUniqueResultException(size, sql);
+                }
+              }
               count++;
             }
           } while (statement.getMoreResults());

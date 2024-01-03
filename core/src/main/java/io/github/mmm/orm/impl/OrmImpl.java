@@ -2,22 +2,33 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.impl;
 
+import java.util.Objects;
+
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.entity.bean.typemapping.TypeMapping;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.IdMapper;
 import io.github.mmm.orm.mapping.DbBeanMapper;
-import io.github.mmm.orm.mapping.DbBeanMapperImpl;
-import io.github.mmm.orm.mapping.DbPropertyMapper;
-import io.github.mmm.orm.mapping.DbPropertyMapperImpl;
-import io.github.mmm.orm.mapping.DbSegmentMapper;
+import io.github.mmm.orm.mapping.DbMapper;
 import io.github.mmm.orm.mapping.Orm;
+import io.github.mmm.orm.mapping.UnmappedTypeException;
+import io.github.mmm.orm.mapping.impl.DbBeanMapperImpl;
+import io.github.mmm.orm.mapping.impl.DbMapperDbResult;
+import io.github.mmm.orm.mapping.impl.DbPropertyMapper;
+import io.github.mmm.orm.mapping.impl.DbPropertyMapperImpl;
+import io.github.mmm.orm.mapping.impl.DbSegmentMapper;
 import io.github.mmm.orm.naming.DbNamingStrategy;
-import io.github.mmm.orm.result.DbResultCellObjectWithDeclaration;
+import io.github.mmm.orm.result.impl.DbResultValueObject;
+import io.github.mmm.orm.statement.select.Select;
+import io.github.mmm.orm.statement.select.SelectEntity;
+import io.github.mmm.orm.statement.select.SelectProjection;
+import io.github.mmm.orm.statement.select.SelectResult;
+import io.github.mmm.orm.statement.select.SelectSingle;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.ProjectionProperty;
 import io.github.mmm.value.CriteriaObject;
+import io.github.mmm.value.PropertyPath;
 import io.github.mmm.value.ReadablePath;
 import io.github.mmm.value.converter.TypeMapper;
 
@@ -45,9 +56,7 @@ public class OrmImpl implements Orm {
     this.namingStrategy = namingStrategy;
   }
 
-  /**
-   * @return the {@link TypeMapping}.
-   */
+  @Override
   public TypeMapping getTypeMapping() {
 
     return this.typeMapping;
@@ -60,8 +69,15 @@ public class OrmImpl implements Orm {
   }
 
   @Override
+  public <B extends WritableBean> DbBeanMapper<B> createBeanMapper(B bean) {
+
+    // TODO add thread-safe caching
+    return Orm.super.createBeanMapper(bean);
+  }
+
+  @Override
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public <B extends WritableBean> DbBeanMapper<B> createBeanMapping(B bean,
+  public <B extends WritableBean> DbBeanMapper<B> createBeanMapper(B bean,
       Iterable<? extends ReadableProperty<?>> properties) {
 
     DbBeanMapperImpl<B> beanMapper = new DbBeanMapperImpl<>(bean);
@@ -77,12 +93,12 @@ public class OrmImpl implements Orm {
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  public <B extends WritableBean> DbBeanMapper<B> createBeanMappingProjection(B bean,
+  public <B extends WritableBean> DbBeanMapper<B> createBeanMapperProjection(B bean,
       Iterable<? extends ProjectionProperty<?>> properties) {
 
     DbBeanMapperImpl<B> beanMapper = new DbBeanMapperImpl<>(bean);
     for (ProjectionProperty<?> projectionProperty : properties) {
-      WritableProperty property = (WritableProperty) projectionProperty.getProperty();
+      ReadableProperty property = (ReadableProperty) projectionProperty.getProperty();
       String columnName = property.getName();
       DbSegmentMapper valueMapper = createSegmentMapper(projectionProperty.getSelection(), columnName,
           property.getValueClass(), property);
@@ -117,8 +133,7 @@ public class OrmImpl implements Orm {
       typeMapper = (TypeMapper) IdMapper.of();
     }
     if (typeMapper == null) {
-      throw new IllegalStateException("No type mapping could be found for type " + valueClass + " and selection "
-          + selection + "[" + selection.getClass().getSimpleName() + "]");
+      throw new UnmappedTypeException(valueClass, selection);
     }
     return createSegmentMapper(selection, columnName, typeMapper);
   }
@@ -135,8 +150,7 @@ public class OrmImpl implements Orm {
     String newColumnName = typeMapper.mapName(columnName);
     if (typeMapper.hasDeclaration()) {
       newColumnName = this.namingStrategy.getColumnName(newColumnName);
-      DbResultCellObjectWithDeclaration entry = new DbResultCellObjectWithDeclaration<>(selection, null, newColumnName,
-          typeMapper.getDeclaration());
+      DbResultValueObject entry = new DbResultValueObject<>(newColumnName, null, typeMapper.getDeclaration());
       return new DbSegmentMapper<>(typeMapper, entry, nextSegment);
     } else {
       DbSegmentMapper child = createSegmentMapper(selection, newColumnName, typeMapper.getTargetType(), null);
@@ -154,6 +168,47 @@ public class OrmImpl implements Orm {
       return this;
     }
     return new OrmImpl(this.typeMapping, newNamingStrategy);
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Override
+  public <V> DbMapper<V> createMapper(Select<V> select) {
+
+    if (select instanceof SelectEntity<?> selectEntity) {
+      return (DbMapper) createBeanMapper(selectEntity.getResultBean());
+    } else if (select instanceof SelectResult) {
+      return (DbMapper) DbMapperDbResult.INSTANCE;
+    } else if (select instanceof SelectSingle<V> selectSingle) {
+      return createMapper(selectSingle.getSelection());
+    } else if (select instanceof SelectProjection<?> selectProjection) {
+      return (DbMapper) createBeanMapperProjection(selectProjection.getResultBean(), selectProjection.getSelections());
+    }
+    Objects.requireNonNull(select);
+    throw new IllegalStateException("Unknown Select type: " + select.getClass().getName());
+  }
+
+  /**
+   * @param selection the {@link SelectSingle#getSelection() single selection}.
+   * @return the according {@link DbMapper}.
+   */
+  private <V> DbSegmentMapper<V, ?> createMapper(CriteriaObject<V> selection) {
+
+    String columnName = null;
+    if (selection instanceof ProjectionProperty<V> projectionProperty) {
+      selection = projectionProperty.getSelection();
+      columnName = columnName(projectionProperty.getProperty());
+    } else if (selection instanceof PropertyPath<V> propertyPath) {
+      columnName = columnName(propertyPath);
+    }
+    return createSegmentMapper(selection, columnName, null, null);
+  }
+
+  private String columnName(PropertyPath<?> propertyPath) {
+
+    if (propertyPath instanceof ReadableProperty<?> property) {
+      return this.namingStrategy.getColumnName(property);
+    }
+    return this.namingStrategy.getColumnName(propertyPath.getName());
   }
 
 }

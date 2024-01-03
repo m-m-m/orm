@@ -13,7 +13,7 @@ import io.github.mmm.orm.statement.DbStatementFormatter;
 /**
  * Implementation of {@link DbDialect} for H2 database.
  */
-public final class H2Dialect extends AbstractDbDialect<H2Dialect> {
+public class H2Dialect extends AbstractDbDialect<H2Dialect> {
 
   /**
    * The constructor.

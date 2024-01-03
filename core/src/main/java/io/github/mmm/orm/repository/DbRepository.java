@@ -3,6 +3,7 @@
 package io.github.mmm.orm.repository;
 
 import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.orm.statement.NonUniqueResultException;
 import io.github.mmm.orm.statement.select.SelectStatement;
 
 /**
@@ -22,7 +23,7 @@ public interface DbRepository<E extends EntityBean> extends EntityRepository<E> 
    * @param statement the {@link SelectStatement} to query the requested entity. Should produce a single result or no
    *        result.
    * @return the matching {@link EntityBean entity} or {@code null} if not found.
-   * @throws RuntimeException if the given {@code query} produced multiple results (matched to more than one entity).
+   * @throws NonUniqueResultException if the given {@code statement} produced more than one result.
    */
   E findOneByQuery(SelectStatement<E> statement);
 

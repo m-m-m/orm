@@ -8,11 +8,16 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Iterator;
 
+import io.github.mmm.base.exception.ObjectMismatchException;
 import io.github.mmm.base.io.AppendableWriter;
+import io.github.mmm.entity.bean.typemapping.TypeMapping;
+import io.github.mmm.orm.dialect.AbstractDbDialect;
+import io.github.mmm.orm.mapping.UnmappedTypeException;
 import io.github.mmm.orm.type.DbType;
 import io.github.mmm.property.criteria.CriteriaExpression;
 import io.github.mmm.property.criteria.CriteriaParameters;
 import io.github.mmm.property.criteria.Literal;
+import io.github.mmm.value.converter.TypeMapper;
 
 /**
  * {@link CriteriaParameters} using {@link CriteriaParameterImpl}.
@@ -21,16 +26,21 @@ import io.github.mmm.property.criteria.Literal;
  */
 public abstract class AbstractCriteriaParameters implements CriteriaParameters<CriteriaParameterImpl<?>> {
 
+  private final AbstractDbDialect<?> dialect;
+
   private CriteriaParameterImpl<?> first;
 
   private CriteriaParameterImpl<?> last;
 
   /**
    * The constructor.
+   *
+   * @param dialect the {@link AbstractDbDialect}.
    */
-  public AbstractCriteriaParameters() {
+  public AbstractCriteriaParameters(AbstractDbDialect<?> dialect) {
 
     super();
+    this.dialect = dialect;
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -44,7 +54,21 @@ public abstract class AbstractCriteriaParameters implements CriteriaParameters<C
         if (this.last != null) {
           index = this.last.getIndex() + 1;
         }
+        TypeMapping typeMapping = this.dialect.getOrm().getTypeMapping();
         DbType dbType = null;
+        while (dbType == null) {
+          Class<?> valueClass = value.getClass();
+          TypeMapper typeMapper = typeMapping.getTypeMapper(valueClass);
+          if (typeMapper == null) {
+            throw new UnmappedTypeException(valueClass);
+          } else if (typeMapper instanceof DbType type) {
+            dbType = type;
+          } else if (typeMapper.next() == null) {
+            value = typeMapper.toTarget(value);
+          } else {
+            throw new ObjectMismatchException(valueClass, "atomic type");
+          }
+        }
         CriteriaParameterImpl<?> param = createParameter(index, value, dbType, parent);
         if (this.last == null) {
           this.first = param;
@@ -58,6 +82,7 @@ public abstract class AbstractCriteriaParameters implements CriteriaParameters<C
       }
     }
     out.append("null");
+
   }
 
   /**

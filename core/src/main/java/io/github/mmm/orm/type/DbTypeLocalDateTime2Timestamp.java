@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * Implementation of {@link DbType} for a regular {@link LocalDateTime}.
  */
 @SuppressWarnings("exports")
-public class DbTypeLocalDateTime2Timestamp extends DbType<LocalDateTime, Timestamp> {
+public class DbTypeLocalDateTime2Timestamp extends DbTypeJdbcSupport<LocalDateTime, Timestamp> {
 
   /**
    * The constructor.
@@ -30,7 +30,18 @@ public class DbTypeLocalDateTime2Timestamp extends DbType<LocalDateTime, Timesta
    */
   public DbTypeLocalDateTime2Timestamp(String declaration) {
 
-    this(declaration, Types.TIMESTAMP);
+    this(declaration, true);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param declaration the database type {@link #getDeclaration() declaration}.
+   * @param jdbcSupport the {@link #isJdbcSupport() JDBC support}.
+   */
+  public DbTypeLocalDateTime2Timestamp(String declaration, boolean jdbcSupport) {
+
+    this(declaration, jdbcSupport, Types.TIMESTAMP);
   }
 
   /**
@@ -38,10 +49,11 @@ public class DbTypeLocalDateTime2Timestamp extends DbType<LocalDateTime, Timesta
    *
    * @param declaration the database type {@link #getDeclaration() declaration}.
    * @param sqlType the {@link #getSqlType() SQL type}.
+   * @param jdbcSupport the {@link #isJdbcSupport() JDBC support}.
    */
-  public DbTypeLocalDateTime2Timestamp(String declaration, int sqlType) {
+  public DbTypeLocalDateTime2Timestamp(String declaration, boolean jdbcSupport, int sqlType) {
 
-    super(declaration, sqlType);
+    super(declaration, sqlType, jdbcSupport);
   }
 
   @Override
@@ -69,6 +81,17 @@ public class DbTypeLocalDateTime2Timestamp extends DbType<LocalDateTime, Timesta
       return null;
     }
     return target.toLocalDateTime();
+  }
+
+  @Override
+  public void setJavaParameter(PreparedStatement statement, int index, LocalDateTime value, Connection connection)
+      throws SQLException {
+
+    if (value == null) {
+      statement.setNull(index, this.sqlType);
+    } else {
+      statement.setObject(index, value);
+    }
   }
 
   @Override

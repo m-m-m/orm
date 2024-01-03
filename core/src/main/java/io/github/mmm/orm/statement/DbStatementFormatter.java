@@ -18,6 +18,7 @@ import io.github.mmm.orm.ddl.DbElement;
 import io.github.mmm.orm.ddl.constraint.CheckConstraint;
 import io.github.mmm.orm.ddl.constraint.DbConstraint;
 import io.github.mmm.orm.ddl.constraint.ForeignKeyConstraint;
+import io.github.mmm.orm.ddl.constraint.PrimaryKeyConstraint;
 import io.github.mmm.orm.ddl.operation.TableColumnOperation;
 import io.github.mmm.orm.ddl.operation.TableConstraintOperation;
 import io.github.mmm.orm.ddl.operation.TableOperation;
@@ -28,8 +29,8 @@ import io.github.mmm.orm.mapping.DbBeanMapper;
 import io.github.mmm.orm.mapping.DbSelection;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.metadata.DbName;
-import io.github.mmm.orm.result.DbResultCell;
-import io.github.mmm.orm.result.DbResultRow;
+import io.github.mmm.orm.result.DbResult;
+import io.github.mmm.orm.result.DbResultValue;
 import io.github.mmm.orm.statement.alter.AlterTable;
 import io.github.mmm.orm.statement.alter.AlterTableOperations;
 import io.github.mmm.orm.statement.create.CreateIndex;
@@ -39,7 +40,6 @@ import io.github.mmm.orm.statement.create.CreateTable;
 import io.github.mmm.orm.statement.create.CreateTableContents;
 import io.github.mmm.orm.statement.delete.Delete;
 import io.github.mmm.orm.statement.insert.Insert;
-import io.github.mmm.orm.statement.insert.InsertInto;
 import io.github.mmm.orm.statement.insert.InsertValues;
 import io.github.mmm.orm.statement.select.OrderBy;
 import io.github.mmm.orm.statement.select.Select;
@@ -56,9 +56,12 @@ import io.github.mmm.property.criteria.CriteriaOrdering;
 import io.github.mmm.property.criteria.CriteriaPredicate;
 import io.github.mmm.property.criteria.Literal;
 import io.github.mmm.property.criteria.PredicateOperator;
+import io.github.mmm.property.criteria.ProjectionProperty;
 import io.github.mmm.property.criteria.PropertyAssignment;
+import io.github.mmm.property.criteria.SimplePath;
 import io.github.mmm.value.CriteriaObject;
 import io.github.mmm.value.PropertyPath;
+import io.github.mmm.value.converter.TypeMapper;
 
 /**
  * Formatter to format a {@link DbClause} or {@link DbStatement} to SQL.
@@ -256,7 +259,7 @@ public class DbStatementFormatter implements DbClauseVisitor {
   public void onSelect(Select<?> select) {
 
     writeIndent();
-    write("SELECT");
+    write("SELECT ");
     SelectStatement<?> statement = select.getStatement();
     SelectFrom<?, ?> selectFrom = null;
     if (statement != null) {
@@ -270,7 +273,7 @@ public class DbStatementFormatter implements DbClauseVisitor {
   public void onDelete(Delete delete) {
 
     writeIndent();
-    write("DELETE");
+    write("DELETE ");
     DbClauseVisitor.super.onDelete(delete);
   }
 
@@ -278,7 +281,7 @@ public class DbStatementFormatter implements DbClauseVisitor {
   public void onInsert(Insert insert) {
 
     writeIndent();
-    write("INSERT");
+    write("INSERT ");
     DbClauseVisitor.super.onInsert(insert);
   }
 
@@ -314,7 +317,7 @@ public class DbStatementFormatter implements DbClauseVisitor {
 
     incIndent();
     List<DbColumnSpec> columns = contents.getColumns();
-    writeColumns(columns, contents.get().getCreateTable().getEntity(), true);
+    writeColumns(columns, contents.get().getCreateTable().getEntity(), true, false);
     if (!columns.isEmpty()) {
       write(",");
     }
@@ -513,50 +516,107 @@ public class DbStatementFormatter implements DbClauseVisitor {
   @Override
   public void onInto(IntoClause<?, ?, ?> into) {
 
-    write(" INTO ");
+    write("INTO ");
     write(into.getEntityName());
-    if (into instanceof InsertInto) {
-      InsertInto<?> insertInto = (InsertInto<?>) into;
-      InsertValues<?> values = insertInto.values();
-      String s = "(";
-      int i = 0;
-      for (PropertyAssignment<?> assignment : values.getAssignments()) {
-        write(s);
-        this.criteriaFormatter.onPropertyPath(assignment.getProperty(), i++, null);
-        s = ", ";
-      }
-      write(")");
-    }
     DbClauseVisitor.super.onInto(into);
   }
 
   @Override
   public void onValues(ValuesClause<?, ?> values) {
 
-    write(" VALUES (");
+    boolean isInto = values instanceof InsertValues;
+    List<PropertyAssignment<?>> assignments = values.getAssignments();
+    List<CriteriaObject<?>> args = null;
+    if (isInto) {
+      args = new ArrayList<>(assignments.size());
+      write("(");
+    } else {
+      write(" VALUES (");
+    }
     String s = "";
     int i = 0;
-    for (PropertyAssignment<?> assignment : values.getAssignments()) {
-      write(s);
-      this.criteriaFormatter.onArg(assignment.getValue(), i++, null);
-      s = ", ";
+    for (PropertyAssignment<?> assignment : assignments) {
+      i = onAssignment(assignment.getProperty(), assignment.getValue(), i, false, args);
     }
     write(")");
+    if (args != null) { // isInto
+      write(" VALUES (");
+      s = "";
+      ;
+      for (int argIndex = 0; argIndex < i; argIndex++) {
+        write(s);
+        this.criteriaFormatter.onArg(args.get(argIndex), argIndex, null);
+        s = ", ";
+      }
+      write(")");
+    }
     DbClauseVisitor.super.onValues(values);
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private CriteriaObject<?> mapValue(CriteriaObject<?> value, TypeMapper typeMapper) {
+
+    if (value instanceof Literal<?> literal) {
+      Object mapped = typeMapper.toTarget(literal.get());
+      return Literal.of(mapped);
+    } else if (value instanceof PropertyPath<?> property) {
+      return mapProperty(property, typeMapper);
+    } else if (value instanceof ProjectionProperty<?> projection) {
+      return new ProjectionProperty(mapValue(projection.getSelection(), typeMapper),
+          mapProperty(projection.getProperty(), typeMapper));
+    } else {
+      // currently unsupported...
+      return value;
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  private PropertyPath<?> mapProperty(PropertyPath<?> property, TypeMapper typeMapper) {
+
+    String name = typeMapper.mapName(property.getName());
+    return new SimplePath(property.parentPath(), name);
+  }
+
+  @SuppressWarnings("rawtypes")
+  private int onAssignment(PropertyPath<?> property, CriteriaObject<?> value, int index, boolean assign,
+      List<CriteriaObject<?>> args) {
+
+    if (property instanceof ReadableProperty<?> p) {
+      TypeMapper typeMapper = p.getTypeMapper();
+      if (typeMapper != null) {
+        do {
+          String name = typeMapper.mapName(property.getName());
+          index = onAssignment(new SimplePath(property.parentPath(), name), mapValue(value, typeMapper), index, assign,
+              args);
+          typeMapper = typeMapper.next();
+        } while (typeMapper != null);
+        return index;
+      }
+    }
+    if (index > 0) {
+      write(", ");
+    }
+    if (assign) {
+      this.criteriaFormatter.onPropertyPath(property, index, null);
+      write("=");
+      assert (args == null);
+    }
+    if (args == null) {
+      this.criteriaFormatter.onArg(value, index, null);
+    } else {
+      this.criteriaFormatter.onPropertyPath(property, index, null);
+      args.add(value);
+    }
+    return index + 1;
   }
 
   @Override
   public void onSet(SetClause<?, ?> set) {
 
     write(" SET ");
-    String s = "";
     int i = 0;
     for (PropertyAssignment<?> assignment : set.getAssignments()) {
-      write(s);
-      this.criteriaFormatter.onPropertyPath(assignment.getProperty(), i++, null);
-      write("=");
-      this.criteriaFormatter.onArg(assignment.getValue(), i++, null);
-      s = ", ";
+      i = onAssignment(assignment.getProperty(), assignment.getValue(), i, true, null);
     }
     DbClauseVisitor.super.onSet(set);
   }
@@ -565,11 +625,14 @@ public class DbStatementFormatter implements DbClauseVisitor {
    * @param columns the {@link Iterable} with the {@link DbColumnSpec columns} to write.
    * @param entity the {@link EntityBean} containing the columns.
    * @param withDeclaration - {@code true} to write column declarations, {@code false} otherwise (to omit declarations).
+   * @param skipDecompose - {@code true} to skip decomposing columns via ORM (e.g. for PK-Constraint), {@code false}
+   *        otherwise.
    */
-  protected void writeColumns(Iterable<DbColumnSpec> columns, EntityBean entity, boolean withDeclaration) {
+  protected void writeColumns(Iterable<DbColumnSpec> columns, EntityBean entity, boolean withDeclaration,
+      boolean skipDecompose) {
 
     String s = "";
-    if (this.dialect == null) {
+    if (skipDecompose || (this.dialect == null)) {
       for (DbColumnSpec column : columns) {
         write(s);
         if (withDeclaration) {
@@ -586,17 +649,17 @@ public class DbStatementFormatter implements DbClauseVisitor {
       for (DbColumnSpec column : columns) {
         properties.add(column.getProperty());
       }
-      DbBeanMapper<EntityBean> mapping = this.dialect.getOrm().createBeanMapping(entity, properties);
-      DbResultRow result = mapping.java2db(entity);
-      for (DbResultCell<?> entry : result.getCells()) {
-        String columnName = entry.getDbName();
+      DbBeanMapper<EntityBean> mapping = this.dialect.getOrm().createBeanMapper(entity, properties);
+      DbResult dbResult = mapping.java2db(entity);
+      for (DbResultValue<?> dbValue : dbResult) {
+        String columnName = dbValue.getName();
         write(s);
         if (withDeclaration) {
           writeIndent();
         }
         writeName(columnName);
         if (withDeclaration) {
-          String declaration = entry.getDeclaration();
+          String declaration = dbValue.getDeclaration();
           write(" ");
           write(declaration);
         }
@@ -629,7 +692,8 @@ public class DbStatementFormatter implements DbClauseVisitor {
       writeCriteriaExpression(predicate);
     } else {
       EntityBean entity = (EntityBean) constraint.getFirstColumn().getProperty().getMetadata().getLock();
-      writeColumns(constraint, entity, false);
+      boolean isPk = constraint instanceof PrimaryKeyConstraint;
+      writeColumns(constraint, entity, false, isPk);
     }
     write(")");
     if (constraint instanceof ForeignKeyConstraint fk) {
@@ -778,7 +842,7 @@ public class DbStatementFormatter implements DbClauseVisitor {
   public void onCreateIndexColumns(CreateIndexColumns<?> columns) {
 
     write(" (");
-    writeColumns(columns.getColumns(), columns.get().getOn().getEntity(), false);
+    writeColumns(columns.getColumns(), columns.get().getOn().getEntity(), false, false);
     write(")");
     DbClauseVisitor.super.onCreateIndexColumns(columns);
   }

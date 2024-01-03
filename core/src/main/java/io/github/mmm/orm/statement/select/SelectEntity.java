@@ -3,12 +3,13 @@
 package io.github.mmm.orm.statement.select;
 
 import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.orm.statement.DbStatement;
 
 /**
  * {@link Select} to query the {@link SelectFrom#getEntity() primary entity}.
  *
  * @param <R> type of the result of the selection.
- * @see Select#entity(EntityBean)
+ * @see DbStatement#select(EntityBean)
  * @since 1.0.0
  */
 public class SelectEntity<R extends EntityBean> extends Select<R> {

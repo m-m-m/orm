@@ -15,7 +15,7 @@ import io.github.mmm.property.criteria.PropertyAssignment;
  * @since 1.0.0
  */
 public abstract class ValuesClause<E extends EntityBean, SELF extends ValuesClause<E, SELF>>
-    extends AssignmentClause<E, SELF> implements ValuesFragment<E, SELF> {
+    extends AssignmentClause<E, SELF> implements ValuesFragment<E, SELF>, MainDbClause<E> {
 
   /**
    * The constructor.
@@ -41,5 +41,8 @@ public abstract class ValuesClause<E extends EntityBean, SELF extends ValuesClau
     }
     return self();
   }
+
+  @Override
+  public abstract IntoValuesStatement<E> get();
 
 }

@@ -11,29 +11,11 @@ import org.junit.jupiter.api.Test;
 import io.github.mmm.entity.id.LongId;
 import io.github.mmm.orm.impl.OrmImpl;
 import io.github.mmm.orm.naming.DbNamingStrategy;
-import io.github.mmm.orm.result.DbResultCell;
-import io.github.mmm.orm.result.DbResultRow;
+import io.github.mmm.orm.result.DbResult;
+import io.github.mmm.orm.result.DbResultValue;
 import io.github.mmm.orm.statement.City;
 import io.github.mmm.orm.statement.GeoLocation;
-import io.github.mmm.orm.type.DbTypeBigDecimal;
-import io.github.mmm.orm.type.DbTypeBigInteger2Number;
-import io.github.mmm.orm.type.DbTypeBoolean;
-import io.github.mmm.orm.type.DbTypeByte;
-import io.github.mmm.orm.type.DbTypeCharacter;
-import io.github.mmm.orm.type.DbTypeDouble;
-import io.github.mmm.orm.type.DbTypeFloat;
-import io.github.mmm.orm.type.DbTypeInstant;
-import io.github.mmm.orm.type.DbTypeInteger;
-import io.github.mmm.orm.type.DbTypeLocalDate;
-import io.github.mmm.orm.type.DbTypeLocalDateTime;
-import io.github.mmm.orm.type.DbTypeLocalTime;
-import io.github.mmm.orm.type.DbTypeLong;
-import io.github.mmm.orm.type.DbTypeOffsetDateTime;
-import io.github.mmm.orm.type.DbTypeOffsetTime;
-import io.github.mmm.orm.type.DbTypeShort;
-import io.github.mmm.orm.type.DbTypeUuid;
-import io.github.mmm.orm.type.DbTypeZonedDateTime;
-import io.github.mmm.orm.typemapping.DbTypeMapping;
+import io.github.mmm.orm.test.TestTypeMapping;
 
 /**
  * Test of {@link Orm} and {@link DbBeanMapper}.
@@ -66,64 +48,29 @@ public class OrmTest {
     Orm orm = createOrm();
 
     // act
-    DbBeanMapper<City> mapping = orm.createBeanMapping(city);
-    DbResultRow row = mapping.java2db(city);
-    City city2 = mapping.db2java(row);
+    DbBeanMapper<City> mapping = orm.createBeanMapper(city);
+    DbResult dbResult = mapping.java2db(city);
+    City city2 = mapping.db2java(dbResult);
 
     // assert
-    Iterator<DbResultCell<?>> cellIterator = row.getCells().iterator();
-    checkCell(cellIterator, "GEO_LOCATION_LATITUDE", latitude, "DOUBLE PRECISION");
-    checkCell(cellIterator, "GEO_LOCATION_LONGITUDE", longitude, "DOUBLE PRECISION");
-    checkCell(cellIterator, "ID", id, "BIGINT");
-    checkCell(cellIterator, "REV", 1L, "BIGINT");
-    checkCell(cellIterator, "INHABITANTS", inhabitants, "INTEGER");
-    checkCell(cellIterator, "NAME", name, "VARCHAR");
-    System.out.println(cellIterator.next());
-    System.out.println(cellIterator.next());
-
-    assertThat(cellIterator.hasNext()).isFalse();
+    Iterator<DbResultValue<?>> dbValueIterator = dbResult.iterator();
+    checkCell(dbValueIterator, "GEO_LOCATION_LATITUDE", latitude, "DOUBLE PRECISION");
+    checkCell(dbValueIterator, "GEO_LOCATION_LONGITUDE", longitude, "DOUBLE PRECISION");
+    checkCell(dbValueIterator, "ID", id, "BIGINT");
+    checkCell(dbValueIterator, "REV", 1L, "BIGINT");
+    checkCell(dbValueIterator, "INHABITANTS", inhabitants, "INTEGER");
+    checkCell(dbValueIterator, "NAME", name, "VARCHAR");
+    assertThat(dbValueIterator.hasNext()).isFalse();
     assertThat(city.isEqual(city2)).isTrue();
   }
 
-  private void checkCell(Iterator<DbResultCell<?>> cellIterator, String dbName, Object value, String declaration) {
+  private void checkCell(Iterator<DbResultValue<?>> dbValueIterator, String dbName, Object value, String declaration) {
 
-    assertThat(cellIterator).hasNext();
-    DbResultCell<?> cell = cellIterator.next();
-    assertThat(cell.getDbName()).isEqualTo(dbName);
-    assertThat(cell.getValue()).isEqualTo(value);
-    assertThat(cell.getDeclaration()).isEqualTo(declaration);
-  }
-
-  private static class TestTypeMapping extends DbTypeMapping {
-
-    /**
-     * The constructor.
-     */
-    public TestTypeMapping() {
-
-      super();
-      add(new DbTypeLong("BIGINT"));
-      add(new DbTypeInteger("INTEGER"));
-      add(new DbTypeShort("SMALLINT"));
-      add(new DbTypeByte("TINYINT"));
-      add(new DbTypeDouble("DOUBLE PRECISION"));
-      add(new DbTypeFloat("REAL"));
-      add(new DbTypeBigDecimal("NUMERIC"));
-      add(new DbTypeBigInteger2Number("NUMERIC(100000)"));
-      add(new DbTypeBoolean("BOOLEAN"));
-      add(new DbTypeCharacter("CHAR"));
-      add(new DbTypeUuid("UUID"));
-      add(new DbTypeInstant("TIMESTAMP"));
-      add(new DbTypeOffsetDateTime("TIMESTAMP WITH TIME ZONE"));
-      add(new DbTypeZonedDateTime("TIMESTAMP WITH TIME ZONE"));
-      add(new DbTypeLocalDate("DATE"));
-      add(new DbTypeLocalTime("TIME"));
-      add(new DbTypeOffsetTime("TIME WITH TIME ZONE"));
-      add(new DbTypeLocalDateTime("DATETIME"));
-      addBinary("BINARY", "BINARY(%s)");
-      addString("VARCHAR", "VARCHAR(%s)", "CHAR(%s)");
-    }
-
+    assertThat(dbValueIterator).hasNext();
+    DbResultValue<?> dbValue = dbValueIterator.next();
+    assertThat(dbValue.getName()).isEqualTo(dbName);
+    assertThat(dbValue.getValue()).isEqualTo(value);
+    assertThat(dbValue.getDeclaration()).isEqualTo(declaration);
   }
 
 }

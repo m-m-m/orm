@@ -3,7 +3,6 @@
 package io.github.mmm.orm.statement.merge;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.orm.statement.MainDbClause;
 import io.github.mmm.orm.statement.ValuesClause;
 
 /**
@@ -12,7 +11,7 @@ import io.github.mmm.orm.statement.ValuesClause;
  * @param <E> type of the {@link MergeInto#getEntity() entity}.
  * @since 1.0.0
  */
-public class MergeValues<E extends EntityBean> extends ValuesClause<E, MergeValues<E>> implements MainDbClause<E> {
+public class MergeValues<E extends EntityBean> extends ValuesClause<E, MergeValues<E>> {
 
   private final MergeStatement<E> statement;
 

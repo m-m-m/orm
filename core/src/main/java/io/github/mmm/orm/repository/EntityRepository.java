@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import io.github.mmm.entity.Entity;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.link.Link;
@@ -21,19 +20,19 @@ import io.github.mmm.entity.link.Link;
 public interface EntityRepository<E extends EntityBean> {
 
   /**
-   * @return the {@link Class} reflecting the managed {@link Entity}.
+   * @return the {@link Class} reflecting the managed {@link EntityBean}.
    */
   Class<E> getEntityClass();
 
   /**
-   * @param id the {@link Id} of the requested {@link Entity entity}.
-   * @return the requested {@link Entity entity} or {@code null} if no such entity exists.
+   * @param id the {@link Id} of the requested {@link EntityBean entity}.
+   * @return the requested {@link EntityBean entity} or {@code null} if no such entity exists.
    */
   E findById(Id<E> id);
 
   /**
-   * @param link the {@link Link} to the requested {@link Entity entity}.
-   * @return the requested {@link Entity entity} or {@code null} if no such entity exists.
+   * @param link the {@link Link} to the requested {@link EntityBean entity}.
+   * @return the requested {@link EntityBean entity} or {@code null} if no such entity exists.
    */
   default E findByLink(Link<E> link) {
 
@@ -46,12 +45,13 @@ public interface EntityRepository<E extends EntityBean> {
   }
 
   /**
-   * @param entity the {@link Entity} to save. If transient, it will be inserted, otherwise it will be updated.
+   * @param entity the {@link EntityBean} to save. If transient, it will be inserted, otherwise it will be updated.
+   * @return the new or updated {@link Id} of the saved {@link EntityBean}.
    */
-  void save(E entity);
+  Id<E> save(E entity);
 
   /**
-   * @param entities the array of {@link Entity entities} to {@link #save(EntityBean) save}.
+   * @param entities the array of {@link EntityBean entities} to {@link #save(EntityBean) save}.
    */
   @SuppressWarnings("unchecked")
   default void saveAll(E... entities) {
@@ -63,7 +63,7 @@ public interface EntityRepository<E extends EntityBean> {
   }
 
   /**
-   * @param entities the {@link Iterable} of {@link Entity entities} to {@link #save(EntityBean) save}.
+   * @param entities the {@link Iterable} of {@link EntityBean entities} to {@link #save(EntityBean) save}.
    */
   default void saveAll(Iterable<E> entities) {
 
@@ -74,8 +74,8 @@ public interface EntityRepository<E extends EntityBean> {
   }
 
   /**
-   * @param entity the {@link Entity} to remove from this repository.
-   * @return {@code true} if the given {@link Entity entity} has been successfully deleted from this repository,
+   * @param entity the {@link EntityBean} to remove from this repository.
+   * @return {@code true} if the given {@link EntityBean entity} has been successfully deleted from this repository,
    *         {@code false} otherwise (was not {@link #save(EntityBean) saved} before).
    */
   default boolean delete(E entity) {
@@ -84,14 +84,14 @@ public interface EntityRepository<E extends EntityBean> {
   }
 
   /**
-   * @param id the {@link Id} (primary key) of the {@link Entity entity} to delete.
+   * @param id the {@link Id} (primary key) of the {@link EntityBean entity} to delete.
    * @return {@code true} if the entity with the given {@link Id} has been successfully deleted from this repository,
    *         {@code false} otherwise (no entity is persistent with this {@link Id}).
    */
   boolean deleteById(Id<E> id);
 
   /**
-   * @param link the {@link Link} to the {@link Entity entity} to delete.
+   * @param link the {@link Link} to the {@link EntityBean entity} to delete.
    * @return {@code true} if the entity for the given {@link Link} has been successfully deleted from this repository,
    *         {@code false} otherwise (no entity is persistent with this {@link Id}).
    */
@@ -108,7 +108,7 @@ public interface EntityRepository<E extends EntityBean> {
   }
 
   /**
-   * @param entities the {@link Iterable} of {@link Entity entities} to {@link #delete(EntityBean) delete}.
+   * @param entities the {@link Iterable} of {@link EntityBean entities} to {@link #delete(EntityBean) delete}.
    * @return the number of entities that have been physically deleted.
    */
   default int deleteAll(Iterable<E> entities) {
@@ -160,7 +160,7 @@ public interface EntityRepository<E extends EntityBean> {
 
   /**
    * @param ids the {@link Iterable} of {@link Id}s to {@link #findById(Id) retrieve}.
-   * @return an {@link List} with the {@link #findById(Id) retrieved} {@link Entity entities}.
+   * @return an {@link List} with the {@link #findById(Id) retrieved} {@link EntityBean entities}.
    */
   default List<E> findAllById(Iterable<Id<E>> ids) {
 

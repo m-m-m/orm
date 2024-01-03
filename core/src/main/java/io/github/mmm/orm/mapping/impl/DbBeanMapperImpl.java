@@ -1,6 +1,6 @@
 /* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0 */
-package io.github.mmm.orm.mapping;
+package io.github.mmm.orm.mapping.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,18 +8,18 @@ import java.util.List;
 
 import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.bean.WritableBean;
-import io.github.mmm.orm.result.DbResultCell;
-import io.github.mmm.orm.result.DbResultRow;
-import io.github.mmm.orm.result.DbResultRowPojo;
-import io.github.mmm.value.converter.TypeMapper;
+import io.github.mmm.orm.mapping.DbBeanMapper;
+import io.github.mmm.orm.result.DbResult;
+import io.github.mmm.orm.result.DbResultValue;
+import io.github.mmm.orm.result.impl.DbResultPojo;
 
 /**
- * Implementation of {@link TypeMapper} to map from {@link WritableBean} to {@link DbResultRow} and vice-versa.
+ * Implementation of {@link DbBeanMapper}.
  *
  * @param <B> type of the {@link WritableBean} to map.
  * @since 1.0.0
  */
-public class DbBeanMapperImpl<B extends WritableBean> implements DbBeanMapper<B> {
+public class DbBeanMapperImpl<B extends WritableBean> extends ComposableDbMapper<B> implements DbBeanMapper<B> {
 
   private final B bean;
 
@@ -47,9 +47,10 @@ public class DbBeanMapperImpl<B extends WritableBean> implements DbBeanMapper<B>
   }
 
   @Override
-  public DbResultRow java2db(B source) {
+  public DbResult java2db(B source) {
 
-    DbResultRowPojo dbResult = new DbResultRowPojo();
+    // TODO compute size as capacity
+    DbResultPojo dbResult = new DbResultPojo();
     for (DbPropertyMapper<?> mapper : this.propertyMappers) {
       mapper.java2db(source, dbResult);
     }
@@ -57,12 +58,11 @@ public class DbBeanMapperImpl<B extends WritableBean> implements DbBeanMapper<B>
   }
 
   @Override
-  public B db2java(DbResultRow dbResult) {
+  public B db2java(Iterator<DbResultValue<?>> dbIterator) {
 
     B resultBean = ReadableBean.copy(this.bean);
-    Iterator<DbResultCell<?>> cellIterator = dbResult.getCells().iterator();
     for (DbPropertyMapper<?> mapper : this.propertyMappers) {
-      mapper.db2java(cellIterator, resultBean);
+      mapper.db2java(dbIterator, resultBean);
     }
     return resultBean;
   }

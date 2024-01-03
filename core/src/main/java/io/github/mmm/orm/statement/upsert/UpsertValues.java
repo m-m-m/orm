@@ -3,7 +3,6 @@
 package io.github.mmm.orm.statement.upsert;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.orm.statement.MainDbClause;
 import io.github.mmm.orm.statement.ValuesClause;
 
 /**
@@ -12,7 +11,7 @@ import io.github.mmm.orm.statement.ValuesClause;
  * @param <E> type of the {@link UpsertInto#getEntity() entity}.
  * @since 1.0.0
  */
-public class UpsertValues<E extends EntityBean> extends ValuesClause<E, UpsertValues<E>> implements MainDbClause<E> {
+public class UpsertValues<E extends EntityBean> extends ValuesClause<E, UpsertValues<E>> {
 
   private final UpsertStatement<E> statement;
 

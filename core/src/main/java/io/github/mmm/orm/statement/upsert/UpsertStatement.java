@@ -6,11 +6,11 @@ import java.util.List;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
-import io.github.mmm.orm.statement.AbstractDbStatement;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.DbStatementType;
+import io.github.mmm.orm.statement.IntoValuesStatement;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
@@ -19,7 +19,7 @@ import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
  * @param <E> type of the {@link UpsertInto#getEntity() entity}.
  * @since 1.0.0
  */
-public class UpsertStatement<E extends EntityBean> extends AbstractDbStatement<E> {
+public class UpsertStatement<E extends EntityBean> extends IntoValuesStatement<E> {
 
   private final Upsert upsert;
 
@@ -62,6 +62,7 @@ public class UpsertStatement<E extends EntityBean> extends AbstractDbStatement<E
   /**
    * @return the {@link UpsertInto INTO}-{@link DbClause clause}.
    */
+  @Override
   public UpsertInto<E> getInto() {
 
     return this.into;
@@ -70,6 +71,7 @@ public class UpsertStatement<E extends EntityBean> extends AbstractDbStatement<E
   /**
    * @return the {@link UpsertValues VALUES}-{@link DbClause clause} or {@code null} if none was added.
    */
+  @Override
   public UpsertValues<E> getValues() {
 
     return this.values;

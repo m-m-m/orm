@@ -11,11 +11,11 @@ import io.github.mmm.value.converter.AtomicTypeMapper;
 /**
  * Abstract base class for a database type.
  *
- * @param <V> type of {@link #getSourceType() Java source type}.
+ * @param <J> type of {@link #getSourceType() Java source type}.
  * @param <D> type of the {@link #getTargetType() database target type}.
  */
 @SuppressWarnings("exports")
-public abstract class DbType<V, D> extends AtomicTypeMapper<V, D> {
+public abstract class DbType<J, D> extends AtomicTypeMapper<J, D> {
 
   /** @see #getSqlType() */
   protected final int sqlType;
@@ -36,7 +36,7 @@ public abstract class DbType<V, D> extends AtomicTypeMapper<V, D> {
    * @return the {@link Class} reflecting the Java standard type.
    */
   @Override
-  public abstract Class<? extends V> getSourceType();
+  public abstract Class<? extends J> getSourceType();
 
   /**
    * @return the {@link Class} reflecting the database standard type.
@@ -62,6 +62,15 @@ public abstract class DbType<V, D> extends AtomicTypeMapper<V, D> {
   }
 
   /**
+   * @return {@code true} if the Java source type is natively supported as
+   *         {@link PreparedStatement#setObject(int, Object) JDBC parameter}, {@code false} otherwise.
+   */
+  protected boolean isJdbcSupport() {
+
+    return false;
+  }
+
+  /**
    * This method sets the parameter at the given {@code index} to the given {@code value}. E.g. if this {@link DbType}
    * is for a simple regular {@link String} this method would more or less be equivalent to:
    *
@@ -81,11 +90,19 @@ public abstract class DbType<V, D> extends AtomicTypeMapper<V, D> {
    * @throws SQLException if JDBC failed.
    * @see #setDbParameter(PreparedStatement, int, Object, Connection)
    */
-  public void setJavaParameter(PreparedStatement statement, int index, V value, Connection connection)
+  public void setJavaParameter(PreparedStatement statement, int index, J value, Connection connection)
       throws SQLException {
 
-    D dbValue = toTarget(value);
-    setDbParameter(statement, index, dbValue, connection);
+    if (isJdbcSupport()) {
+      if (value == null) {
+        statement.setNull(index, this.sqlType);
+      } else {
+        statement.setObject(index, value);
+      }
+    } else {
+      D dbValue = toTarget(value);
+      setDbParameter(statement, index, dbValue, connection);
+    }
   }
 
   /**

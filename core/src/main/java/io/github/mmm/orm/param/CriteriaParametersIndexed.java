@@ -2,6 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.param;
 
+import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.type.DbType;
 import io.github.mmm.property.criteria.CriteriaExpression;
 import io.github.mmm.property.criteria.CriteriaParameters;
@@ -18,10 +19,12 @@ public class CriteriaParametersIndexed extends AbstractCriteriaParameters {
 
   /**
    * The constructor.
+   *
+   * @param dialect the {@link AbstractDbDialect}.
    */
-  public CriteriaParametersIndexed() {
+  public CriteriaParametersIndexed(AbstractDbDialect<?> dialect) {
 
-    super();
+    super(dialect);
   }
 
   @Override
