@@ -27,7 +27,7 @@ public abstract class JdbcConnectionPoolProvider implements DbConnectionPoolProv
   public DbConnectionPool<JdbcConnection> create(DbSource source, MetaInfo config, DbDialect dialect) {
 
     DataSource dataSource = createDataSource(config);
-    return new JdbcConnectionPool(dataSource, source, dialect);
+    return new JdbcConnectionPool(dataSource, source, dialect, this);
   }
 
   /**
@@ -35,5 +35,11 @@ public abstract class JdbcConnectionPoolProvider implements DbConnectionPoolProv
    * @return the connection pool as {@link DataSource}.
    */
   protected abstract DataSource createDataSource(MetaInfo config);
+
+  /**
+   * @param dataSource the {@link DataSource} that was created by {@link #createDataSource(MetaInfo)} and is now to be
+   *        closed to free resources as the connection pool is no longer needed.
+   */
+  protected abstract void close(DataSource dataSource);
 
 }

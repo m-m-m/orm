@@ -14,5 +14,6 @@
   <modules>
     <module>dialect</module>
     <module>jdbc</module>
+    <module>r2dbc</module>
   </modules>
 </project>

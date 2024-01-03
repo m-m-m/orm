@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.github.m-m-m</groupId>
+    <artifactId>mmm-orm-parent</artifactId>
+    <version>${revision}</version>
+  </parent>
+  <artifactId>mmm-orm-r2dbc-parent</artifactId>
+  <packaging>pom</packaging>
+  <name>${project.artifactId}</name>
+  <description>R2DBC based ORM.</description>
+
+  <modules>
+    <module>core</module>
+  </modules>
+</project>

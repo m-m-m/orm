@@ -5,11 +5,11 @@ package io.github.mmm.orm.statement.update;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractEntitiesClause;
 import io.github.mmm.orm.statement.AliasMap;
+import io.github.mmm.orm.statement.SetFragment;
 import io.github.mmm.orm.statement.MainDbClause;
 import io.github.mmm.orm.statement.StartClause;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.PropertyAssignment;
-import io.github.mmm.value.PropertyPath;
 
 /**
  * {@link StartClause} of an UpdateStatement to update data in the database.
@@ -18,7 +18,7 @@ import io.github.mmm.value.PropertyPath;
  * @since 1.0.0
  */
 public final class Update<E extends EntityBean> extends AbstractEntitiesClause<E, E, Update<E>>
-    implements StartClause, MainDbClause<E> {
+    implements StartClause, MainDbClause<E>, SetFragment<E, UpdateSet<E>> {
 
   /** Name of {@link Update} for marshaling. */
   public static final String NAME_UPDATE = "UPDATE";
@@ -56,75 +56,21 @@ public final class Update<E extends EntityBean> extends AbstractEntitiesClause<E
 
     UpdateSet<E> set = this.statement.getSet();
     for (WritableProperty<?> property : this.entity.getProperties()) {
-      set.and(PropertyAssignment.ofValue(property));
+      set.set(PropertyAssignment.ofValue(property));
     }
     return set;
   }
 
-  /**
-   * @param <V> type of the {@link PropertyPath#get() value}.
-   * @param assignment the {@link PropertyAssignment} to set.
-   * @return the {@link UpdateSet} for fluent API.
-   */
-  public <V> UpdateSet<E> set(PropertyAssignment<V> assignment) {
+  @Override
+  public UpdateSet<E> set(PropertyAssignment<?> assignment) {
 
-    UpdateSet<E> set = this.statement.getSet();
-    set.and(assignment);
-    return set;
+    return this.statement.getSet().set(assignment);
   }
 
-  /**
-   * @param <V> type of the {@link PropertyPath#get() value}.
-   * @param assignments the {@link PropertyAssignment}s to set.
-   * @return the {@link UpdateSet} for fluent API.
-   */
-  @SuppressWarnings("unchecked")
-  public <V> UpdateSet<E> set(PropertyAssignment<V>... assignments) {
+  @Override
+  public UpdateSet<E> setAll(PropertyAssignment<?>... assignments) {
 
-    UpdateSet<E> set = this.statement.getSet();
-    set.and(assignments);
-    return set;
-  }
-
-  /**
-   * Convenience method for
-   * <code>{@link #set(PropertyAssignment) set}({@link PropertyAssignment}.{@link PropertyAssignment#ofValue(PropertyPath) ofValue}(property)).</code>
-   *
-   * @param <V> type of the {@link PropertyPath#get() value}.
-   * @param property the {@link PropertyPath property} to set.
-   * @return the {@link UpdateSet} for fluent API.
-   */
-  public <V> UpdateSet<E> set(PropertyPath<V> property) {
-
-    return set(PropertyAssignment.ofValue(property));
-  }
-
-  /**
-   * Convenience method for
-   * <code>{@link #set(PropertyAssignment) set}({@link PropertyAssignment}.{@link PropertyAssignment#of(PropertyPath, Object) of}(property, value)).</code>
-   *
-   * @param <V> type of the {@link PropertyPath#get() value}.
-   * @param property the {@link PropertyPath property} to set.
-   * @param value the {@link io.github.mmm.property.criteria.Literal} value to set.
-   * @return the {@link UpdateSet} for fluent API.
-   */
-  public <V> UpdateSet<E> set(PropertyPath<V> property, V value) {
-
-    return set(PropertyAssignment.of(property, value));
-  }
-
-  /**
-   * Convenience method for
-   * <code>{@link #set(PropertyAssignment) set}({@link PropertyAssignment}.{@link PropertyAssignment#of(PropertyPath, PropertyPath) of}(property, valueProperty)).</code>
-   *
-   * @param <V> type of the {@link PropertyPath#get() value}.
-   * @param property the {@link PropertyPath property} to set.
-   * @param valueProperty the {@link PropertyPath property} from where to read the value to set.
-   * @return the {@link UpdateSet} for fluent API.
-   */
-  public <V> UpdateSet<E> set(PropertyPath<V> property, PropertyPath<V> valueProperty) {
-
-    return set(PropertyAssignment.of(property, valueProperty));
+    return this.statement.getSet().setAll(assignments);
   }
 
   @Override

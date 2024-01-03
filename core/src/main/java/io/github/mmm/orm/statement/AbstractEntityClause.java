@@ -97,7 +97,8 @@ public abstract class AbstractEntityClause<R, E extends EntityBean, SELF extends
   }
 
   /**
-   * @return alias the alias (variable name) for the {@link EntityBean} to query.
+   * @return alias the alias (variable name) for the {@link EntityBean} to query. Will be created lazily if not
+   *         {@link #hasAlias() already created}.
    * @see #as(String)
    */
   public String getAlias() {
@@ -106,6 +107,14 @@ public abstract class AbstractEntityClause<R, E extends EntityBean, SELF extends
       setAlias(this.aliasMap.createAlias(this));
     }
     return this.alias;
+  }
+
+  /**
+   * @return {@code true} if an {@link #getAlias() alias} has already been assigned or created, {@code false} otherwise.
+   */
+  public boolean hasAlias() {
+
+    return (this.alias != null);
   }
 
   /**

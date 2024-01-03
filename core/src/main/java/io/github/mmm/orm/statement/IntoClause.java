@@ -6,8 +6,6 @@ import java.util.Objects;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.property.WritableProperty;
-import io.github.mmm.property.criteria.PropertyAssignment;
-import io.github.mmm.value.PropertyPath;
 
 /**
  * An {@code INTO}-{@link DbClause clause} of a {@link DbStatement} such as
@@ -15,11 +13,12 @@ import io.github.mmm.value.PropertyPath;
  * {@link io.github.mmm.orm.statement.upsert.UpsertStatement UPSERT}.
  *
  * @param <E> type of the {@link #getEntity() entity}.
+ * @param <V> type of the {@link ValuesClause}.
  * @param <SELF> type of this class itself.
  * @since 1.0.0
  */
-public abstract class IntoClause<E extends EntityBean, SELF extends IntoClause<E, SELF>>
-    extends AbstractEntityClause<E, E, SELF> {
+public abstract class IntoClause<E extends EntityBean, V extends ValuesClause<E, ?>, SELF extends IntoClause<E, V, SELF>>
+    extends AbstractEntityClause<E, E, SELF> implements ValuesFragment<E, V> {
 
   /**
    * The constructor.
@@ -34,40 +33,17 @@ public abstract class IntoClause<E extends EntityBean, SELF extends IntoClause<E
   }
 
   /**
-   * @param assignment the {@link PropertyAssignment} to set.
-   * @return the {@link ValuesClause} for fluent API.
-   */
-  public abstract ValuesClause<E, ?> values(PropertyAssignment<?> assignment);
-
-  /**
-   * @param assignments the {@link PropertyAssignment}s to set.
-   * @return the {@link ValuesClause} for fluent API.
-   */
-  public abstract ValuesClause<E, ?> values(PropertyAssignment<?>... assignments);
-
-  /**
-   * Convenience method for
-   * <code>{@link #values(PropertyAssignment) values}({@link PropertyAssignment}.{@link PropertyAssignment#of(PropertyPath, Object) of}(property, value)).</code>
-   *
-   * @param <V> type of the {@link PropertyPath#get() value}.
-   * @param property the {@link PropertyPath property} to set.
-   * @param value the {@link io.github.mmm.property.criteria.Literal} value to insert (assign the {@code property} to).
-   * @return the {@link ValuesClause} for fluent API.
-   */
-  public abstract <V> ValuesClause<E, ?> values(PropertyPath<V> property, V value);
-
-  /**
    * Sets all {@link EntityBean#getProperties() properties} of the {@link #getEntity() entity} that are not
    * {@code null}.
    *
    * @return the {@link ValuesClause} for fluent API.
    */
-  public ValuesClause<E, ?> values() {
+  public V valuesAll() {
 
     Objects.requireNonNull(this.entity);
-    ValuesClause<E, ?> values = null;
+    V values = null;
     for (WritableProperty<?> property : this.entity.getProperties()) {
-      if (!property.isReadOnly()) {
+      if (!property.isTransient()) {
         values = addValues(values, property);
       }
     }
@@ -77,17 +53,27 @@ public abstract class IntoClause<E extends EntityBean, SELF extends IntoClause<E
     return values;
   }
 
-  private <V> ValuesClause<E, ?> addValues(ValuesClause<E, ?> values, WritableProperty<V> property) {
+  private <T> V addValues(V values, WritableProperty<T> property) {
 
-    V value = property.get();
-    if (value != null) {
+    T value = property.get();
+    if (isIncludeNullValues() || (value != null)) {
       if (values == null) {
-        values = values(property, value);
+        values = value(property, value);
       } else {
-        values = values.and(property, value);
+        @SuppressWarnings("rawtypes")
+        ValuesClause values2 = values.value(property, value);
+        assert (values2 == values);
       }
     }
     return values;
+  }
+
+  /**
+   * @return {@code true} to include {@code null} values, {@code false} otherwise (to ignore them).
+   */
+  protected boolean isIncludeNullValues() {
+
+    return true;
   }
 
 }

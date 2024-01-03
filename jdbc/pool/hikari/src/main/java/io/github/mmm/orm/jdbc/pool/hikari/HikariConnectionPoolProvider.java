@@ -39,4 +39,11 @@ public final class HikariConnectionPoolProvider extends JdbcConnectionPoolProvid
     return pool;
   }
 
+  @Override
+  protected void close(DataSource dataSource) {
+
+    HikariDataSource pool = (HikariDataSource) dataSource;
+    pool.close();
+  }
+
 }

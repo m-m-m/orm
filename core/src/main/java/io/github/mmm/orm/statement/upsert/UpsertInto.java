@@ -6,7 +6,6 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.IntoClause;
 import io.github.mmm.property.criteria.PropertyAssignment;
-import io.github.mmm.value.PropertyPath;
 
 /**
  * A {@link IntoClause} of an {@link UpsertStatement}.
@@ -14,7 +13,7 @@ import io.github.mmm.value.PropertyPath;
  * @param <E> type of the {@link #getEntity() entity}.
  * @since 1.0.0
  */
-public class UpsertInto<E extends EntityBean> extends IntoClause<E, UpsertInto<E>> {
+public class UpsertInto<E extends EntityBean> extends IntoClause<E, UpsertValues<E>, UpsertInto<E>> {
 
   private final UpsertStatement<E> statement;
 
@@ -43,32 +42,15 @@ public class UpsertInto<E extends EntityBean> extends IntoClause<E, UpsertInto<E
   }
 
   @Override
-  public UpsertValues<E> values(PropertyAssignment<?> assignment) {
+  public UpsertValues<E> value(PropertyAssignment<?> assignment) {
 
-    UpsertValues<E> values = this.statement.getValues();
-    values.and(assignment);
-    return values;
+    return this.statement.getValues().value(assignment);
   }
 
   @Override
   public UpsertValues<E> values(PropertyAssignment<?>... assignments) {
 
-    UpsertValues<E> values = this.statement.getValues();
-    values.and(assignments);
-    return values;
-  }
-
-  @Override
-  public <V> UpsertValues<E> values(PropertyPath<V> property, V value) {
-
-    return values(PropertyAssignment.of(property, value));
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public UpsertValues<E> values() {
-
-    return (UpsertValues<E>) super.values();
+    return this.statement.getValues().values(assignments);
   }
 
   @Override

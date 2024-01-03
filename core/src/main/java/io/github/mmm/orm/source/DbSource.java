@@ -33,10 +33,10 @@ import java.util.Set;
  * db.h2.pool=hikari
  * </pre>
  *
- * Now, in your {@link io.github.mmm.entity.repository.EntityRepository repository} implementation you may override the
+ * Now, in your {@link io.github.mmm.orm.repository.EntityRepository repository} implementation you may override the
  * {@link DbSource} to {@link DbSource#of(String) DbSource.of}("h2") to work on the secondary database.
  *
- * @see io.github.mmm.orm.repository.AbstractDbRepository#getSource()
+ * @see io.github.mmm.orm.spi.repository.AbstractDbRepository#getSource()
  */
 public final class DbSource {
 
@@ -50,11 +50,20 @@ public final class DbSource {
   /** {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the database connection URL. */
   public static final String KEY_URL = "url";
 
+  /** {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the database host name. */
+  public static final String KEY_HOST = "host";
+
+  /** {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the database port number. */
+  public static final String KEY_PORT = "port";
+
   /** {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the user login of the database connection. */
   public static final String KEY_USER = "user";
 
   /** {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the user password of the database connection. */
   public static final String KEY_PASSWORD = "password";
+
+  /** {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the database name. */
+  public static final String KEY_DATABASE = "database";
 
   /**
    * {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the
@@ -87,7 +96,7 @@ public final class DbSource {
    * connection pools).
    */
   public static final Set<String> STANDARD_KEYS = Set.of(KEY_URL, KEY_USER, KEY_PASSWORD, KEY_DIALECT, KEY_TYPE,
-      KEY_POOL, KEY_KIND);
+      KEY_POOL, KEY_KIND, KEY_HOST, KEY_PORT, KEY_DATABASE);
 
   private DbSource(String name) {
 

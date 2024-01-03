@@ -4,17 +4,17 @@ package io.github.mmm.orm.sync;
 
 import io.github.mmm.bean.BeanFactory;
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.entity.repository.EntityRepository;
-import io.github.mmm.entity.repository.EntityRepositoryManager;
-import io.github.mmm.orm.access.DbAccess;
 import io.github.mmm.orm.connection.DbConnection;
 import io.github.mmm.orm.dialect.DbDialect;
 import io.github.mmm.orm.metadata.DbMetaData;
 import io.github.mmm.orm.metadata.DbName;
 import io.github.mmm.orm.metadata.DbQualifiedName;
 import io.github.mmm.orm.metadata.DbTable;
-import io.github.mmm.orm.repository.AbstractDbRepository;
+import io.github.mmm.orm.repository.EntityRepository;
 import io.github.mmm.orm.source.DbSource;
+import io.github.mmm.orm.spi.access.DbAccess;
+import io.github.mmm.orm.spi.repository.AbstractDbRepository;
+import io.github.mmm.orm.spi.repository.EntityRepositoryManager;
 import io.github.mmm.property.WritableProperty;
 
 /**

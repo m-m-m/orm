@@ -7,6 +7,7 @@ import io.github.mmm.orm.statement.alter.AlterTable;
 import io.github.mmm.orm.statement.alter.AlterTableOperations;
 import io.github.mmm.orm.statement.create.CreateIndex;
 import io.github.mmm.orm.statement.create.CreateIndexColumns;
+import io.github.mmm.orm.statement.create.CreateIndexOn;
 import io.github.mmm.orm.statement.create.CreateTable;
 import io.github.mmm.orm.statement.create.CreateTableContents;
 import io.github.mmm.orm.statement.delete.Delete;
@@ -49,8 +50,10 @@ public interface DbClauseVisitor {
    */
   default DbClauseVisitor onOtherClause(DbClause clause) {
 
-    if (clause instanceof IntoClause) {
-      onInto((IntoClause<?, ?>) clause);
+    if (clause instanceof IntoClause<?, ?, ?> into) {
+      onInto(into);
+    } else if (clause instanceof CreateIndexOn<?> on) {
+      onCreateIndexOn(on);
     }
     return this;
   }
@@ -78,7 +81,7 @@ public interface DbClauseVisitor {
     } else if (clause instanceof CreateTableContents<?> columns) {
       onCreateTableContents(columns);
     } else if (clause instanceof CreateIndexColumns<?> columns) {
-      onColumns(columns);
+      onCreateIndexColumns(columns);
     } else if (clause instanceof AlterTableOperations<?> addColumns) {
       onAlterTableOperations(addColumns);
     }
@@ -212,7 +215,7 @@ public interface DbClauseVisitor {
   /**
    * @param into the {@link IntoClause}-{@link DbClause} to visit.
    */
-  default void onInto(IntoClause<?, ?> into) {
+  default void onInto(IntoClause<?, ?, ?> into) {
 
   }
 
@@ -238,9 +241,16 @@ public interface DbClauseVisitor {
   }
 
   /**
+   * @param on the {@link CreateIndexOn}-{@link DbClause} to visit.
+   */
+  default void onCreateIndexOn(CreateIndexOn<?> on) {
+
+  }
+
+  /**
    * @param columns the {@link CreateIndexColumns}-{@link DbClause} to visit.
    */
-  default void onColumns(CreateIndexColumns<?> columns) {
+  default void onCreateIndexColumns(CreateIndexColumns<?> columns) {
 
   }
 

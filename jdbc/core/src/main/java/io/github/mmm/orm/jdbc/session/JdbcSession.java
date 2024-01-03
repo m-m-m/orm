@@ -13,14 +13,14 @@ import io.github.mmm.orm.connection.DbConnectionData;
 import io.github.mmm.orm.jdbc.connection.JdbcConnection;
 import io.github.mmm.orm.jdbc.connection.JdbcConnectionPool;
 import io.github.mmm.orm.jdbc.tx.JdbcTransactionExecutor;
-import io.github.mmm.orm.session.DbSession;
 import io.github.mmm.orm.source.DbSource;
+import io.github.mmm.orm.spi.session.DbSession;
 import io.github.mmm.orm.tx.DbTransaction;
 
 /**
  * Database session data for a single transaction.
  */
-public class JdbcSession implements DbSession<JdbcEntitySession<?>>, DbTransaction {
+public class JdbcSession implements DbSession, DbTransaction {
 
   // private static final ScopedValue<JdbcSession> SESSION_HOLDER = ScopedValue.newInstance();
 
@@ -49,11 +49,13 @@ public class JdbcSession implements DbSession<JdbcEntitySession<?>>, DbTransacti
     this.entitySessions = new HashMap<>();
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  public JdbcEntitySession<?> get(EntityBean entity) {
+  public <E extends EntityBean> JdbcEntitySession<E> get(E entity) {
 
     String key = entity.getType().getQualifiedName();
-    return this.entitySessions.computeIfAbsent(key, k -> new JdbcEntitySession<>(this.connection));
+    JdbcEntitySession session = this.entitySessions.computeIfAbsent(key, k -> new JdbcEntitySession<>(this.connection));
+    return session;
   }
 
   /**

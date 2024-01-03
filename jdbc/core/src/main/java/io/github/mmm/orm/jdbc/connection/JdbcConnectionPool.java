@@ -17,11 +17,13 @@ import io.github.mmm.orm.source.DbSource;
  */
 public class JdbcConnectionPool implements DbConnectionPool<JdbcConnection> {
 
-  private final DataSource dataSource;
+  private DataSource dataSource;
 
   private final DbSource source;
 
   private final DbDialect dialect;
+
+  private final JdbcConnectionPoolProvider provider;
 
   /**
    * The constructor.
@@ -29,13 +31,16 @@ public class JdbcConnectionPool implements DbConnectionPool<JdbcConnection> {
    * @param dataSource the {@link DataSource} pre-configured as connection pool.
    * @param source the {@link DbSource}.
    * @param dialect the {@link DbDialect}.
+   * @param provider the {@link JdbcConnectionPoolProvider} who created this pool.
    */
-  public JdbcConnectionPool(DataSource dataSource, DbSource source, DbDialect dialect) {
+  public JdbcConnectionPool(DataSource dataSource, DbSource source, DbDialect dialect,
+      JdbcConnectionPoolProvider provider) {
 
     super();
     this.dataSource = dataSource;
     this.source = source;
     this.dialect = dialect;
+    this.provider = provider;
   }
 
   @Override
@@ -57,6 +62,15 @@ public class JdbcConnectionPool implements DbConnectionPool<JdbcConnection> {
       connection.close();
     } catch (SQLException e) {
       throw new IllegalStateException("Unable to release connection!", e);
+    }
+  }
+
+  @Override
+  public void close() {
+
+    if (this.dataSource != null) {
+      this.provider.close(this.dataSource);
+      this.dataSource = null;
     }
   }
 

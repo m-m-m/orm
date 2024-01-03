@@ -16,12 +16,20 @@
 
   <properties>
     <mmm.repository>orm</mmm.repository>
+    <r2dbc.version>1.0.0.RELEASE</r2dbc.version>
+    <r2dbc.pool.version>1.0.1.RELEASE</r2dbc.pool.version>
+    <r2dbc.postgresql.version>1.0.2.RELEASE</r2dbc.postgresql.version>
+    <r2dbc.mariadb.version>1.1.1-rc</r2dbc.mariadb.version>
+    <r2dbc.mssql.version>1.0.2.RELEASE</r2dbc.mssql.version>
+    <r2dbc.h2.version>1.0.0.RELEASE</r2dbc.h2.version>
+    <r2dbc.oracle.version>1.2.0</r2dbc.oracle.version>
   </properties>
 
   <modules>
     <module>core</module>
     <module>spi</module>
     <module>jdbc</module>
+    <module>r2dbc</module>
     <module>db</module>
   </modules>
 
@@ -34,6 +42,41 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>io.r2dbc</groupId>
+        <artifactId>r2dbc-spi</artifactId>
+        <version>${r2dbc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.r2dbc</groupId>
+        <artifactId>r2dbc-pool</artifactId>
+        <version>${r2dbc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>r2dbc-postgresql</artifactId>
+        <version>${r2dbc.postgresql.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mariadb</groupId>
+        <artifactId>r2dbc-mariadb</artifactId>
+        <version>${r2dbc.mariadb.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.r2dbc</groupId>
+        <artifactId>r2dbc-mssql</artifactId>
+        <version>${r2dbc.mssql.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.r2dbc</groupId>
+        <artifactId>r2dbc-h2</artifactId>
+        <version>${r2dbc.h2.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.oracle.database.r2dbc</groupId>
+        <artifactId>oracle-r2dbc</artifactId>
+        <version>${r2dbc.oracle.version}</version>
+      </dependency>
       <!-- own modules -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -43,6 +86,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>mmm-orm-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mmm-orm-r2dbc</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

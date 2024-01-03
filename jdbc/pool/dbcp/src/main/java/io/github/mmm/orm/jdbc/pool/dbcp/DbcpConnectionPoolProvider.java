@@ -35,4 +35,15 @@ public final class DbcpConnectionPoolProvider extends JdbcConnectionPoolProvider
           + config.getKeyPrefix() + "*)!", e);
     }
   }
+
+  @Override
+  protected void close(DataSource dataSource) {
+
+    try {
+      BasicDataSource pool = (BasicDataSource) dataSource;
+      pool.close();
+    } catch (SQLException e) {
+      throw new IllegalStateException("Failed to close DBCP connection pool!", e);
+    }
+  }
 }

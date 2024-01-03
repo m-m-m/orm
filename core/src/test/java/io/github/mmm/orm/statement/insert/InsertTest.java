@@ -18,15 +18,15 @@ public class InsertTest extends DbStatementTest {
     // given
     Person p = Person.of();
     // when
-    InsertStatement<Person> insertStatement = new Insert().into(p).values(p.Name(), "John Doe").and(p.Single(), true)
-        .andId(4711).get();
+    InsertStatement<Person> insertStatement = new Insert().into(p).value(p.Name(), "John Doe").value(p.Single(), true)
+        .get();
     // then
-    check(insertStatement, "INSERT INTO Person(Name, Single, Id) VALUES ('John Doe', TRUE, 4711)");
+    check(insertStatement, "INSERT INTO Person(Name, Single) VALUES ('John Doe', TRUE)");
   }
 
   /** Test {@link Insert} with simple literal values. */
   @Test
-  public void testInsertBeanValues() {
+  public void testInsertAllValues() {
 
     // given
     Person p = Person.of();
@@ -34,7 +34,7 @@ public class InsertTest extends DbStatementTest {
     p.Single().setValue(true);
     p.Id().set(LongId.of(4711L));
     // when
-    InsertStatement<Person> insertStatement = new Insert().into(p).values().get();
+    InsertStatement<Person> insertStatement = new Insert().into(p).valuesAll().get();
     // then
     check(insertStatement, "INSERT INTO Person(Id, Name, Single) VALUES (4711, 'John Doe', TRUE)");
   }

@@ -11,7 +11,9 @@ import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
+import io.github.mmm.orm.statement.DbStatementType;
 import io.github.mmm.orm.statement.StartClause;
+import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
  * {@link DbStatement} to {@link AlterTable alter a table}.
@@ -28,7 +30,7 @@ public class AlterTableStatement<E extends EntityBean> extends AbstractDbStateme
   /**
    * The constructor.
    *
-   * @param createTable the {@link #getAlterTable() create table}.
+   * @param createTable the {@link #getAlterTable() alter table}.
    */
   public AlterTableStatement(AlterTable<E> createTable) {
 
@@ -68,6 +70,12 @@ public class AlterTableStatement<E extends EntityBean> extends AbstractDbStateme
 
     list.add(this.alterTable);
     list.add(this.operations);
+  }
+
+  @Override
+  public DbStatementType getType() {
+
+    return DbStatementTypeImpl.ALTER_TABLE;
   }
 
   @Override

@@ -3,16 +3,18 @@
 package io.github.mmm.orm.mapping;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.bean.WritableBean;
-import io.github.mmm.orm.result.DbResult;
-import io.github.mmm.orm.result.DbResultPojo;
+import io.github.mmm.orm.result.DbResultCell;
+import io.github.mmm.orm.result.DbResultRow;
+import io.github.mmm.orm.result.DbResultRowPojo;
 import io.github.mmm.value.converter.TypeMapper;
 
 /**
- * Implementation of {@link TypeMapper} to map from {@link WritableBean} to {@link DbResult} and vice-versa.
+ * Implementation of {@link TypeMapper} to map from {@link WritableBean} to {@link DbResultRow} and vice-versa.
  *
  * @param <B> type of the {@link WritableBean} to map.
  * @since 1.0.0
@@ -45,9 +47,9 @@ public class DbBeanMapperImpl<B extends WritableBean> implements DbBeanMapper<B>
   }
 
   @Override
-  public DbResult java2db(B source) {
+  public DbResultRow java2db(B source) {
 
-    DbResultPojo dbResult = new DbResultPojo();
+    DbResultRowPojo dbResult = new DbResultRowPojo();
     for (DbPropertyMapper<?> mapper : this.propertyMappers) {
       mapper.java2db(source, dbResult);
     }
@@ -55,11 +57,12 @@ public class DbBeanMapperImpl<B extends WritableBean> implements DbBeanMapper<B>
   }
 
   @Override
-  public B db2java(DbResult dbResult) {
+  public B db2java(DbResultRow dbResult) {
 
-    B resultBean = ReadableBean.copy(this.bean, false);
+    B resultBean = ReadableBean.copy(this.bean);
+    Iterator<DbResultCell<?>> cellIterator = dbResult.getCells().iterator();
     for (DbPropertyMapper<?> mapper : this.propertyMappers) {
-      mapper.db2java(dbResult.iterator(), resultBean);
+      mapper.db2java(cellIterator, resultBean);
     }
     return resultBean;
   }

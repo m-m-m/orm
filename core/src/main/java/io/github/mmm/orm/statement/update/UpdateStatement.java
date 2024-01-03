@@ -10,6 +10,8 @@ import io.github.mmm.orm.statement.AbstractDbStatement;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
+import io.github.mmm.orm.statement.DbStatementType;
+import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 import io.github.mmm.orm.statement.insert.Insert;
 import io.github.mmm.orm.statement.insert.InsertInto;
 
@@ -80,6 +82,12 @@ public class UpdateStatement<E extends EntityBean> extends AbstractDbStatement<E
     list.add(this.update);
     list.add(this.set);
     list.add(this.where);
+  }
+
+  @Override
+  public DbStatementType getType() {
+
+    return DbStatementTypeImpl.UPDATE;
   }
 
   @Override

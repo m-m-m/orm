@@ -3,7 +3,6 @@
 package io.github.mmm.orm.repository;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.entity.repository.EntityRepository;
 import io.github.mmm.orm.statement.select.SelectStatement;
 
 /**

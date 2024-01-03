@@ -11,7 +11,9 @@ import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
+import io.github.mmm.orm.statement.DbStatementType;
 import io.github.mmm.orm.statement.StartClause;
+import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
  * {@link DbStatement} to {@link Delete}
@@ -81,6 +83,12 @@ public class DeleteStatement<E extends EntityBean> extends AbstractDbStatement<E
     list.add(this.delete);
     list.add(this.from);
     list.add(this.where);
+  }
+
+  @Override
+  public DbStatementType getType() {
+
+    return DbStatementTypeImpl.DELETE;
   }
 
   @Override

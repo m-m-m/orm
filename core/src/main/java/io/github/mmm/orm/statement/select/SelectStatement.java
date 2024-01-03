@@ -9,6 +9,8 @@ import io.github.mmm.orm.statement.AbstractDbStatement;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
+import io.github.mmm.orm.statement.DbStatementType;
+import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
  * {@link DbStatement} to query data from the database using a {@link Select}.
@@ -115,6 +117,12 @@ public class SelectStatement<R> extends AbstractDbStatement<R> {
     list.add(this.groupBy);
     list.add(this.having);
     list.add(this.orderBy);
+  }
+
+  @Override
+  public DbStatementType getType() {
+
+    return DbStatementTypeImpl.SELECT;
   }
 
   @Override

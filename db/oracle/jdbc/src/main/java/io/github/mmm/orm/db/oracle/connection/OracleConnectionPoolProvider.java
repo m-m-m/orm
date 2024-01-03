@@ -47,4 +47,11 @@ public class OracleConnectionPoolProvider extends JdbcConnectionPoolProvider {
     }
   }
 
+  @Override
+  protected void close(DataSource dataSource) {
+
+    PoolDataSource poolDataSource = (PoolDataSource) dataSource;
+    // UCP does not seem to support dispose/close/shutdown/stop
+  }
+
 }

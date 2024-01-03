@@ -11,7 +11,9 @@ import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
+import io.github.mmm.orm.statement.DbStatementType;
 import io.github.mmm.orm.statement.StartClause;
+import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
  * {@link DbStatement} to {@link CreateIndex create an index}
@@ -81,6 +83,12 @@ public class CreateIndexStatement<E extends EntityBean> extends AbstractDbStatem
     list.add(this.createIndex);
     list.add(this.on);
     list.add(this.column);
+  }
+
+  @Override
+  public DbStatementType getType() {
+
+    return DbStatementTypeImpl.CREATE_INDEX;
   }
 
   @Override

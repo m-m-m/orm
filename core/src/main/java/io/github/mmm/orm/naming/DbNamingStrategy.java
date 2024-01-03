@@ -8,6 +8,8 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
+import io.github.mmm.value.ReadablePath;
+import io.github.mmm.value.ReadablePath.PathBuilder;
 
 /**
  * Interface to define the naming strategy to map {@link EntityBean}s to a database.
@@ -27,6 +29,14 @@ public interface DbNamingStrategy {
     String columnName = property.getMetadata().getMetaInfo().get(EntityBean.META_KEY_COLUMN);
     if (columnName == null) {
       columnName = getColumnName(property.getName());
+    }
+    ReadablePath parent = property.parentPath();
+    ;
+    if (parent != null) {
+      PathBuilder builder = PathBuilder.of();
+      parent.path(builder);
+      builder.add(columnName);
+      return builder.toString();
     }
     return columnName;
   }

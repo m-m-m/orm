@@ -4,7 +4,7 @@ package io.github.mmm.orm.mapping;
 
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.orm.naming.DbNamingStrategy;
-import io.github.mmm.orm.result.DbResult;
+import io.github.mmm.orm.result.DbResultRow;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.ProjectionProperty;
@@ -20,7 +20,7 @@ public interface Orm {
   /**
    * @param <B> type of the {@link WritableBean} to map.
    * @param bean the prototype of the {@link WritableBean} to map.
-   * @return the {@link AtomicTypeMapper} to map from the {@link WritableBean} to {@link DbResult} and vice-versa.
+   * @return the {@link AtomicTypeMapper} to map from the {@link WritableBean} to {@link DbResultRow} and vice-versa.
    */
   default <B extends WritableBean> DbBeanMapper<B> createBeanMapping(B bean) {
 
@@ -31,7 +31,7 @@ public interface Orm {
    * @param <B> type of the {@link WritableBean} to map.
    * @param bean the prototype of the {@link WritableBean} to map.
    * @param properties the {@link Iterable} with the explicit {@link WritableProperty properties} to map.
-   * @return the {@link AtomicTypeMapper} to map from the {@link WritableBean} to {@link DbResult} and vice-versa.
+   * @return the {@link AtomicTypeMapper} to map from the {@link WritableBean} to {@link DbResultRow} and vice-versa.
    */
   <B extends WritableBean> DbBeanMapper<B> createBeanMapping(B bean,
       Iterable<? extends ReadableProperty<?>> properties);
@@ -40,7 +40,7 @@ public interface Orm {
    * @param <B> type of the {@link WritableBean} to map.
    * @param bean the prototype of the {@link WritableBean} to map.
    * @param properties the {@link Iterable} with the {@link ProjectionProperty projection properties} to map.
-   * @return the {@link AtomicTypeMapper} to map from the {@link WritableBean} to {@link DbResult} and vice-versa.
+   * @return the {@link AtomicTypeMapper} to map from the {@link WritableBean} to {@link DbResultRow} and vice-versa.
    */
   <B extends WritableBean> DbBeanMapper<B> createBeanMappingProjection(B bean,
       Iterable<? extends ProjectionProperty<?>> properties);

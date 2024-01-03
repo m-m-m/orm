@@ -11,7 +11,9 @@ import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
+import io.github.mmm.orm.statement.DbStatementType;
 import io.github.mmm.orm.statement.StartClause;
+import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
  * {@link DbStatement} to {@link CreateTable create a table}.
@@ -68,6 +70,12 @@ public class CreateTableStatement<E extends EntityBean> extends AbstractDbStatem
 
     list.add(this.createTable);
     list.add(this.contents);
+  }
+
+  @Override
+  public DbStatementType getType() {
+
+    return DbStatementTypeImpl.CREATE_TABLE;
   }
 
   @Override

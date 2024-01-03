@@ -1,5 +1,6 @@
 package io.github.mmm.orm.statement;
 
+import io.github.mmm.base.exception.ObjectMismatchException;
 import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.bean.property.BeanProperty;
@@ -71,13 +72,33 @@ class EntityPathParser implements PropertyPathParser {
         segment = PropertyPathParser.parseSegment(scanner);
       }
       if (p == null) {
-        p = bean.getRequiredProperty(segment);
+        p = bean.getProperty(segment);
+        if (p == null) {
+          parsePathAlias(scanner, bean, bean, segment);
+        }
       } else {
         p = traverseProperty(p, segment);
       }
       segment = null;
     } while (scanner.expectOne('.'));
     return p;
+  }
+
+  private static void parsePathAlias(CharStreamScanner scanner, ReadablePath path, ReadableBean bean, String segment) {
+
+    if (path == null) {
+      bean.getRequiredProperty(segment); // force property not found exception
+    } else {
+      ReadablePath parentPath = path.parentPath();
+      if (parentPath != null) {
+        parsePathAlias(scanner, parentPath, bean, segment);
+        scanner.requireOne('.');
+        segment = PropertyPathParser.parseSegment(scanner);
+      }
+      if (!segment.equals(path.pathSegment())) {
+        throw new ObjectMismatchException(segment, path.pathSegment());
+      }
+    }
   }
 
   static ReadableProperty<?> traverseProperty(ReadableProperty<?> property, String segment) {

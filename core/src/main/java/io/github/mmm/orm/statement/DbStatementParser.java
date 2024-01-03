@@ -28,9 +28,14 @@ import io.github.mmm.orm.ddl.operation.TableOperationType;
 import io.github.mmm.orm.statement.alter.AlterTable;
 import io.github.mmm.orm.statement.alter.AlterTableOperations;
 import io.github.mmm.orm.statement.alter.AlterTableStatement;
+import io.github.mmm.orm.statement.create.CreateIndex;
+import io.github.mmm.orm.statement.create.CreateIndexColumns;
+import io.github.mmm.orm.statement.create.CreateIndexOn;
+import io.github.mmm.orm.statement.create.CreateIndexStatement;
 import io.github.mmm.orm.statement.create.CreateTable;
 import io.github.mmm.orm.statement.create.CreateTableContents;
 import io.github.mmm.orm.statement.create.CreateTableStatement;
+import io.github.mmm.orm.statement.create.CreateUniqueIndex;
 import io.github.mmm.orm.statement.delete.Delete;
 import io.github.mmm.orm.statement.delete.DeleteFrom;
 import io.github.mmm.orm.statement.delete.DeleteStatement;
@@ -107,8 +112,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
     try {
       DbStatement<?> statement;
       scanner.skipWhile(NEWLINE_OR_SPACE);
-      String name = scanner.readWhile(CharFilter.LATIN_LETTER).toUpperCase(Locale.ROOT);
-      scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+      String name = readKeyword(scanner);
       if (Select.NAME_SELECT.equals(name)) {
         statement = parseSelectStatement(scanner);
       } else if (matchesKeyword(Update.NAME_UPDATE, name, scanner)) {
@@ -117,8 +121,20 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
         statement = parseInsertStatement(scanner);
       } else if (matchesKeyword(Delete.NAME_DELETE, name, scanner)) {
         statement = parseDeleteStatement(scanner);
-      } else if (matchesKeyword(CreateTable.NAME_CREATE_TABLE, name, scanner)) {
-        statement = parseCreateTableStatement(scanner);
+      } else if ("CREATE".equals(name)) {
+        name = readKeyword(scanner);
+        boolean unique = false;
+        if (name.equals("UNIQUE")) {
+          unique = true;
+          name = readKeyword(scanner);
+        }
+        if (name.equals("TABLE") && !unique) {
+          statement = parseCreateTableStatement(scanner);
+        } else if (name.equals("INDEX")) {
+          statement = parseCreateIndexStatement(scanner, unique);
+        } else {
+          throw new IllegalStateException();
+        }
       } else if (matchesKeyword(Upsert.NAME_UPSERT, name, scanner)) {
         statement = parseUsertStatement(scanner);
       } else if (matchesKeyword(Merge.NAME_MERGE, name, scanner)) {
@@ -157,6 +173,40 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
     return false;
   }
 
+  private CreateIndexStatement<?> parseCreateIndexStatement(CharStreamScanner scanner, boolean unique) {
+
+    CreateIndex createIndex = parseCreateIndex(scanner, unique);
+    CreateIndexOn<?> createIndexOn = parseCreateIndexOn(scanner, createIndex);
+    CreateIndexColumns<?> createIndexColumns = parseCreateIndexColumns(scanner, createIndexOn);
+    return createIndexColumns.get();
+  }
+
+  private CreateIndex parseCreateIndex(CharStreamScanner scanner, boolean unique) {
+
+    String name = parseSegment(scanner);
+    scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+    if (unique) {
+      return new CreateUniqueIndex(name);
+    } else {
+      return new CreateIndex(name);
+    }
+  }
+
+  private CreateIndexOn<?> parseCreateIndexOn(CharStreamScanner scanner, CreateIndex createIndex) {
+
+    CreateIndexOn<?> createIndexOn = new CreateIndexOn<>(createIndex, null);
+    scanner.require(CreateIndexOn.NAME_ON, true);
+    scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+    parseEntityClause(scanner, createIndexOn, true);
+    return createIndexOn;
+  }
+
+  private CreateIndexColumns<?> parseCreateIndexColumns(CharStreamScanner scanner, CreateIndexOn<?> createIndexOn) {
+
+    DbColumnSpec[] columns = parseColumns(scanner, createIndexOn.getEntity(), 1);
+    return createIndexOn.columns(columns);
+  }
+
   private AlterTableStatement<?> parseAlterTableStatement(CharStreamScanner scanner) {
 
     AlterTable<?> alterTable = parseAlterTable(scanner);
@@ -167,7 +217,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
   private AlterTable<?> parseAlterTable(CharStreamScanner scanner) {
 
     AlterTable<?> alterTable = new AlterTable<>(null);
-    parseEntityClause(scanner, alterTable);
+    parseEntityClause(scanner, alterTable, false);
     return alterTable;
   }
 
@@ -414,12 +464,12 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
     Update<?> update = parseUpdate(scanner);
     UpdateStatement<?> statement = update.get();
     AliasMap aliasMap = getAliasMap(update);
-    parseUpdateSet(scanner, statement.getSet(), aliasMap);
+    parseSetClause(scanner, statement.getSet(), aliasMap);
     parseWhere(scanner, statement.getWhere());
     return statement;
   }
 
-  private void parseUpdateSet(CharStreamScanner scanner, SetClause set, PropertyPathParser pathParser) {
+  private void parseSetClause(CharStreamScanner scanner, SetClause set, PropertyPathParser pathParser) {
 
     do {
       scanner.skipWhile(NEWLINE_OR_SPACE);
@@ -428,7 +478,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
       scanner.requireOne('=');
       scanner.skipWhile(NEWLINE_OR_SPACE);
       CriteriaObject value = this.criteriaSelectionParser.parseSelection(scanner, pathParser);
-      set.and(PropertyAssignment.of(property, value));
+      set.set(PropertyAssignment.of(property, value));
       scanner.skipWhile(NEWLINE_OR_SPACE);
     } while (scanner.expectOne(','));
   }
@@ -507,7 +557,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
       PropertyPath<?> path = columns.get(i);
       scanner.skipWhile(' ');
       Literal literal = this.criteriaSelectionParser.parseLiteral(scanner);
-      values.and(PropertyAssignment.of(path, literal));
+      values.value(PropertyAssignment.of(path, literal));
       i++;
       scanner.skipWhile(' ');
       if (scanner.expectOne(')')) {
@@ -526,22 +576,14 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
     scanner.skipWhile(NEWLINE_OR_SPACE);
     scanner.require("INTO", true);
     scanner.requireOneOrMore(NEWLINE_OR_SPACE);
-    parseEntityClause(scanner, into);
+    parseEntityClause(scanner, into, false);
   }
 
   private CreateTable<?> parseCreateTable(CharStreamScanner scanner) {
 
     CreateTable<?> createTable = new CreateTable<>(null);
-    parseEntityClause(scanner, createTable);
+    parseEntityClause(scanner, createTable, false);
     return createTable;
-  }
-
-  private void parseEntityClause(CharStreamScanner scanner, AbstractEntityClause entityClause) {
-
-    String entityName = parseSegment(scanner);
-    Class entityClass = this.classNameMapper.getClass(entityName);
-    EntityBean entity = (EntityBean) this.beanFactory.create(entityClass);
-    entityClause.setEntity(entity);
   }
 
   private CriteriaObject<?> resolve(CriteriaObject<?> selection, AliasMap aliasMap) {
@@ -663,22 +705,43 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
     parseEntitiesClause(scanner, from);
   }
 
+  private void parseEntityClause(CharStreamScanner scanner, AbstractEntityClause entityClause, boolean allowAlias) {
+
+    String entityName = parseSegment(scanner);
+    Class entityClass = this.classNameMapper.getClass(entityName);
+    EntityBean entity = (EntityBean) this.beanFactory.create(entityClass);
+    scanner.skipWhile(NEWLINE_OR_SPACE);
+    String entityAlias = "";
+    if (allowAlias) {
+      boolean hasAsKeyword = false;
+      if (scanner.expect("AS", true)) {
+        hasAsKeyword = true;
+        scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+      }
+      entityAlias = parseSegment(scanner);
+      if (entityAlias.isEmpty()) {
+        if (hasAsKeyword) {
+          throw new IllegalStateException("Missing alias after AS keyword!");
+        }
+      } else {
+        scanner.skipWhile(NEWLINE_OR_SPACE);
+      }
+    }
+    if (entityClause.getEntity() == null) {
+      entityClause.setEntity(entity);
+      if (!entityAlias.isEmpty()) {
+        entityClause.as(entityAlias);
+      }
+    } else if (entityClause instanceof AbstractEntitiesClause entitesClause) {
+      entitesClause.and(entity, entityAlias);
+    }
+  }
+
   private void parseEntitiesClause(CharStreamScanner scanner, AbstractEntitiesClause entitesClause) {
 
     do {
       scanner.skipWhile(NEWLINE_OR_SPACE);
-      String entityName = parseSegment(scanner);
-      Class entityClass = this.classNameMapper.getClass(entityName);
-      EntityBean entity = (EntityBean) this.beanFactory.create(entityClass);
-      if (entitesClause.getEntity() == null) {
-        entitesClause.setEntity(entity);
-      } else {
-        entitesClause.and(entity);
-      }
-      scanner.requireOneOrMore(NEWLINE_OR_SPACE);
-      String entityAlias = parseSegment(scanner);
-      entitesClause.as(entityAlias);
-      scanner.skipWhile(NEWLINE_OR_SPACE);
+      parseEntityClause(scanner, entitesClause, true);
     } while (scanner.expectOne(','));
   }
 
@@ -717,6 +780,13 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
   private String parseSegment(CharStreamScanner scanner) {
 
     return scanner.readWhile(CharFilter.SEGMENT, 1, 128);
+  }
+
+  private String readKeyword(CharStreamScanner scanner) {
+
+    String keywordUpperCase = scanner.readWhile(CharFilter.LATIN_LETTER, 1, 128).toUpperCase(Locale.ROOT);
+    scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+    return keywordUpperCase;
   }
 
   private void parseHaving(CharStreamScanner scanner, Having having) {

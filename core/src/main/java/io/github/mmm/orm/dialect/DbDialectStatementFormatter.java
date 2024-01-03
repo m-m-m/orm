@@ -7,8 +7,8 @@ import java.util.Objects;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.mapping.DbBeanMapper;
 import io.github.mmm.orm.param.CriteriaParametersIndexed;
-import io.github.mmm.orm.result.DbResult;
-import io.github.mmm.orm.result.DbResultEntry;
+import io.github.mmm.orm.result.DbResultCell;
+import io.github.mmm.orm.result.DbResultRow;
 import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.orm.statement.DbStatementFormatter;
 import io.github.mmm.orm.statement.select.SelectFrom;
@@ -56,11 +56,11 @@ public abstract class DbDialectStatementFormatter extends DbStatementFormatter {
 
     EntityBean entity = selectFrom.getEntity();
     DbBeanMapper<EntityBean> mapping = this.dialect.getOrm().createBeanMapping(entity, entity.getProperties());
-    DbResult result = mapping.java2db(entity);
+    DbResultRow result = mapping.java2db(entity);
     String s = "";
-    for (DbResultEntry<?> entry : result) {
+    for (DbResultCell<?> cell : result.getCells()) {
       write(s);
-      String columnName = entry.getDbName();
+      String columnName = cell.getDbName();
       write(columnName);
       s = ", ";
     }

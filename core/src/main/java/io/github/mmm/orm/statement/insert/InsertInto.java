@@ -7,7 +7,6 @@ import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.IntoClause;
 import io.github.mmm.property.criteria.PropertyAssignment;
-import io.github.mmm.value.PropertyPath;
 
 /**
  * A {@link IntoClause}-{@link DbClause} of an SQL {@link InsertStatement}.
@@ -15,7 +14,7 @@ import io.github.mmm.value.PropertyPath;
  * @param <E> type of the {@link #getEntity() entity}.
  * @since 1.0.0
  */
-public class InsertInto<E extends EntityBean> extends IntoClause<E, InsertInto<E>> {
+public class InsertInto<E extends EntityBean> extends IntoClause<E, InsertValues<E>, InsertInto<E>> {
 
   private final InsertStatement<E> statement;
 
@@ -44,32 +43,21 @@ public class InsertInto<E extends EntityBean> extends IntoClause<E, InsertInto<E
   }
 
   @Override
-  public InsertValues<E> values(PropertyAssignment<?> assignment) {
+  public InsertValues<E> value(PropertyAssignment<?> assignment) {
 
-    InsertValues<E> values = this.statement.getValues();
-    values.and(assignment);
-    return values;
+    return this.statement.getValues().value(assignment);
   }
 
   @Override
   public InsertValues<E> values(PropertyAssignment<?>... assignments) {
 
-    InsertValues<E> values = this.statement.getValues();
-    values.and(assignments);
-    return values;
+    return this.statement.getValues().values(assignments);
   }
 
   @Override
-  public <V> InsertValues<E> values(PropertyPath<V> property, V value) {
+  protected boolean isIncludeNullValues() {
 
-    return values(PropertyAssignment.of(property, value));
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public InsertValues<E> values() {
-
-    return (InsertValues<E>) super.values();
+    return false;
   }
 
   /**

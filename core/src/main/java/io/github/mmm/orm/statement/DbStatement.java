@@ -26,4 +26,9 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    */
   List<? extends DbClause> getClauses();
 
+  /**
+   * @return the {@link DbStatementType type} of this {@link DbStatement statement}.
+   */
+  DbStatementType getType();
+
 }

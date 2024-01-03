@@ -19,7 +19,9 @@ module io.github.mmm.orm.spi {
 
   uses io.github.mmm.orm.connection.DbConnectionPoolProvider;
 
-  exports io.github.mmm.orm.session;
+  exports io.github.mmm.orm.spi.access;
+
+  exports io.github.mmm.orm.spi.session;
 
   exports io.github.mmm.orm.connection;
 

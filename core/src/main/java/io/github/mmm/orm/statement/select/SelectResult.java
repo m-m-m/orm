@@ -1,15 +1,15 @@
 package io.github.mmm.orm.statement.select;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.orm.result.DbResultObject;
+import io.github.mmm.orm.result.DbResultRowObject;
 
 /**
- * {@link Select} to query arbitrary {@link #getSelections() selections} as generic {@link DbResultObject}.
+ * {@link Select} to query arbitrary {@link #getSelections() selections} as generic {@link DbResultRowObject}.
  *
  * @see Select#result()
  * @since 1.0.0
  */
-public class SelectResult extends Select<DbResultObject> {
+public class SelectResult extends Select<DbResultRowObject> {
 
   /**
    * The constructor.
@@ -21,7 +21,7 @@ public class SelectResult extends Select<DbResultObject> {
   }
 
   @Override
-  protected <E extends EntityBean> SelectFrom<DbResultObject, E> from(E entity) {
+  protected <E extends EntityBean> SelectFrom<DbResultRowObject, E> from(E entity) {
 
     return super.from(entity);
   }

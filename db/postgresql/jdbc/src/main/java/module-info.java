@@ -3,7 +3,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 /**
- * Provides ORM support for H2 database via JDBC.
+ * Provides ORM support for PostGreSQL database via JDBC.
  */
 module io.github.mmm.orm.db.postgresql.jdbc {
 

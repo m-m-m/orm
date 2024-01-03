@@ -16,7 +16,7 @@ import io.github.mmm.entity.bean.EntityBean;
 public interface ModelSynchronizer {
 
   /**
-   * Synchronizes all {@link EntityBean}s managed by a {@link io.github.mmm.entity.repository.EntityRepository
+   * Synchronizes all {@link EntityBean}s managed by a {@link io.github.mmm.orm.repository.EntityRepository
    * repository} that currently have an open transaction.
    */
   void sync();

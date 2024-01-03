@@ -48,7 +48,7 @@ public class EntitySubClause<R, E extends EntityBean> extends AbstractEntityClau
   public EntitySubClause(AliasMap aliasMap, E entity, String entityName, String alias) {
 
     super(aliasMap, entity, entityName);
-    if (alias != null) {
+    if ((alias != null) && !alias.isEmpty()) {
       as(alias);
     }
   }

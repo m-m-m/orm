@@ -6,9 +6,9 @@ import java.util.Iterator;
 
 import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.bean.WritableBean;
-import io.github.mmm.orm.result.DbResult;
-import io.github.mmm.orm.result.DbResultEntry;
-import io.github.mmm.orm.result.DbResultPojo;
+import io.github.mmm.orm.result.DbResultRow;
+import io.github.mmm.orm.result.DbResultCell;
+import io.github.mmm.orm.result.DbResultRowPojo;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 
@@ -27,19 +27,19 @@ public interface DbPropertyMapper<V> {
 
   /**
    * @param javaBean the {@link ReadableBean} to map.
-   * @param dbResult the {@link DbResultPojo} where to
-   *        {@link DbResultPojo#addEntry(io.github.mmm.orm.result.DbResultEntry) add} the collected
-   *        {@link io.github.mmm.orm.result.DbResultEntry database data}.
+   * @param dbResult the {@link DbResultRowPojo} where to
+   *        {@link DbResultRowPojo#addCell(io.github.mmm.orm.result.DbResultCell) add} the collected
+   *        {@link io.github.mmm.orm.result.DbResultCell database data}.
    */
-  void java2db(ReadableBean javaBean, DbResultPojo dbResult);
+  void java2db(ReadableBean javaBean, DbResultRowPojo dbResult);
 
   /**
    * @param javaProperty the {@link ReadableProperty} to map.
-   * @param dbResult the {@link DbResultPojo} where to
-   *        {@link DbResultPojo#addEntry(io.github.mmm.orm.result.DbResultEntry) add} the collected
-   *        {@link io.github.mmm.orm.result.DbResultEntry database data}.
+   * @param dbResult the {@link DbResultRowPojo} where to
+   *        {@link DbResultRowPojo#addCell(io.github.mmm.orm.result.DbResultCell) add} the collected
+   *        {@link io.github.mmm.orm.result.DbResultCell database data}.
    */
-  default void java2db(ReadableProperty<V> javaProperty, DbResultPojo dbResult) {
+  default void java2db(ReadableProperty<V> javaProperty, DbResultRowPojo dbResult) {
 
     V value = null;
     if (javaProperty != null) {
@@ -50,17 +50,17 @@ public interface DbPropertyMapper<V> {
 
   /**
    * @param javaValue the Java value to map.
-   * @param dbResult the {@link DbResultPojo} where to
-   *        {@link DbResultPojo#addEntry(io.github.mmm.orm.result.DbResultEntry) add} the collected
-   *        {@link io.github.mmm.orm.result.DbResultEntry database data}.
+   * @param dbResult the {@link DbResultRowPojo} where to
+   *        {@link DbResultRowPojo#addCell(io.github.mmm.orm.result.DbResultCell) add} the collected
+   *        {@link io.github.mmm.orm.result.DbResultCell database data}.
    */
-  void java2dbValue(V javaValue, DbResultPojo dbResult);
+  void java2dbValue(V javaValue, DbResultRowPojo dbResult);
 
   /**
-   * @param dbEntryIterator the {@link Iterator} of the {@link DbResultEntry database entries} received from the
+   * @param dbCellIterator the {@link Iterator} of the {@link DbResultCell database entries} received from the
    *        database to convert to Java.
-   * @param javaBean the {@link WritableBean} where to map the {@link DbResult} to.
+   * @param javaBean the {@link WritableBean} where to map the {@link DbResultRow} to.
    */
-  void db2java(Iterator<DbResultEntry<?>> dbEntryIterator, WritableBean javaBean);
+  void db2java(Iterator<DbResultCell<?>> dbCellIterator, WritableBean javaBean);
 
 }

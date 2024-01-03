@@ -13,7 +13,7 @@ import io.github.mmm.orm.mapping.DbPropertyMapperImpl;
 import io.github.mmm.orm.mapping.DbSegmentMapper;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.naming.DbNamingStrategy;
-import io.github.mmm.orm.result.DbResultEntryObjectWithDeclaration;
+import io.github.mmm.orm.result.DbResultCellObjectWithDeclaration;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.ProjectionProperty;
@@ -135,8 +135,8 @@ public class OrmImpl implements Orm {
     String newColumnName = typeMapper.mapName(columnName);
     if (typeMapper.hasDeclaration()) {
       newColumnName = this.namingStrategy.getColumnName(newColumnName);
-      DbResultEntryObjectWithDeclaration entry = new DbResultEntryObjectWithDeclaration<>(selection, null,
-          newColumnName, typeMapper.getDeclaration());
+      DbResultCellObjectWithDeclaration entry = new DbResultCellObjectWithDeclaration<>(selection, null, newColumnName,
+          typeMapper.getDeclaration());
       return new DbSegmentMapper<>(typeMapper, entry, nextSegment);
     } else {
       DbSegmentMapper child = createSegmentMapper(selection, newColumnName, typeMapper.getTargetType(), null);

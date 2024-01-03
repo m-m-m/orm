@@ -3,6 +3,7 @@
 package io.github.mmm.orm.statement;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,13 +25,16 @@ import io.github.mmm.orm.ddl.operation.TableOperationType;
 import io.github.mmm.orm.ddl.operation.TableRenameConstraintOperation;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.mapping.DbBeanMapper;
+import io.github.mmm.orm.mapping.DbSelection;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.metadata.DbName;
-import io.github.mmm.orm.result.DbResult;
-import io.github.mmm.orm.result.DbResultEntry;
+import io.github.mmm.orm.result.DbResultCell;
+import io.github.mmm.orm.result.DbResultRow;
 import io.github.mmm.orm.statement.alter.AlterTable;
 import io.github.mmm.orm.statement.alter.AlterTableOperations;
+import io.github.mmm.orm.statement.create.CreateIndex;
 import io.github.mmm.orm.statement.create.CreateIndexColumns;
+import io.github.mmm.orm.statement.create.CreateIndexOn;
 import io.github.mmm.orm.statement.create.CreateTable;
 import io.github.mmm.orm.statement.create.CreateTableContents;
 import io.github.mmm.orm.statement.delete.Delete;
@@ -74,6 +78,8 @@ public class DbStatementFormatter implements DbClauseVisitor {
   protected final AbstractDbDialect<?> dialect;
 
   private final CriteriaFormatter criteriaFormatter;
+
+  private List<DbSelection<?>> selections;
 
   private final String indentation;
 
@@ -141,6 +147,18 @@ public class DbStatementFormatter implements DbClauseVisitor {
   public CriteriaFormatter getCriteriaFormatter() {
 
     return this.criteriaFormatter;
+  }
+
+  /**
+   * @return the {@link Iterable} with the {@link DbSelection}s. Will be empty unless a {@link SelectStatement} has been
+   *         formatted.
+   */
+  public Iterable<DbSelection<?>> getSelections() {
+
+    if (this.selections == null) {
+      return Collections.emptyList();
+    }
+    return this.selections;
   }
 
   /**
@@ -330,8 +348,8 @@ public class DbStatementFormatter implements DbClauseVisitor {
    */
   protected void onSelections(Select<?> select, SelectFrom<?, ?> selectFrom) {
 
-    List<? extends CriteriaObject<?>> selections = select.getSelections();
-    if (selections.isEmpty()) {
+    List<? extends CriteriaObject<?>> selectionCriterias = select.getSelections();
+    if (selectionCriterias.isEmpty()) {
       if (!select.isSelectEntity()) {
         LOG.info("Formatting invalid select statement.");
       }
@@ -346,7 +364,7 @@ public class DbStatementFormatter implements DbClauseVisitor {
         s = " new " + select.getResultName() + "(";
       }
       int i = 0;
-      for (CriteriaObject<?> selection : selections) {
+      for (CriteriaObject<?> selection : selectionCriterias) {
         write(s);
         this.criteriaFormatter.onArg(selection, i++, null);
         s = ", ";
@@ -412,8 +430,20 @@ public class DbStatementFormatter implements DbClauseVisitor {
    */
   protected void onEntity(AbstractEntityClause<?, ?, ?> entity) {
 
+    writeEntity(entity, true);
+  }
+
+  /**
+   * @param entity the {@link AbstractEntityClause} for which to write the {@link AbstractEntityClause#getEntityName()
+   *        entity name} or table name and optional {@link #onAlias(String, DbClause) alias}.
+   * @param forceAlias - {@code true} to force an {@link #onAlias(String, DbClause) alias}, {@code false} otherwise.
+   */
+  protected void writeEntity(AbstractEntityClause<?, ?, ?> entity, boolean forceAlias) {
+
     writeEntityName(entity);
-    onAlias(entity.getAlias(), entity);
+    if (forceAlias || entity.hasAlias()) {
+      onAlias(entity.getAlias(), entity);
+    }
   }
 
   /**
@@ -481,13 +511,13 @@ public class DbStatementFormatter implements DbClauseVisitor {
   }
 
   @Override
-  public void onInto(IntoClause<?, ?> into) {
+  public void onInto(IntoClause<?, ?, ?> into) {
 
     write(" INTO ");
     write(into.getEntityName());
     if (into instanceof InsertInto) {
       InsertInto<?> insertInto = (InsertInto<?>) into;
-      InsertValues<?> values = insertInto.values(PropertyAssignment.EMPTY_ARRAY);
+      InsertValues<?> values = insertInto.values();
       String s = "(";
       int i = 0;
       for (PropertyAssignment<?> assignment : values.getAssignments()) {
@@ -557,8 +587,8 @@ public class DbStatementFormatter implements DbClauseVisitor {
         properties.add(column.getProperty());
       }
       DbBeanMapper<EntityBean> mapping = this.dialect.getOrm().createBeanMapping(entity, properties);
-      DbResult result = mapping.java2db(entity);
-      for (DbResultEntry<?> entry : result) {
+      DbResultRow result = mapping.java2db(entity);
+      for (DbResultCell<?> entry : result.getCells()) {
         String columnName = entry.getDbName();
         write(s);
         if (withDeclaration) {
@@ -724,9 +754,33 @@ public class DbStatementFormatter implements DbClauseVisitor {
   }
 
   @Override
-  public void onColumns(CreateIndexColumns<?> columns) {
+  public void onCreateIndex(CreateIndex createIndex) {
 
-    DbClauseVisitor.super.onColumns(columns);
+    writeIndent();
+    write("CREATE ");
+    if (createIndex.isUnique()) {
+      write("UNIQUE ");
+    }
+    write("INDEX ");
+    writeName(createIndex.getName());
+    DbClauseVisitor.super.onCreateIndex(createIndex);
+  }
+
+  @Override
+  public void onCreateIndexOn(CreateIndexOn<?> on) {
+
+    write(" ON ");
+    writeEntity(on, false);
+    DbClauseVisitor.super.onCreateIndexOn(on);
+  }
+
+  @Override
+  public void onCreateIndexColumns(CreateIndexColumns<?> columns) {
+
+    write(" (");
+    writeColumns(columns.getColumns(), columns.get().getOn().getEntity(), false);
+    write(")");
+    DbClauseVisitor.super.onCreateIndexColumns(columns);
   }
 
   @Override

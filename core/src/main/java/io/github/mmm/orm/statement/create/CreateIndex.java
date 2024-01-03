@@ -4,13 +4,10 @@ package io.github.mmm.orm.statement.create;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
-import io.github.mmm.orm.statement.DbClause;
-import io.github.mmm.orm.statement.FromClause;
 import io.github.mmm.orm.statement.StartClause;
-import io.github.mmm.orm.statement.delete.DeleteStatement;
 
 /**
- * A {@link FromClause}-{@link DbClause} of an SQL {@link DeleteStatement}.
+ * A {@link CreateIndex}-{@link StartClause} of an SQL {@link CreateIndexStatement}.
  *
  * @since 1.0.0
  */
@@ -46,6 +43,14 @@ public class CreateIndex extends AbstractDbClause implements StartClause {
   public void setName(String name) {
 
     this.name = name;
+  }
+
+  /**
+   * @return {@code true} if unique, {@code false} otherwise.
+   */
+  public boolean isUnique() {
+
+    return false;
   }
 
   /**

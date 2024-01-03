@@ -33,4 +33,11 @@ public final class C3poConnectionPoolProvider extends JdbcConnectionPoolProvider
     return pool;
   }
 
+  @Override
+  protected void close(DataSource dataSource) {
+
+    ComboPooledDataSource pool = (ComboPooledDataSource) dataSource;
+    pool.close();
+  }
+
 }

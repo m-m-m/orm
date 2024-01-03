@@ -2,6 +2,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.connection;
 
+import java.io.Closeable;
+
 /**
  * This is the interface for a pool of {@link DbConnection}s. It is an internal API that allows to {@link #acquire()} a
  * {@link DbConnection} from the pool. After it has been used, it has to be {@link #release(DbConnection) released}. To
@@ -10,7 +12,7 @@ package io.github.mmm.orm.connection;
  *
  * @param <C> type of the {@link DbConnection}.
  */
-public interface DbConnectionPool<C extends DbConnection> {
+public interface DbConnectionPool<C extends DbConnection> extends Closeable {
 
   /**
    * @return the acquired {@link DbConnection} that has been borrowed from this pool. The caller has to guarantee to
@@ -23,5 +25,8 @@ public interface DbConnectionPool<C extends DbConnection> {
    *        {@link #acquire()}.
    */
   void release(C connection);
+
+  @Override
+  void close();
 
 }

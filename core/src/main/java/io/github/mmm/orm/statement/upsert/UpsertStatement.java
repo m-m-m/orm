@@ -10,6 +10,8 @@ import io.github.mmm.orm.statement.AbstractDbStatement;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
+import io.github.mmm.orm.statement.DbStatementType;
+import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
  * {@link DbStatement} to {@link Upsert} data into the database.
@@ -79,6 +81,12 @@ public class UpsertStatement<E extends EntityBean> extends AbstractDbStatement<E
     list.add(this.upsert);
     list.add(this.into);
     list.add(this.values);
+  }
+
+  @Override
+  public DbStatementType getType() {
+
+    return DbStatementTypeImpl.UPSERT;
   }
 
   @Override

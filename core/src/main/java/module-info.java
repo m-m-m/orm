@@ -7,8 +7,10 @@
  * Provides database support for {@code mmm-entity-bean}.
  *
  * @uses io.github.mmm.orm.dialect.DbDialect
+ * @uses io.github.mmm.orm.repository.EntityRepository
  * @uses io.github.mmm.orm.tx.DbTransactionExecutorProvider
  */
+@SuppressWarnings("rawtypes") //
 module io.github.mmm.orm {
 
   requires transitive io.github.mmm.entity.bean;
@@ -19,9 +21,9 @@ module io.github.mmm.orm {
 
   uses io.github.mmm.orm.dialect.DbDialect;
 
-  uses io.github.mmm.orm.tx.DbTransactionExecutorProvider;
+  uses io.github.mmm.orm.repository.EntityRepository;
 
-  exports io.github.mmm.orm.access;
+  uses io.github.mmm.orm.tx.DbTransactionExecutorProvider;
 
   exports io.github.mmm.orm.ddl;
 
