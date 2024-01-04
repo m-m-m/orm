@@ -43,8 +43,8 @@ import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.CriteriaPredicate;
 import io.github.mmm.property.criteria.PredicateOperator;
 import io.github.mmm.property.criteria.PropertyAssignment;
-import io.github.mmm.property.criteria.SimplePath;
 import io.github.mmm.value.PropertyPath;
+import io.github.mmm.value.SimplePath;
 
 /**
  * Abstract implementation of {@link io.github.mmm.orm.spi.access.DbAccess} using JDBC.

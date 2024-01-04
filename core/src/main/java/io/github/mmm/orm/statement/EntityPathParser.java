@@ -5,9 +5,13 @@ import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.bean.property.BeanProperty;
 import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.entity.id.Id;
+import io.github.mmm.property.PropertyMetadata;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.criteria.PropertyPathParser;
+import io.github.mmm.property.object.ObjectProperty;
 import io.github.mmm.scanner.CharStreamScanner;
+import io.github.mmm.validation.Validator;
 import io.github.mmm.value.PropertyPath;
 import io.github.mmm.value.ReadablePath;
 
@@ -18,6 +22,9 @@ import io.github.mmm.value.ReadablePath;
  * @since 1.0.0
  */
 class EntityPathParser implements PropertyPathParser {
+
+  static ReadableProperty<?> PROPERTY_REVISION = new ObjectProperty<>(Id.COLUMN_REVISION, new Object(),
+      PropertyMetadata.of(null, Validator.none(), () -> null));
 
   private final ReadableBean entity;
 
@@ -72,9 +79,15 @@ class EntityPathParser implements PropertyPathParser {
         segment = PropertyPathParser.parseSegment(scanner);
       }
       if (p == null) {
-        p = bean.getProperty(segment);
-        if (p == null) {
+        if (scanner.peek() == '.') {
           parsePathAlias(scanner, bean, bean, segment);
+        } else {
+          p = bean.getProperty(segment);
+          if (p == null) {
+            if (segment.equals(Id.COLUMN_REVISION)) {
+              return PROPERTY_REVISION;
+            }
+          }
         }
       } else {
         p = traverseProperty(p, segment);

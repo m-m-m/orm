@@ -32,11 +32,11 @@ public class InsertTest extends DbStatementTest {
     Person p = Person.of();
     p.Name().set("John Doe");
     p.Single().setValue(true);
-    p.Id().set(LongId.of(4711L));
+    p.Id().set(LongId.of(4711L).updateRevision());
     // when
     InsertStatement<Person> insertStatement = new Insert().into(p).valuesAll().get();
     // then
-    check(insertStatement, "INSERT INTO Person(Id, Name, Single) VALUES (4711, 'John Doe', TRUE)");
+    check(insertStatement, "INSERT INTO Person(Id, Rev, Name, Single) VALUES (4711, 1, 'John Doe', TRUE)");
   }
 
 }

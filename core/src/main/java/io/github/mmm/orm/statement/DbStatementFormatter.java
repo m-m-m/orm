@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import io.github.mmm.base.io.AppendableWriter;
 import io.github.mmm.bean.mapping.ClassNameMapper;
 import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.entity.id.PkMapper;
 import io.github.mmm.orm.ddl.DbColumnSpec;
 import io.github.mmm.orm.ddl.DbElement;
 import io.github.mmm.orm.ddl.constraint.CheckConstraint;
@@ -58,9 +59,9 @@ import io.github.mmm.property.criteria.Literal;
 import io.github.mmm.property.criteria.PredicateOperator;
 import io.github.mmm.property.criteria.ProjectionProperty;
 import io.github.mmm.property.criteria.PropertyAssignment;
-import io.github.mmm.property.criteria.SimplePath;
 import io.github.mmm.value.CriteriaObject;
 import io.github.mmm.value.PropertyPath;
+import io.github.mmm.value.SimplePath;
 import io.github.mmm.value.converter.TypeMapper;
 
 /**
@@ -360,11 +361,11 @@ public class DbStatementFormatter implements DbClauseVisitor {
     } else {
       String s;
       if (select.isSelectResult()) {
-        s = " new (";
+        s = "new (";
       } else if (select.isSelectEntity() || select.isSelectSingle()) {
-        s = " (";
+        s = "(";
       } else {
-        s = " new " + select.getResultName() + "(";
+        s = "new " + select.getResultName() + "(";
       }
       int i = 0;
       for (CriteriaObject<?> selection : selectionCriterias) {
@@ -372,7 +373,7 @@ public class DbStatementFormatter implements DbClauseVisitor {
         this.criteriaFormatter.onArg(selection, i++, null);
         s = ", ";
       }
-      write(")");
+      write(") ");
     }
   }
 
@@ -402,17 +403,17 @@ public class DbStatementFormatter implements DbClauseVisitor {
   protected void onSelectAll(SelectFrom<?, ?> selectFrom) {
 
     if (isSelectAllByAlias()) {
-      write(" ");
       write(selectFrom.getAlias());
+      write(" ");
     } else {
-      write(" *");
+      write("* ");
     }
   }
 
   @Override
   public void onFrom(FromClause<?, ?, ?> from) {
 
-    write(" FROM ");
+    write("FROM ");
     onEntities(from);
     DbClauseVisitor.super.onFrom(from);
   }
@@ -557,7 +558,11 @@ public class DbStatementFormatter implements DbClauseVisitor {
   private CriteriaObject<?> mapValue(CriteriaObject<?> value, TypeMapper typeMapper) {
 
     if (value instanceof Literal<?> literal) {
-      Object mapped = typeMapper.toTarget(literal.get());
+      Object sourceValue = literal.get();
+      if ((sourceValue instanceof Number) && (typeMapper instanceof PkMapper)) {
+        return value;
+      }
+      Object mapped = typeMapper.toTarget(sourceValue);
       return Literal.of(mapped);
     } else if (value instanceof PropertyPath<?> property) {
       return mapProperty(property, typeMapper);

@@ -64,6 +64,7 @@ public class DbDialectStatementFormatter extends DbStatementFormatter {
       write(columnName);
       s = ", ";
     }
+    write(" ");
   }
 
 }

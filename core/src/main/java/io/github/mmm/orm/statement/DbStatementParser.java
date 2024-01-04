@@ -16,6 +16,8 @@ import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.bean.mapping.ClassNameMapper;
 import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.entity.id.GenericId;
+import io.github.mmm.entity.id.IdFactory;
 import io.github.mmm.orm.ddl.DbColumnSpec;
 import io.github.mmm.orm.ddl.constraint.CheckConstraint;
 import io.github.mmm.orm.ddl.constraint.DbConstraint;
@@ -71,11 +73,12 @@ import io.github.mmm.property.criteria.Literal;
 import io.github.mmm.property.criteria.ProjectionProperty;
 import io.github.mmm.property.criteria.PropertyAssignment;
 import io.github.mmm.property.criteria.PropertyPathParser;
-import io.github.mmm.property.criteria.SimplePath;
+import io.github.mmm.property.criteria.SimplePathParser;
 import io.github.mmm.scanner.CharScannerParser;
 import io.github.mmm.scanner.CharStreamScanner;
 import io.github.mmm.value.CriteriaObject;
 import io.github.mmm.value.PropertyPath;
+import io.github.mmm.value.SimplePath;
 
 /**
  * {@link CharScannerParser} for {@link DbStatement}s.<br>
@@ -319,9 +322,6 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
       scanner.skipWhile(NEWLINE_OR_SPACE);
     }
     ReadableProperty<?> property = bean.getProperty(name);
-    if (property != null) {
-      name = null;
-    }
     String declaration = null;
     if (withDeclaration) {
       declaration = scanner.readWhile(CharFilter.IDENTIFIER);
@@ -364,11 +364,13 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
         contents.constraint(constraint);
       } else {
         ReadableProperty<?> columnProperty = EntityPathParser.parsePath(scanner, entity);
+        // if (columnProperty != EntityPathParser.PROPERTY_REVISION) {
         contents.column(columnProperty);
         scanner.requireOne(NEWLINE_OR_SPACE);
         String columnType = parseSegment(scanner);
         Class<?> columnClass = this.classNameMapper.getClass(columnType);
         assert (columnClass == columnProperty.getValueClass());
+        // }
       }
       scanner.skipWhile(NEWLINE_OR_SPACE);
     } while (scanner.expectOne(','));
@@ -529,12 +531,12 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
 
     // TODO consider mql change: INSERT INTO MyEntity e VALUES (e.Property1=value1, e.Property2=value2)
     scanner.requireOne('(');
-    List<PropertyPath<?>> columns = new ArrayList<>();
+    List<ReadableProperty<?>> properties = new ArrayList<>();
     boolean todo = true;
     while (todo) {
       scanner.skipWhile(NEWLINE_OR_SPACE);
-      PropertyPath<?> path = EntityPathParser.parsePath(scanner, entity);
-      columns.add(path);
+      ReadableProperty<?> path = EntityPathParser.parsePath(scanner, entity);
+      properties.add(path);
       scanner.skipWhile(NEWLINE_OR_SPACE);
       if (scanner.expectOne(')')) {
         todo = false;
@@ -549,15 +551,37 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
     scanner.requireOne('(');
     int i = 0;
     todo = true;
-    int columnCount = columns.size();
+    int columnCount = properties.size();
     while (todo) {
       if (i >= columnCount) {
         break;
       }
-      PropertyPath<?> path = columns.get(i);
+      ReadableProperty<?> property = properties.get(i);
       scanner.skipWhile(' ');
       Literal literal = this.criteriaSelectionParser.parseLiteral(scanner);
-      values.value(PropertyAssignment.of(path, literal));
+      if (property != EntityPathParser.PROPERTY_REVISION) {
+        if (property == entity.Id()) {
+          Object pk = literal.get();
+          i++;
+          Object rev = null;
+          if (i < columnCount) {
+            ReadableProperty<?> ref = properties.get(i);
+            if (ref == EntityPathParser.PROPERTY_REVISION) {
+              scanner.requireOne(',');
+              scanner.skipWhile(' ');
+              literal = this.criteriaSelectionParser.parseLiteral(scanner);
+              rev = literal.get();
+            }
+          }
+          if (rev == null) {
+            i--; // edge-case
+          }
+          GenericId<?, Object, Comparable<?>> id = IdFactory.get().create(entity.getJavaClass(), pk,
+              (Comparable<?>) rev);
+          literal = Literal.of(id);
+        }
+        values.value(PropertyAssignment.of(property, literal));
+      }
       i++;
       scanner.skipWhile(' ');
       if (scanner.expectOne(')')) {
@@ -687,7 +711,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
       }
     } else {
       // single selection or entityAlias
-      PropertyPath path = SimplePath.PARSER.parse(scanner);
+      PropertyPath path = SimplePathParser.INSTANCE.parse(scanner);
       if (path.parentPath() == null) {
         select = new SelectEntity(path.getName());
       } else {
