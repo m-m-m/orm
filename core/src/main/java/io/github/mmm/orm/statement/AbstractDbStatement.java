@@ -5,10 +5,12 @@ package io.github.mmm.orm.statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import io.github.mmm.marshall.MarshallingConfig;
 import io.github.mmm.marshall.StructuredReader;
 import io.github.mmm.marshall.StructuredWriter;
+import io.github.mmm.orm.impl.DbContextNone;
 
 /**
  * Abstract base implementation of an SQL {@link DbStatement} that may be executed to the database.
@@ -25,24 +27,30 @@ public abstract class AbstractDbStatement<E> implements DbStatement<E> {
 
     if (this.clauses == null) {
       List<AbstractDbClause> list = new ArrayList<>();
-      addClauses(list);
+      Consumer<AbstractDbClause> consumer = c -> {
+        if (c != null) {
+          list.add(c);
+        }
+      };
+      addClauses(consumer);
       this.clauses = Collections.unmodifiableList(list);
     }
     return this.clauses;
   }
 
   /**
-   * @param list the {@link List} where to {@link List#add(Object) add} the {@link DbClause}s.
+   * @param consumer the {@link List} where to {@link List#add(Object) add} the {@link DbClause}s.
    * @see #getClauses()
    */
-  protected abstract void addClauses(List<AbstractDbClause> list);
+  protected abstract void addClauses(Consumer<AbstractDbClause> consumer);
 
   @Override
   public void write(StructuredWriter writer) {
 
     String indendation = writer.getFormat().getConfig().get(MarshallingConfig.VAR_INDENTATION);
-    DbStatementFormatter formatter = new DbStatementFormatter(indendation);
-    writer.writeValueAsString(formatter.onStatement(this).toString());
+    AbstractDbStatementFormatter formatter = new AbstractDbStatementFormatter(indendation);
+    formatter.formatStatement(this, DbContextNone.INSTANCE);
+    writer.writeValueAsString(formatter.get());
   }
 
   @Override
@@ -59,7 +67,9 @@ public abstract class AbstractDbStatement<E> implements DbStatement<E> {
   @Override
   public String toString() {
 
-    return new DbStatementFormatter().onStatement(this).toString();
+    AbstractDbStatementFormatter formatter = new AbstractDbStatementFormatter();
+    formatter.formatStatement(this);
+    return formatter.toString();
   }
 
 }

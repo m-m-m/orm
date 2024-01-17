@@ -6,20 +6,20 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.DbStatement;
 
 /**
- * {@link Select} to query the {@link SelectFrom#getEntity() primary entity}.
+ * {@link SelectClause} to query the {@link SelectFrom#getEntity() primary entity}.
  *
  * @param <R> type of the result of the selection.
  * @see DbStatement#select(EntityBean)
  * @since 1.0.0
  */
-public class SelectEntity<R extends EntityBean> extends Select<R> {
+public class SelectEntityClause<R extends EntityBean> extends SelectClause<R> {
 
   /**
    * The constructor.
    *
    * @param entity the entity.
    */
-  public SelectEntity(R entity) {
+  public SelectEntityClause(R entity) {
 
     super(entity);
     setResultName(VALUE_RESULT_ENTITY);
@@ -30,10 +30,14 @@ public class SelectEntity<R extends EntityBean> extends Select<R> {
    *
    * @param alias the alias to use as {@link #getResultName() result name}.
    */
-  public SelectEntity(String alias) {
+  public SelectEntityClause(String alias) {
 
     super(null);
-    setResultName(alias);
+    if ((alias == null) || alias.isEmpty()) {
+      setResultName(VALUE_RESULT_ENTITY);
+    } else {
+      setResultName(alias);
+    }
   }
 
   /**

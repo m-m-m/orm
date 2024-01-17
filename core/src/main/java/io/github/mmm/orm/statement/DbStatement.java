@@ -7,20 +7,24 @@ import java.util.List;
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.marshall.MarshallingObject;
-import io.github.mmm.orm.statement.create.CreateTable;
-import io.github.mmm.orm.statement.delete.Delete;
+import io.github.mmm.orm.metadata.DbName;
+import io.github.mmm.orm.metadata.DbQualifiedName;
+import io.github.mmm.orm.statement.create.CreateTableClause;
+import io.github.mmm.orm.statement.delete.DeleteClause;
 import io.github.mmm.orm.statement.delete.DeleteFrom;
 import io.github.mmm.orm.statement.drop.DropTable;
-import io.github.mmm.orm.statement.insert.Insert;
+import io.github.mmm.orm.statement.insert.InsertClause;
 import io.github.mmm.orm.statement.insert.InsertInto;
-import io.github.mmm.orm.statement.merge.Merge;
+import io.github.mmm.orm.statement.merge.MergeClause;
 import io.github.mmm.orm.statement.merge.MergeInto;
-import io.github.mmm.orm.statement.select.SelectEntity;
+import io.github.mmm.orm.statement.select.SelectEntityClause;
 import io.github.mmm.orm.statement.select.SelectFrom;
-import io.github.mmm.orm.statement.select.SelectProjection;
-import io.github.mmm.orm.statement.select.SelectSingle;
-import io.github.mmm.orm.statement.update.Update;
-import io.github.mmm.orm.statement.upsert.Upsert;
+import io.github.mmm.orm.statement.select.SelectProjectionClause;
+import io.github.mmm.orm.statement.select.SelectSequenceNextValueClause;
+import io.github.mmm.orm.statement.select.SelectSingleClause;
+import io.github.mmm.orm.statement.select.SelectStatement;
+import io.github.mmm.orm.statement.update.UpdateClause;
+import io.github.mmm.orm.statement.upsert.UpsertClause;
 import io.github.mmm.orm.statement.upsert.UpsertInto;
 import io.github.mmm.value.CriteriaObject;
 
@@ -54,11 +58,11 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    *
    * @param <E> type of the {@link EntityBean} to select.
    * @param entity the {@link EntityBean} to select.
-   * @return the {@link SelectEntity} clause.
+   * @return the {@link SelectEntityClause} clause.
    */
   public static <E extends EntityBean> SelectFrom<E, E> select(E entity) {
 
-    return new SelectEntity<>(entity).from();
+    return new SelectEntityClause<>(entity).from();
   }
 
   /**
@@ -66,11 +70,11 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    *
    * @param <R> type of the result of the selection.
    * @param selection the single {@link CriteriaObject} to select.
-   * @return the new {@link SelectSingle} clause.
+   * @return the new {@link SelectSingleClause} clause.
    */
-  public static <R> SelectSingle<R> select(CriteriaObject<R> selection) {
+  public static <R> SelectSingleClause<R> select(CriteriaObject<R> selection) {
 
-    return new SelectSingle<>(selection);
+    return new SelectSingleClause<>(selection);
   }
 
   /**
@@ -78,11 +82,29 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    *
    * @param <R> type of the {@link WritableBean} to select.
    * @param bean the {@link WritableBean} to select.
-   * @return the new {@link SelectProjection} clause.
+   * @return the new {@link SelectProjectionClause} clause.
    */
-  public static <R extends WritableBean> SelectProjection<R> selectProjection(R bean) {
+  public static <R extends WritableBean> SelectProjectionClause<R> selectProjection(R bean) {
 
-    return new SelectProjection<>(bean);
+    return new SelectProjectionClause<>(bean);
+  }
+
+  /**
+   * @param sequenceName the {@link DbName} of the sequence to select.
+   * @return the {@link SelectStatement} to select the next value from the specified sequence.
+   */
+  public static SelectStatement<Long> selectSeqNextVal(DbName sequenceName) {
+
+    return selectSeqNextVal(new DbQualifiedName(null, null, sequenceName));
+  }
+
+  /**
+   * @param sequenceName the {@link DbQualifiedName} of the sequence to select.
+   * @return the {@link SelectStatement} to select the next value from the specified sequence.
+   */
+  public static SelectStatement<Long> selectSeqNextVal(DbQualifiedName sequenceName) {
+
+    return new SelectSequenceNextValueClause(sequenceName).getStatement();
   }
 
   /**
@@ -94,7 +116,7 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    */
   public static <E extends EntityBean> DeleteFrom<E> delete(E entity) {
 
-    return new Delete().from(entity);
+    return new DeleteClause().from(entity);
   }
 
   /**
@@ -106,7 +128,7 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    */
   public static <E extends EntityBean> InsertInto<E> insert(E entity) {
 
-    return new Insert().into(entity);
+    return new InsertClause().into(entity);
   }
 
   /**
@@ -114,11 +136,11 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    *
    * @param <E> type of the {@link EntityBean} to update.
    * @param entity the {@link EntityBean} to update.
-   * @return the {@link Update} clause.
+   * @return the {@link UpdateClause} clause.
    */
-  public static <E extends EntityBean> Update<E> update(E entity) {
+  public static <E extends EntityBean> UpdateClause<E> update(E entity) {
 
-    return new Update<>(entity);
+    return new UpdateClause<>(entity);
   }
 
   /**
@@ -130,7 +152,7 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    */
   public static <E extends EntityBean> UpsertInto<E> upset(E entity) {
 
-    return new Upsert().into(entity);
+    return new UpsertClause().into(entity);
   }
 
   /**
@@ -142,7 +164,7 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    */
   public static <E extends EntityBean> MergeInto<E> merge(E entity) {
 
-    return new Merge().into(entity);
+    return new MergeClause().into(entity);
   }
 
   /**
@@ -150,11 +172,11 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    *
    * @param <E> type of the {@link EntityBean} to create the table for.
    * @param entity the {@link EntityBean} to create the table for.
-   * @return the {@link CreateTable} clause.
+   * @return the {@link CreateTableClause} clause.
    */
-  public static <E extends EntityBean> CreateTable<E> createTable(E entity) {
+  public static <E extends EntityBean> CreateTableClause<E> createTable(E entity) {
 
-    return new CreateTable<>(entity);
+    return new CreateTableClause<>(entity);
   }
 
   /**

@@ -4,17 +4,17 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.result.DbResult;
 
 /**
- * {@link Select} to query arbitrary {@link #getSelections() selections} as generic {@link DbResult}.
+ * {@link SelectClause} to query arbitrary {@link #getSelections() selections} as generic {@link DbResult}.
  *
- * @see Select#result()
+ * @see SelectClause#result()
  * @since 1.0.0
  */
-public class SelectResult extends Select<DbResult> {
+public class SelectResultClause extends SelectClause<DbResult> {
 
   /**
    * The constructor.
    */
-  public SelectResult() {
+  public SelectResultClause() {
 
     super(null);
     setResultName(VALUE_RESULT_RESULT);

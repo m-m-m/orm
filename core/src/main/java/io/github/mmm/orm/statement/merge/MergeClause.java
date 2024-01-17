@@ -8,19 +8,19 @@ import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.StartClause;
 
 /**
- * {@link Merge}-{@link DbClause} to merge data in the database.
+ * {@link MergeClause}-{@link DbClause} to merge data in the database.
  *
  * @since 1.0.0
  */
-public final class Merge extends AbstractDbClause implements StartClause {
+public final class MergeClause extends AbstractDbClause implements StartClause {
 
-  /** Name of {@link Merge} for marshaling. */
+  /** Name of {@link MergeClause} for marshaling. */
   public static final String NAME_MERGE = "MERGE";
 
   /**
    * The constructor.
    */
-  public Merge() {
+  public MergeClause() {
 
     super();
   }

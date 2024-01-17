@@ -2,7 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.alter;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
@@ -16,14 +16,14 @@ import io.github.mmm.orm.statement.StartClause;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
- * {@link DbStatement} to {@link AlterTable alter a table}.
+ * {@link DbStatement} to {@link AlterTableClause alter a table}.
  *
  * @param <E> type of the {@link AbstractEntityClause#getEntity() entity}.
  * @since 1.0.0
  */
 public class AlterTableStatement<E extends EntityBean> extends AbstractDbStatement<E> {
 
-  private final AlterTable<E> alterTable;
+  private final AlterTableClause<E> alterTable;
 
   private final AlterTableOperations<E> operations;
 
@@ -32,7 +32,7 @@ public class AlterTableStatement<E extends EntityBean> extends AbstractDbStateme
    *
    * @param createTable the {@link #getAlterTable() alter table}.
    */
-  public AlterTableStatement(AlterTable<E> createTable) {
+  public AlterTableStatement(AlterTableClause<E> createTable) {
 
     super();
     this.alterTable = createTable;
@@ -50,9 +50,9 @@ public class AlterTableStatement<E extends EntityBean> extends AbstractDbStateme
   }
 
   /**
-   * @return the opening {@link AlterTable}-{@link DbClause}.
+   * @return the opening {@link AlterTableClause}-{@link DbClause}.
    */
-  public AlterTable<E> getAlterTable() {
+  public AlterTableClause<E> getAlterTable() {
 
     return this.alterTable;
   }
@@ -66,10 +66,10 @@ public class AlterTableStatement<E extends EntityBean> extends AbstractDbStateme
   }
 
   @Override
-  protected void addClauses(List<AbstractDbClause> list) {
+  protected void addClauses(Consumer<AbstractDbClause> consumer) {
 
-    list.add(this.alterTable);
-    list.add(this.operations);
+    consumer.accept(this.alterTable);
+    consumer.accept(this.operations);
   }
 
   @Override

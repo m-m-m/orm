@@ -2,7 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.create;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
@@ -16,16 +16,16 @@ import io.github.mmm.orm.statement.StartClause;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
- * {@link DbStatement} to {@link CreateIndex create an index}
+ * {@link DbStatement} to {@link CreateIndexClause create an index}
  *
  * @param <E> type of the {@link AbstractEntityClause#getEntity() entity}.
  * @since 1.0.0
  */
 public class CreateIndexStatement<E extends EntityBean> extends AbstractDbStatement<E> {
 
-  private final CreateIndex createIndex;
+  private final CreateIndexClause createIndex;
 
-  private final CreateIndexOn<E> on;
+  private final CreateIndexOnClause<E> on;
 
   private final CreateIndexColumns<E> column;
 
@@ -35,7 +35,7 @@ public class CreateIndexStatement<E extends EntityBean> extends AbstractDbStatem
    * @param createIndex the {@link #getCreateIndex() create index clause}.
    * @param on the {@link #getOn() on clause}.
    */
-  public CreateIndexStatement(CreateIndex createIndex, CreateIndexOn<E> on) {
+  public CreateIndexStatement(CreateIndexClause createIndex, CreateIndexOnClause<E> on) {
 
     super();
     this.createIndex = createIndex;
@@ -54,17 +54,17 @@ public class CreateIndexStatement<E extends EntityBean> extends AbstractDbStatem
   }
 
   /**
-   * @return the opening {@link CreateIndex}-{@link DbClause}.
+   * @return the opening {@link CreateIndexClause}-{@link DbClause}.
    */
-  public CreateIndex getCreateIndex() {
+  public CreateIndexClause getCreateIndex() {
 
     return this.createIndex;
   }
 
   /**
-   * @return the {@link CreateIndexOn}-{@link DbClause}.
+   * @return the {@link CreateIndexOnClause}-{@link DbClause}.
    */
-  public CreateIndexOn<E> getOn() {
+  public CreateIndexOnClause<E> getOn() {
 
     return this.on;
   }
@@ -78,11 +78,11 @@ public class CreateIndexStatement<E extends EntityBean> extends AbstractDbStatem
   }
 
   @Override
-  protected void addClauses(List<AbstractDbClause> list) {
+  protected void addClauses(Consumer<AbstractDbClause> consumer) {
 
-    list.add(this.createIndex);
-    list.add(this.on);
-    list.add(this.column);
+    consumer.accept(this.createIndex);
+    consumer.accept(this.on);
+    consumer.accept(this.column);
   }
 
   @Override

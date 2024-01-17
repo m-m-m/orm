@@ -6,7 +6,7 @@ import io.github.mmm.orm.statement.MainDbClause;
 import io.github.mmm.property.criteria.CriteriaPredicate;
 
 /**
- * {@link MainDbClause} allowing to {@link #having(CriteriaPredicate) begin} a {@link Having}-clause.
+ * {@link MainDbClause} allowing to {@link #having(CriteriaPredicate) begin} a {@link HavingClause}-clause.
  *
  * @param <R> type of the result of the selection.
  * @since 1.0.0
@@ -17,24 +17,24 @@ public interface ClauseWithHaving<R> extends MainDbClause<R> {
   SelectStatement<R> get();
 
   /**
-   * @param predicate the {@link CriteriaPredicate} to add as {@link Having}-clause.
-   * @return the {@link Having}-clause for fluent API calls.
+   * @param predicate the {@link CriteriaPredicate} to add as {@link HavingClause}-clause.
+   * @return the {@link HavingClause}-clause for fluent API calls.
    */
-  default Having<R> having(CriteriaPredicate predicate) {
+  default HavingClause<R> having(CriteriaPredicate predicate) {
 
-    Having<R> having = get().getHaving();
+    HavingClause<R> having = get().getHaving();
     having.and(predicate);
     return having;
   }
 
   /**
-   * @param predicates the {@link CriteriaPredicate}s to add as {@link Having}-clause. They will be combined with
+   * @param predicates the {@link CriteriaPredicate}s to add as {@link HavingClause}-clause. They will be combined with
    *        {@link io.github.mmm.property.criteria.PredicateOperator#AND AND}.
-   * @return the {@link Having}-clause for fluent API calls.
+   * @return the {@link HavingClause}-clause for fluent API calls.
    */
-  default Having<R> having(CriteriaPredicate... predicates) {
+  default HavingClause<R> having(CriteriaPredicate... predicates) {
 
-    Having<R> having = get().getHaving();
+    HavingClause<R> having = get().getHaving();
     having.and(predicates);
     return having;
   }

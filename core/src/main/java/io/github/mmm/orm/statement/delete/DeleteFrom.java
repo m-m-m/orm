@@ -21,10 +21,10 @@ public class DeleteFrom<E extends EntityBean> extends FromClause<E, E, DeleteFro
   /**
    * The constructor.
    *
-   * @param delete the opening {@link Delete}.
+   * @param delete the opening {@link DeleteClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    */
-  public DeleteFrom(Delete delete, E entity) {
+  public DeleteFrom(DeleteClause delete, E entity) {
 
     this(delete, entity, null);
   }
@@ -32,11 +32,11 @@ public class DeleteFrom<E extends EntityBean> extends FromClause<E, E, DeleteFro
   /**
    * The constructor.
    *
-   * @param delete the opening {@link Delete}.
+   * @param delete the opening {@link DeleteClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public DeleteFrom(Delete delete, E entity, String entityName) {
+  public DeleteFrom(DeleteClause delete, E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new DeleteStatement<>(delete, this);

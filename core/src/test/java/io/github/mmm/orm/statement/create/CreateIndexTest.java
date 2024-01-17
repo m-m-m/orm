@@ -8,30 +8,30 @@ import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Song;
 
 /**
- * Test of {@link CreateIndex} and {@link CreateIndexStatement}.
+ * Test of {@link CreateIndexClause} and {@link CreateIndexStatement}.
  */
 public class CreateIndexTest extends DbStatementTest {
 
-  /** Test of {@link CreateIndex} on a single column. */
+  /** Test of {@link CreateIndexClause} on a single column. */
   @Test
   public void testSingleColumn() {
 
     // given
     Song s = Song.of();
     // when
-    CreateIndexStatement<Song> createIndexStatement = new CreateIndex("IDX_GENRE").on(s).column(s.Genre()).get();
+    CreateIndexStatement<Song> createIndexStatement = new CreateIndexClause("IDX_GENRE").on(s).column(s.Genre()).get();
     // then
     check(createIndexStatement, "CREATE INDEX IDX_GENRE ON Song (Genre)");
   }
 
-  /** Test of {@link CreateIndex} on multiple columns. */
+  /** Test of {@link CreateIndexClause} on multiple columns. */
   @Test
   public void testMultipleColumns() {
 
     // given
     Song s = Song.of();
     // when
-    CreateIndexStatement<Song> createIndexStatement = new CreateIndex("IDX_GENRE").on(s).as("S")
+    CreateIndexStatement<Song> createIndexStatement = new CreateIndexClause("IDX_GENRE").on(s).as("S")
         .columns(s.Title(), s.Genre()).get();
     // then
     check(createIndexStatement, "CREATE INDEX IDX_GENRE ON Song S (S.Title,S.Genre)");

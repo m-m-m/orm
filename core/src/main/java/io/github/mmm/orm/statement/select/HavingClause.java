@@ -6,14 +6,14 @@ import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.PredicateClause;
 
 /**
- * A {@link Having}-{@link DbClause} of an SQL {@link SelectStatement}.
+ * A {@link HavingClause}-{@link DbClause} of an SQL {@link SelectStatement}.
  *
  * @param <R> type of the result of the selection.
  * @since 1.0.0
  */
-public class Having<R> extends PredicateClause<R, Having<R>> implements ClauseWithOrderBy<R> {
+public class HavingClause<R> extends PredicateClause<R, HavingClause<R>> implements ClauseWithOrderBy<R> {
 
-  /** Name of {@link Having} for marshaling. */
+  /** Name of {@link HavingClause} for marshaling. */
   public static final String NAME_HAVING = "HAVING";
 
   private final SelectStatement<R> statement;
@@ -23,7 +23,7 @@ public class Having<R> extends PredicateClause<R, Having<R>> implements ClauseWi
    *
    * @param statement the owning {@link SelectStatement}.
    */
-  public Having(SelectStatement<R> statement) {
+  public HavingClause(SelectStatement<R> statement) {
 
     super();
     this.statement = statement;

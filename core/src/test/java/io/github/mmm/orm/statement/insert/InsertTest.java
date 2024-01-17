@@ -7,24 +7,24 @@ import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
 
 /**
- * Test of {@link Insert} and {@link InsertStatement}.
+ * Test of {@link InsertClause} and {@link InsertStatement}.
  */
 public class InsertTest extends DbStatementTest {
 
-  /** Test {@link Insert} with simple literal values. */
+  /** Test {@link InsertClause} with simple literal values. */
   @Test
   public void testInsertValues() {
 
     // given
     Person p = Person.of();
     // when
-    InsertStatement<Person> insertStatement = new Insert().into(p).value(p.Name(), "John Doe").value(p.Single(), true)
+    InsertStatement<Person> insertStatement = new InsertClause().into(p).value(p.Name(), "John Doe").value(p.Single(), true)
         .get();
     // then
     check(insertStatement, "INSERT INTO Person(Name, Single) VALUES ('John Doe', TRUE)");
   }
 
-  /** Test {@link Insert} with simple literal values. */
+  /** Test {@link InsertClause} with simple literal values. */
   @Test
   public void testInsertAllValues() {
 
@@ -34,7 +34,7 @@ public class InsertTest extends DbStatementTest {
     p.Single().setValue(true);
     p.Id().set(LongId.of(4711L).updateRevision());
     // when
-    InsertStatement<Person> insertStatement = new Insert().into(p).valuesAll().get();
+    InsertStatement<Person> insertStatement = new InsertClause().into(p).valuesAll().get();
     // then
     check(insertStatement, "INSERT INTO Person(Id, Rev, Name, Single) VALUES (4711, 1, 'John Doe', TRUE)");
   }

@@ -37,22 +37,22 @@ public class MySqlFormatter extends DbDialectStatementFormatter {
   }
 
   @Override
-  protected void writeConstraintKeywordWithName(TableOperationType type, DbConstraint constraint) {
+  protected void formatConstraintKeywordWithName(TableOperationType type, DbConstraint constraint) {
 
     if (type == TableOperationType.DROP) {
       write("INDEX ");
     } else {
-      super.writeConstraintKeywordWithName(type, constraint);
+      super.formatConstraintKeywordWithName(type, constraint);
     }
   }
 
   @Override
-  protected void writeAlterTableColumn(TableOperationType type) {
+  protected void formatAlterTableColumn(TableOperationType type) {
 
     if (type == TableOperationType.MODIFY) {
       write("COLUMN ");
     } else {
-      super.writeAlterTableColumn(type);
+      super.formatAlterTableColumn(type);
     }
   }
 

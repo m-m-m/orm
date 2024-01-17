@@ -20,10 +20,10 @@ public class UpsertInto<E extends EntityBean> extends IntoClause<E, UpsertValues
   /**
    * The constructor.
    *
-   * @param upset the opening {@link Upsert}.
+   * @param upset the opening {@link UpsertClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    */
-  public UpsertInto(Upsert upset, E entity) {
+  public UpsertInto(UpsertClause upset, E entity) {
 
     this(upset, entity, null);
   }
@@ -31,11 +31,11 @@ public class UpsertInto<E extends EntityBean> extends IntoClause<E, UpsertValues
   /**
    * The constructor.
    *
-   * @param upsert the opening {@link Upsert}.
+   * @param upsert the opening {@link UpsertClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public UpsertInto(Upsert upsert, E entity, String entityName) {
+  public UpsertInto(UpsertClause upsert, E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new UpsertStatement<>(upsert, this);

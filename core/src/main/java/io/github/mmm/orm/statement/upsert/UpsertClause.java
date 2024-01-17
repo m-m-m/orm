@@ -11,15 +11,15 @@ import io.github.mmm.orm.statement.StartClause;
  *
  * @since 1.0.0
  */
-public final class Upsert extends AbstractDbClause implements StartClause {
+public final class UpsertClause extends AbstractDbClause implements StartClause {
 
-  /** Name of {@link Upsert} for marshaling. */
+  /** Name of {@link UpsertClause} for marshaling. */
   public static final String NAME_UPSERT = "UPSERT";
 
   /**
    * The constructor.
    */
-  public Upsert() {
+  public UpsertClause() {
 
     super();
   }

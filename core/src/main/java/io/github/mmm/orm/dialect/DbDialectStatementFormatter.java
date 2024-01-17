@@ -10,14 +10,14 @@ import io.github.mmm.orm.param.CriteriaParametersIndexed;
 import io.github.mmm.orm.result.DbResult;
 import io.github.mmm.orm.result.DbResultValue;
 import io.github.mmm.orm.statement.AbstractEntityClause;
-import io.github.mmm.orm.statement.DbStatementFormatter;
+import io.github.mmm.orm.statement.AbstractDbStatementFormatter;
 import io.github.mmm.orm.statement.select.SelectFrom;
 import io.github.mmm.property.criteria.CriteriaFormatter;
 
 /**
- * {@link DbStatementFormatter} for any real {@link DbDialect database dialect}.
+ * {@link AbstractDbStatementFormatter} for any real {@link DbDialect database dialect}.
  */
-public class DbDialectStatementFormatter extends DbStatementFormatter {
+public class DbDialectStatementFormatter extends AbstractDbStatementFormatter {
 
   /**
    * The constructor.
@@ -45,7 +45,7 @@ public class DbDialectStatementFormatter extends DbStatementFormatter {
   }
 
   @Override
-  protected void writeEntityName(AbstractEntityClause<?, ?, ?> entityClause) {
+  protected void formatEntityName(AbstractEntityClause<?, ?, ?> entityClause) {
 
     String table = this.dialect.getNamingStrategy().getTableName(entityClause);
     write(table);

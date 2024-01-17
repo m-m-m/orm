@@ -6,7 +6,7 @@ import io.github.mmm.orm.statement.MainDbClause;
 import io.github.mmm.property.criteria.CriteriaOrdering;
 
 /**
- * {@link MainDbClause} allowing to {@link #orderBy(CriteriaOrdering) begin} a {@link Having}-clause.
+ * {@link MainDbClause} allowing to {@link #orderBy(CriteriaOrdering) begin} a {@link HavingClause}-clause.
  *
  * @param <R> type of the result of the selection.
  * @since 1.0.0
@@ -17,23 +17,23 @@ public interface ClauseWithOrderBy<R> extends MainDbClause<R> {
   SelectStatement<R> get();
 
   /**
-   * @param ordering the {@link CriteriaOrdering} to add as {@link OrderBy}-clause.
-   * @return the {@link OrderBy}-clause for fluent API calls.
+   * @param ordering the {@link CriteriaOrdering} to add as {@link OrderByClause}-clause.
+   * @return the {@link OrderByClause}-clause for fluent API calls.
    */
-  default OrderBy<R> orderBy(CriteriaOrdering ordering) {
+  default OrderByClause<R> orderBy(CriteriaOrdering ordering) {
 
-    OrderBy<R> orderBy = get().getOrderBy();
+    OrderByClause<R> orderBy = get().getOrderBy();
     orderBy.and(ordering);
     return orderBy;
   }
 
   /**
-   * @param orderings the {@link CriteriaOrdering}s to add as {@link OrderBy}-clause.
-   * @return the {@link OrderBy}-clause for fluent API calls.
+   * @param orderings the {@link CriteriaOrdering}s to add as {@link OrderByClause}-clause.
+   * @return the {@link OrderByClause}-clause for fluent API calls.
    */
-  default OrderBy<R> orderBy(CriteriaOrdering... orderings) {
+  default OrderByClause<R> orderBy(CriteriaOrdering... orderings) {
 
-    OrderBy<R> orderBy = get().getOrderBy();
+    OrderByClause<R> orderBy = get().getOrderBy();
     orderBy.and(orderings);
     return orderBy;
   }

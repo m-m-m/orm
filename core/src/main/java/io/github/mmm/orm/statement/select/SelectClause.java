@@ -18,34 +18,39 @@ import io.github.mmm.value.PropertyPath;
  * {@link StartClause} of a {@link SelectStatement} to query data from the database. As {@link SelectStatement}s are
  * rather complex, this class is abstract to allow property type-safety and guidance of fluent API and code completion
  * via derived sub-classes for different scenarios. For simplest usage you can use the static methods provided by
- * {@link Select} to start your query (typing {@code Select.} and starting code completion). However, you are still free
- * to use regular instantiation like for other statements (typing {@code new Select} and starting code completion).
+ * {@link SelectClause} to start your query (typing {@code Select.} and starting code completion). However, you are
+ * still free to use regular instantiation like for other statements (typing {@code new Select} and starting code
+ * completion).
  *
  * <b>ATTENTION:</b> Please note that after
  * {@link io.github.mmm.orm.statement.DbStatementMarshalling#readObject(StructuredReader) unmarshalling} or
  * {@link io.github.mmm.orm.statement.DbStatementParser#parse(String) parsing} a {@link SelectStatement} the
  * {@link SelectStatement#getSelect() select} clause may not be of any of the expected sub-classes such as
- * {@link SelectEntity}, {@link SelectSingle}, {@link SelectResult}, or {@link SelectProjection}. Use {@code isSelect*}
- * methods like {@link #isSelectEntity()} to determine the actual selection type.
+ * {@link SelectEntityClause}, {@link SelectSingleClause}, {@link SelectResultClause}, or
+ * {@link SelectProjectionClause}. Use {@code isSelect*} methods like {@link #isSelectEntity()} to determine the actual
+ * selection type.
  *
  * @param <R> type of the result of the selection.
  * @since 1.0.0
  */
-public abstract class Select<R> extends AbstractDbClause implements StartClause {
+public abstract class SelectClause<R> extends AbstractDbClause implements StartClause {
 
-  /** Name of {@link Select} for marshaling. */
+  /** Name of {@link SelectClause} for marshaling. */
   public static final String NAME_SELECT = "SELECT";
 
   /** Name of property {@link #isDistinct()} for marshaling. */
   public static final String NAME_DISTINCT = "DISTINCT";
 
-  /** {@link #getResultName() Result name} for {@link SelectEntity}. */
+  /** {@link #getResultName() Result name} for {@link SelectEntityClause}. */
   public static final String VALUE_RESULT_ENTITY = "entity";
 
-  /** {@link #getResultName() Result name} for {@link SelectSingle}. */
+  /** {@link #getResultName() Result name} for {@link SelectSingleClause}. */
   public static final String VALUE_RESULT_SINLGE = "1";
 
-  /** {@link #getResultName() Result name} for {@link SelectResult}. */
+  /** {@link #getResultName() Result name} for {@link SelectSequenceNextValueClause}. */
+  public static final String VALUE_RESULT_SEQ_NEXT_VAL = "seq.nextval";
+
+  /** {@link #getResultName() Result name} for {@link SelectResultClause}. */
   public static final String VALUE_RESULT_RESULT = "result";
 
   private SelectStatement<R> statement;
@@ -63,7 +68,7 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
    *
    * @param resultBean the {@link #getResultBean() result bean}.
    */
-  protected Select(R resultBean) {
+  protected SelectClause(R resultBean) {
 
     super();
     this.selections = new ArrayList<>();
@@ -101,8 +106,8 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
   }
 
   /**
-   * @return the result {@link io.github.mmm.bean.WritableBean bean} for {@link SelectProjection} or
-   *         {@link SelectEntity}, otherwise {@code null}.
+   * @return the result {@link io.github.mmm.bean.WritableBean bean} for {@link SelectProjectionClause} or
+   *         {@link SelectEntityClause}, otherwise {@code null}.
    */
   public R getResultBean() {
 
@@ -121,9 +126,9 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
   }
 
   /**
-   * @return the optional result name. Will be {@link #VALUE_RESULT_ENTITY} for {@link SelectEntity},
-   *         {@link #VALUE_RESULT_SINLGE} for {@link SelectSingle}, and {@link #VALUE_RESULT_RESULT} for
-   *         {@link SelectResult}.
+   * @return the optional result name. Will be {@link #VALUE_RESULT_ENTITY} for {@link SelectEntityClause},
+   *         {@link #VALUE_RESULT_SINLGE} for {@link SelectSingleClause}, and {@link #VALUE_RESULT_RESULT} for
+   *         {@link SelectResultClause}.
    * @see #getResultBean()
    * @see io.github.mmm.orm.statement.AbstractEntityClause#getEntityName()
    */
@@ -142,7 +147,7 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
 
   /**
    * @return {@code true} if the {@link SelectFrom#getEntity() primary entity} is selected, {@code false} otherwise.
-   * @see SelectEntity
+   * @see SelectEntityClause
    */
   public boolean isSelectEntity() {
 
@@ -150,9 +155,10 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
   }
 
   /**
-   * @return {@code true} if only a {@link SelectSingle single} {@link #getSelections() selection} is selected as raw
-   *         value, {@code false} otherwise.
-   * @see SelectSingle
+   * @return {@code true} if only a {@link SelectSingleClause single} {@link #getSelections() selection} is selected as
+   *         raw value, {@code false} otherwise.
+   * @see SelectSingleClause
+   * @see SelectSequenceNextValueClause
    */
   public boolean isSelectSingle() {
 
@@ -162,7 +168,7 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
   /**
    * @return {@code true} if only if the {@link SelectFrom#getEntity() main entity} is selected, {@code false}
    *         otherwise.
-   * @see SelectEntity
+   * @see SelectEntityClause
    */
   public boolean isSelectResult() {
 
@@ -172,9 +178,9 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
   /**
    * Sets {@link #isDistinct() DISTINCT} selection (filter out duplicates).
    *
-   * @return this {@link Select} for fluent API calls.
+   * @return this {@link SelectClause} for fluent API calls.
    */
-  public Select<R> distinct() {
+  public SelectClause<R> distinct() {
 
     this.distinct = true;
     return this;
@@ -188,9 +194,9 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
 
   /**
    * @param expression the {@link CriteriaExpression} to add to the selection.
-   * @return this {@link Select} for fluent API calls.
+   * @return this {@link SelectClause} for fluent API calls.
    */
-  protected Select<R> and(CriteriaExpression<?> expression) {
+  protected SelectClause<R> and(CriteriaExpression<?> expression) {
 
     add(expression);
     return this;
@@ -198,9 +204,9 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
 
   /**
    * @param expressions the {@link CriteriaExpression}s to add to the selection.
-   * @return this {@link Select} for fluent API calls.
+   * @return this {@link SelectClause} for fluent API calls.
    */
-  protected Select<R> and(CriteriaExpression<?>... expressions) {
+  protected SelectClause<R> and(CriteriaExpression<?>... expressions) {
 
     for (CriteriaExpression<?> aggregation : expressions) {
       add(aggregation);
@@ -210,9 +216,9 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
 
   /**
    * @param property the {@link PropertyPath property} to add to the selection.
-   * @return this {@link Select} for fluent API calls.
+   * @return this {@link SelectClause} for fluent API calls.
    */
-  protected Select<R> and(PropertyPath<?> property) {
+  protected SelectClause<R> and(PropertyPath<?> property) {
 
     add(property);
     return this;
@@ -220,9 +226,9 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
 
   /**
    * @param properties the {@link PropertyPath properties} to add to the selection.
-   * @return this {@link Select} for fluent API calls.
+   * @return this {@link SelectClause} for fluent API calls.
    */
-  protected Select<R> and(PropertyPath<?>... properties) {
+  protected SelectClause<R> and(PropertyPath<?>... properties) {
 
     for (PropertyPath<?> property : properties) {
       add(property);
@@ -243,11 +249,11 @@ public abstract class Select<R> extends AbstractDbClause implements StartClause 
   /**
    * Alternative for {@code new SelectResult()}.
    *
-   * @return the new {@link SelectResult} clause.
+   * @return the new {@link SelectResultClause} clause.
    */
-  public static SelectResult result() {
+  public static SelectResultClause result() {
 
-    return new SelectResult();
+    return new SelectResultClause();
   }
 
 }

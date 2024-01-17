@@ -8,31 +8,31 @@ import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Song;
 
 /**
- * Test of {@link AlterTable} and {@link AlterTableStatement}.
+ * Test of {@link AlterTableClause} and {@link AlterTableStatement}.
  */
 public class AlterTableTest extends DbStatementTest {
 
-  /** Test of {@link AlterTable} that adds a single column. */
+  /** Test of {@link AlterTableClause} that adds a single column. */
   @Test
   public void testAddColumn() {
 
     // given
     Song s = Song.of();
     // when
-    AlterTableStatement<Song> alterTableStatement = new AlterTable<>(s).addColumn(s.Composer()).get();
+    AlterTableStatement<Song> alterTableStatement = new AlterTableClause<>(s).addColumn(s.Composer()).get();
     // then
     check(alterTableStatement, "ALTER TABLE Song\n" //
         + "ADD Composer Link");
   }
 
-  /** Test of {@link AlterTable} that adds a single column with auto constraint. */
+  /** Test of {@link AlterTableClause} that adds a single column with auto constraint. */
   @Test
   public void testAddColumnAutoConstraint() {
 
     // given
     Song s = Song.of();
     // when
-    AlterTableStatement<Song> alterTableStatement = new AlterTable<>(s).addColumn(s.Composer(), true).get();
+    AlterTableStatement<Song> alterTableStatement = new AlterTableClause<>(s).addColumn(s.Composer(), true).get();
     // then
     check(alterTableStatement, "ALTER TABLE Song\n" //
         + "ADD Composer Link,\n" //

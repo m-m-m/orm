@@ -11,11 +11,11 @@ import io.github.mmm.orm.statement.Person;
 import io.github.mmm.orm.statement.Song;
 
 /**
- * Test of {@link CreateTable} and {@link CreateTableStatement}.
+ * Test of {@link CreateTableClause} and {@link CreateTableStatement}.
  */
 public class CreateTableTest extends DbStatementTest {
 
-  /** Test of {@link CreateTable} that automatically creates all columns. */
+  /** Test of {@link CreateTableClause} that automatically creates all columns. */
   @Test
   public void testAuto() {
 
@@ -24,7 +24,7 @@ public class CreateTableTest extends DbStatementTest {
     // temporary workaround
     s.Composer().set(Link.of(LongId.of(4711L, Person.class)));
     // when
-    CreateTableStatement<Song> createTableStatement = new CreateTable<>(s).columns().get();
+    CreateTableStatement<Song> createTableStatement = new CreateTableClause<>(s).columns().get();
     // then
     check(createTableStatement, "CREATE TABLE Song (\n" //
         + "  Composer Link,\n" // types (Link, Long, String, etc.) are mapped to proper DB types if dialect is used

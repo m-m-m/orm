@@ -6,7 +6,7 @@ import io.github.mmm.orm.statement.MainDbClause;
 import io.github.mmm.value.PropertyPath;
 
 /**
- * {@link MainDbClause} allowing to {@link #groupBy(PropertyPath) begin} a {@link GroupBy}-clause.
+ * {@link MainDbClause} allowing to {@link #groupBy(PropertyPath) begin} a {@link GroupByClause}-clause.
  *
  * @param <R> type of the result of the selection.
  * @since 1.0.0
@@ -17,12 +17,12 @@ public interface ClauseWithGroupBy<R> extends MainDbClause<R> {
   SelectStatement<R> get();
 
   /**
-   * @param path the {@link PropertyPath} to add as {@link GroupBy}-clause.
-   * @return the {@link GroupBy}-clause for fluent API calls.
+   * @param path the {@link PropertyPath} to add as {@link GroupByClause}-clause.
+   * @return the {@link GroupByClause}-clause for fluent API calls.
    */
-  default GroupBy<R> groupBy(PropertyPath<?> path) {
+  default GroupByClause<R> groupBy(PropertyPath<?> path) {
 
-    GroupBy<R> groupBy = get().getGroupBy();
+    GroupByClause<R> groupBy = get().getGroupBy();
     if (path != null) {
       groupBy.and(path);
     }
@@ -30,12 +30,12 @@ public interface ClauseWithGroupBy<R> extends MainDbClause<R> {
   }
 
   /**
-   * @param paths the {@link PropertyPath}s to add as {@link GroupBy}-clause.
-   * @return the {@link GroupBy}-clause for fluent API calls.
+   * @param paths the {@link PropertyPath}s to add as {@link GroupByClause}-clause.
+   * @return the {@link GroupByClause}-clause for fluent API calls.
    */
-  default GroupBy<R> groupBy(PropertyPath<?>... paths) {
+  default GroupByClause<R> groupBy(PropertyPath<?>... paths) {
 
-    GroupBy<R> groupBy = get().getGroupBy();
+    GroupByClause<R> groupBy = get().getGroupBy();
     groupBy.and(paths);
     return groupBy;
   }

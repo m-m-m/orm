@@ -22,10 +22,10 @@ public class SelectFrom<R, E extends EntityBean> extends FromClause<R, E, Select
   /**
    * The constructor.
    *
-   * @param select the {@link Select}.
+   * @param select the {@link SelectClause}.
    * @param entity the {@link #getEntity() entity}.
    */
-  public SelectFrom(Select<R> select, E entity) {
+  public SelectFrom(SelectClause<R> select, E entity) {
 
     this(select, entity, null);
   }
@@ -33,11 +33,11 @@ public class SelectFrom<R, E extends EntityBean> extends FromClause<R, E, Select
   /**
    * The constructor.
    *
-   * @param select the {@link Select}.
+   * @param select the {@link SelectClause}.
    * @param entity the {@link #getEntity() entity}.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public SelectFrom(Select<R> select, E entity, String entityName) {
+  public SelectFrom(SelectClause<R> select, E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new SelectStatement<>(select, this);

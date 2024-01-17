@@ -4,12 +4,14 @@ package io.github.mmm.orm.spi.access;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.create.CreateIndexStatement;
-import io.github.mmm.orm.statement.create.CreateTable;
+import io.github.mmm.orm.statement.create.CreateSequenceStatement;
+import io.github.mmm.orm.statement.create.CreateTableClause;
 import io.github.mmm.orm.statement.create.CreateTableStatement;
 
 /**
- * Interface providing support for {@link #createTable(CreateTableStatement)} and
- * {@link #createIndex(CreateIndexStatement)}.
+ * Interface providing support for {@link #createTable(CreateTableStatement) createTable},
+ * {@link #createIndex(CreateIndexStatement) createIndex}, and {@link #createSequence(CreateSequenceStatement)
+ * createSequence}.
  */
 public interface DbCreateAccess {
 
@@ -23,7 +25,7 @@ public interface DbCreateAccess {
    */
   default void createTable(EntityBean entity) {
 
-    CreateTableStatement<EntityBean> statement = new CreateTable<>(entity).columns().get();
+    CreateTableStatement<EntityBean> statement = new CreateTableClause<>(entity).columns().get();
     createTable(statement);
   }
 
@@ -40,5 +42,10 @@ public interface DbCreateAccess {
    * @param statement the {@link CreateIndexStatement} to execute.
    */
   void createIndex(CreateIndexStatement<?> statement);
+
+  /**
+   * @param statement the {@link CreateSequenceStatement} to execute.
+   */
+  void createSequence(CreateSequenceStatement statement);
 
 }

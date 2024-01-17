@@ -10,15 +10,15 @@ import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.property.ReadableProperty;
 
 /**
- * A {@link CreateIndexOn}-{@link DbClause} of an SQL {@link CreateIndexStatement}.
+ * A {@link CreateIndexOnClause}-{@link DbClause} of an SQL {@link CreateIndexStatement}.
  *
  * @param <E> type of the {@link #getEntity() entity}.
  * @since 1.0.0
  */
-public class CreateIndexOn<E extends EntityBean> extends AbstractEntityClause<E, E, CreateIndexOn<E>>
+public class CreateIndexOnClause<E extends EntityBean> extends AbstractEntityClause<E, E, CreateIndexOnClause<E>>
     implements CreateIndexFragment<E> {
 
-  /** Name of {@link CreateIndexOn} for marshaling. */
+  /** Name of {@link CreateIndexOnClause} for marshaling. */
   public static final String NAME_ON = "ON";
 
   private final CreateIndexStatement<E> statement;
@@ -26,10 +26,10 @@ public class CreateIndexOn<E extends EntityBean> extends AbstractEntityClause<E,
   /**
    * The constructor.
    *
-   * @param createIndex the {@link CreateIndex}-{@link DbClause}.
+   * @param createIndex the {@link CreateIndexClause}-{@link DbClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    */
-  public CreateIndexOn(CreateIndex createIndex, E entity) {
+  public CreateIndexOnClause(CreateIndexClause createIndex, E entity) {
 
     this(createIndex, entity, null);
   }
@@ -37,11 +37,11 @@ public class CreateIndexOn<E extends EntityBean> extends AbstractEntityClause<E,
   /**
    * The constructor.
    *
-   * @param createIndex the {@link CreateIndex}-{@link DbClause}.
+   * @param createIndex the {@link CreateIndexClause}-{@link DbClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public CreateIndexOn(CreateIndex createIndex, E entity, String entityName) {
+  public CreateIndexOnClause(CreateIndexClause createIndex, E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new CreateIndexStatement<>(createIndex, this);

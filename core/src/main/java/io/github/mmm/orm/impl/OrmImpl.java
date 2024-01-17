@@ -19,11 +19,11 @@ import io.github.mmm.orm.mapping.impl.DbPropertyMapperImpl;
 import io.github.mmm.orm.mapping.impl.DbSegmentMapper;
 import io.github.mmm.orm.naming.DbNamingStrategy;
 import io.github.mmm.orm.result.impl.DbResultValueObject;
-import io.github.mmm.orm.statement.select.Select;
-import io.github.mmm.orm.statement.select.SelectEntity;
-import io.github.mmm.orm.statement.select.SelectProjection;
-import io.github.mmm.orm.statement.select.SelectResult;
-import io.github.mmm.orm.statement.select.SelectSingle;
+import io.github.mmm.orm.statement.select.SelectClause;
+import io.github.mmm.orm.statement.select.SelectEntityClause;
+import io.github.mmm.orm.statement.select.SelectProjectionClause;
+import io.github.mmm.orm.statement.select.SelectResultClause;
+import io.github.mmm.orm.statement.select.SelectSingleClause;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.ProjectionProperty;
@@ -172,15 +172,15 @@ public class OrmImpl implements Orm {
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
-  public <V> DbMapper<V> createMapper(Select<V> select) {
+  public <V> DbMapper<V> createMapper(SelectClause<V> select) {
 
-    if (select instanceof SelectEntity<?> selectEntity) {
+    if (select instanceof SelectEntityClause<?> selectEntity) {
       return (DbMapper) createBeanMapper(selectEntity.getResultBean());
-    } else if (select instanceof SelectResult) {
+    } else if (select instanceof SelectResultClause) {
       return (DbMapper) DbMapperDbResult.INSTANCE;
-    } else if (select instanceof SelectSingle<V> selectSingle) {
+    } else if (select instanceof SelectSingleClause<V> selectSingle) {
       return createMapper(selectSingle.getSelection());
-    } else if (select instanceof SelectProjection<?> selectProjection) {
+    } else if (select instanceof SelectProjectionClause<?> selectProjection) {
       return (DbMapper) createBeanMapperProjection(selectProjection.getResultBean(), selectProjection.getSelections());
     }
     Objects.requireNonNull(select);
@@ -188,7 +188,7 @@ public class OrmImpl implements Orm {
   }
 
   /**
-   * @param selection the {@link SelectSingle#getSelection() single selection}.
+   * @param selection the {@link SelectSingleClause#getSelection() single selection}.
    * @return the according {@link DbMapper}.
    */
   private <V> DbSegmentMapper<V, ?> createMapper(CriteriaObject<V> selection) {

@@ -2,7 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.delete;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
@@ -16,14 +16,14 @@ import io.github.mmm.orm.statement.StartClause;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
- * {@link DbStatement} to {@link Delete}
+ * {@link DbStatement} to {@link DeleteClause}
  *
  * @param <E> type of the {@link AbstractEntityClause#getEntity() entity}.
  * @since 1.0.0
  */
 public class DeleteStatement<E extends EntityBean> extends AbstractDbStatement<E> {
 
-  private final Delete delete;
+  private final DeleteClause delete;
 
   private final DeleteFrom<E> from;
 
@@ -35,7 +35,7 @@ public class DeleteStatement<E extends EntityBean> extends AbstractDbStatement<E
    * @param delete the {@link #getDelete() delete}.
    * @param from the #getFrom
    */
-  public DeleteStatement(Delete delete, DeleteFrom<E> from) {
+  public DeleteStatement(DeleteClause delete, DeleteFrom<E> from) {
 
     super();
     this.delete = delete;
@@ -54,9 +54,9 @@ public class DeleteStatement<E extends EntityBean> extends AbstractDbStatement<E
   }
 
   /**
-   * @return the opening {@link Delete}-{@link DbClause}.
+   * @return the opening {@link DeleteClause}-{@link DbClause}.
    */
-  public Delete getDelete() {
+  public DeleteClause getDelete() {
 
     return this.delete;
   }
@@ -78,11 +78,11 @@ public class DeleteStatement<E extends EntityBean> extends AbstractDbStatement<E
   }
 
   @Override
-  protected void addClauses(List<AbstractDbClause> list) {
+  protected void addClauses(Consumer<AbstractDbClause> consumer) {
 
-    list.add(this.delete);
-    list.add(this.from);
-    list.add(this.where);
+    consumer.accept(this.delete);
+    consumer.accept(this.from);
+    consumer.accept(this.where);
   }
 
   @Override

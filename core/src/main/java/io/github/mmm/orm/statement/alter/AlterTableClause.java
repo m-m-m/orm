@@ -11,15 +11,15 @@ import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.StartClause;
 
 /**
- * A {@link AlterTable}-{@link DbClause} of an SQL {@link AlterTableStatement}.
+ * A {@link AlterTableClause}-{@link DbClause} of an SQL {@link AlterTableStatement}.
  *
  * @param <E> type of the {@link #getEntity() entity}.
  * @since 1.0.0
  */
-public class AlterTable<E extends EntityBean> extends AbstractEntityClause<E, E, AlterTable<E>>
+public class AlterTableClause<E extends EntityBean> extends AbstractEntityClause<E, E, AlterTableClause<E>>
     implements StartClause, AlterTableFragment<E> {
 
-  /** Name of {@link AlterTable} for marshaling. */
+  /** Name of {@link AlterTableClause} for marshaling. */
   public static final String NAME_ALTER_TABLE = "ALTER TABLE";
 
   private final AlterTableStatement<E> statement;
@@ -29,7 +29,7 @@ public class AlterTable<E extends EntityBean> extends AbstractEntityClause<E, E,
    *
    * @param entity the {@link #getEntity() entity} to operate on.
    */
-  public AlterTable(E entity) {
+  public AlterTableClause(E entity) {
 
     this(entity, null);
   }
@@ -40,7 +40,7 @@ public class AlterTable<E extends EntityBean> extends AbstractEntityClause<E, E,
    * @param entity the {@link #getEntity() entity} to operate on.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public AlterTable(E entity, String entityName) {
+  public AlterTableClause(E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new AlterTableStatement<>(this);

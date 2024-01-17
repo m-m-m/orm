@@ -17,10 +17,10 @@ import io.github.mmm.property.criteria.PropertyAssignment;
  * @param <E> type of the {@link #getEntity() entity}.
  * @since 1.0.0
  */
-public final class Update<E extends EntityBean> extends AbstractEntitiesClause<E, E, Update<E>>
+public final class UpdateClause<E extends EntityBean> extends AbstractEntitiesClause<E, E, UpdateClause<E>>
     implements StartClause, MainDbClause<E>, SetFragment<E, UpdateSet<E>> {
 
-  /** Name of {@link Update} for marshaling. */
+  /** Name of {@link UpdateClause} for marshaling. */
   public static final String NAME_UPDATE = "UPDATE";
 
   private final UpdateStatement<E> statement;
@@ -30,7 +30,7 @@ public final class Update<E extends EntityBean> extends AbstractEntitiesClause<E
    *
    * @param entity the {@link #getEntity() entity} to operate on.
    */
-  public Update(E entity) {
+  public UpdateClause(E entity) {
 
     this(entity, null);
   }
@@ -41,7 +41,7 @@ public final class Update<E extends EntityBean> extends AbstractEntitiesClause<E
    * @param entity the {@link #getEntity() entity} to operate on.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public Update(E entity, String entityName) {
+  public UpdateClause(E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new UpdateStatement<>(this);

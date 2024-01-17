@@ -2,7 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.create;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
@@ -16,27 +16,27 @@ import io.github.mmm.orm.statement.StartClause;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
- * {@link DbStatement} to {@link CreateTable create a table}.
+ * {@link DbStatement} to {@link CreateTableClause create a table}.
  *
  * @param <E> type of the {@link AbstractEntityClause#getEntity() entity}.
  * @since 1.0.0
  */
 public class CreateTableStatement<E extends EntityBean> extends AbstractDbStatement<E> {
 
-  private final CreateTable<E> createTable;
+  private final CreateTableClause<E> createTable;
 
-  private final CreateTableContents<E> contents;
+  private final CreateTableContentsClause<E> contents;
 
   /**
    * The constructor.
    *
    * @param createTable the {@link #getCreateTable() create table}.
    */
-  public CreateTableStatement(CreateTable<E> createTable) {
+  public CreateTableStatement(CreateTableClause<E> createTable) {
 
     super();
     this.createTable = createTable;
-    this.contents = new CreateTableContents<>(this);
+    this.contents = new CreateTableContentsClause<>(this);
   }
 
   /**
@@ -50,9 +50,9 @@ public class CreateTableStatement<E extends EntityBean> extends AbstractDbStatem
   }
 
   /**
-   * @return the opening {@link CreateTable}-{@link DbClause}.
+   * @return the opening {@link CreateTableClause}-{@link DbClause}.
    */
-  public CreateTable<E> getCreateTable() {
+  public CreateTableClause<E> getCreateTable() {
 
     return this.createTable;
   }
@@ -60,16 +60,16 @@ public class CreateTableStatement<E extends EntityBean> extends AbstractDbStatem
   /**
    * @return columns
    */
-  public CreateTableContents<E> getContents() {
+  public CreateTableContentsClause<E> getContents() {
 
     return this.contents;
   }
 
   @Override
-  protected void addClauses(List<AbstractDbClause> list) {
+  protected void addClauses(Consumer<AbstractDbClause> consumer) {
 
-    list.add(this.createTable);
-    list.add(this.contents);
+    consumer.accept(this.createTable);
+    consumer.accept(this.contents);
   }
 
   @Override

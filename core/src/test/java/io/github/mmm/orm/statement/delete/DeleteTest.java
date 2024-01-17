@@ -8,30 +8,30 @@ import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
 
 /**
- * Test of {@link Delete} and {@link DeleteStatement}.
+ * Test of {@link DeleteClause} and {@link DeleteStatement}.
  */
 public class DeleteTest extends DbStatementTest {
 
-  /** Test of {@link Delete} for entire table. */
+  /** Test of {@link DeleteClause} for entire table. */
   @Test
   public void testDeleteAll() {
 
     // given
     Person p = Person.of();
     // when
-    DeleteStatement<Person> deleteStatement = new Delete().from(p).get();
+    DeleteStatement<Person> deleteStatement = new DeleteClause().from(p).get();
     // then
     check(deleteStatement, "DELETE FROM Person p");
   }
 
-  /** Test of {@link Delete} with where clause. */
+  /** Test of {@link DeleteClause} with where clause. */
   @Test
   public void testDeleteWhere() {
 
     // given
     Person p = Person.of();
     // when
-    DeleteStatement<Person> deleteStatement = new Delete().from(p).as("p").where(p.Single().eq(Boolean.TRUE)).get();
+    DeleteStatement<Person> deleteStatement = new DeleteClause().from(p).as("p").where(p.Single().eq(Boolean.TRUE)).get();
     // then
     check(deleteStatement, "DELETE FROM Person p WHERE p.Single = TRUE");
   }

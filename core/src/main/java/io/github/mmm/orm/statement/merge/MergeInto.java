@@ -20,10 +20,10 @@ public class MergeInto<E extends EntityBean> extends IntoClause<E, MergeValues<E
   /**
    * The constructor.
    *
-   * @param merge the opening {@link Merge}.
+   * @param merge the opening {@link MergeClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    */
-  public MergeInto(Merge merge, E entity) {
+  public MergeInto(MergeClause merge, E entity) {
 
     this(merge, entity, null);
   }
@@ -31,11 +31,11 @@ public class MergeInto<E extends EntityBean> extends IntoClause<E, MergeValues<E
   /**
    * The constructor.
    *
-   * @param merge the opening {@link Merge}.
+   * @param merge the opening {@link MergeClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public MergeInto(Merge merge, E entity, String entityName) {
+  public MergeInto(MergeClause merge, E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new MergeStatement<>(merge, this);

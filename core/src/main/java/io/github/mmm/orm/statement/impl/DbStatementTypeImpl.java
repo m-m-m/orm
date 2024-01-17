@@ -32,6 +32,9 @@ public enum DbStatementTypeImpl implements DbStatementType {
   /** {@link DbStatementType} of {@link io.github.mmm.orm.statement.create.CreateTableStatement}. */
   CREATE_TABLE(true),
 
+  /** {@link DbStatementType} of {@link io.github.mmm.orm.statement.create.CreateSequenceStatement}. */
+  CREATE_SEQUENCE(true),
+
   /** {@link DbStatementType} of {@link io.github.mmm.orm.statement.create.CreateIndexStatement}. */
   CREATE_INDEX(true),
 

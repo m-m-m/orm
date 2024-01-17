@@ -21,7 +21,7 @@ import io.github.mmm.value.PropertyPath;
 /**
  * Interface for a fragment or clause to add {@link TableOperation}s.
  *
- * @param <E> type of the {@link AlterTable#getEntity() entity}.
+ * @param <E> type of the {@link AlterTableClause#getEntity() entity}.
  */
 public interface AlterTableFragment<E extends EntityBean> {
 

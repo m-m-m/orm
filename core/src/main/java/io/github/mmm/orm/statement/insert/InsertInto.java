@@ -21,10 +21,10 @@ public class InsertInto<E extends EntityBean> extends IntoClause<E, InsertValues
   /**
    * The constructor.
    *
-   * @param insert the opening {@link Insert}.
+   * @param insert the opening {@link InsertClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    */
-  public InsertInto(Insert insert, E entity) {
+  public InsertInto(InsertClause insert, E entity) {
 
     this(insert, entity, null);
   }
@@ -32,11 +32,11 @@ public class InsertInto<E extends EntityBean> extends IntoClause<E, InsertValues
   /**
    * The constructor.
    *
-   * @param insert the opening {@link Insert}.
+   * @param insert the opening {@link InsertClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public InsertInto(Insert insert, E entity, String entityName) {
+  public InsertInto(InsertClause insert, E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new InsertStatement<>(insert, this);

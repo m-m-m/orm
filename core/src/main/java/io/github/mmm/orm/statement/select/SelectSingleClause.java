@@ -10,12 +10,12 @@ import io.github.mmm.value.CriteriaObject;
 import io.github.mmm.value.PropertyPath;
 
 /**
- * {@link Select} to query a single {@link #getSelection() selection}.
+ * {@link SelectClause} to query a single {@link #getSelection() selection}.
  *
  * @param <R> type of the result of the selection.
  * @since 1.0.0
  */
-public class SelectSingle<R> extends Select<R> {
+public class SelectSingleClause<R> extends SelectClause<R> {
 
   private final CriteriaObject<R> selection;
 
@@ -25,7 +25,7 @@ public class SelectSingle<R> extends Select<R> {
    * @param selection the {@link CriteriaObject} to select. Typically a {@link PropertyPath property} but may also be
    *        a {@link CriteriaAggregation}, etc.
    */
-  public SelectSingle(CriteriaObject<R> selection) {
+  public SelectSingleClause(CriteriaObject<R> selection) {
 
     super(null);
     Objects.requireNonNull(selection);
@@ -43,7 +43,7 @@ public class SelectSingle<R> extends Select<R> {
   }
 
   @Override
-  public SelectSingle<R> distinct() {
+  public SelectSingleClause<R> distinct() {
 
     super.distinct();
     return this;

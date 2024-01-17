@@ -10,7 +10,7 @@ import io.github.mmm.orm.impl.OrmImpl;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.naming.DbNamingStrategy;
 import io.github.mmm.orm.source.DbSource;
-import io.github.mmm.orm.statement.DbStatementFormatter;
+import io.github.mmm.orm.statement.AbstractDbStatementFormatter;
 
 /**
  * Abstract base implementation of {@link DbDialect}.
@@ -87,7 +87,7 @@ public abstract class AbstractDbDialect<SELF extends AbstractDbDialect<SELF>> im
   protected abstract SELF withOrm(Orm newOrm);
 
   @Override
-  public DbStatementFormatter createFormatter() {
+  public AbstractDbStatementFormatter createFormatter() {
 
     return new DbDialectStatementFormatter(this);
   }

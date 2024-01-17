@@ -3,7 +3,7 @@
 package io.github.mmm.orm.statement;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.orm.statement.alter.AlterTable;
+import io.github.mmm.orm.statement.alter.AlterTableClause;
 import io.github.mmm.orm.statement.update.UpdateSet;
 import io.github.mmm.property.criteria.PropertyAssignment;
 import io.github.mmm.value.PropertyPath;
@@ -11,7 +11,7 @@ import io.github.mmm.value.PropertyPath;
 /**
  * Interface for a fragment or clause to {@link #set(PropertyAssignment) set} {@link PropertyAssignment assignments}.
  *
- * @param <E> type of the {@link AlterTable#getEntity() entity}.
+ * @param <E> type of the {@link AlterTableClause#getEntity() entity}.
  * @param <C> type of {@link DbClause} to return for fluent API.
  * @since 1.0.0
  */

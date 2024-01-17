@@ -36,12 +36,12 @@ public class SqlServerFormatter extends DbDialectStatementFormatter {
   }
 
   @Override
-  protected void writeAlterTableOperationType(TableOperationType type) {
+  protected void formatAlterTableOperationType(TableOperationType type) {
 
     if (type == TableOperationType.MODIFY) {
       write("ALTER");
     } else {
-      super.writeAlterTableOperationType(type);
+      super.formatAlterTableOperationType(type);
     }
   }
 

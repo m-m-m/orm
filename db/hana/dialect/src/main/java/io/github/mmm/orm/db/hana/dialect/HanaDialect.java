@@ -5,7 +5,7 @@ package io.github.mmm.orm.db.hana.dialect;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
 import io.github.mmm.orm.mapping.Orm;
-import io.github.mmm.orm.statement.DbStatementFormatter;
+import io.github.mmm.orm.statement.AbstractDbStatementFormatter;
 
 /**
  * Implementation of {@link DbDialect} for H2 database.
@@ -43,7 +43,7 @@ public final class HanaDialect extends AbstractDbDialect<HanaDialect> {
   }
 
   @Override
-  public DbStatementFormatter createFormatter() {
+  public AbstractDbStatementFormatter createFormatter() {
 
     return new HanaFormatter(this);
   }

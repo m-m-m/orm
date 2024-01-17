@@ -35,8 +35,6 @@ import java.util.Set;
  *
  * Now, in your {@link io.github.mmm.orm.repository.EntityRepository repository} implementation you may override the
  * {@link DbSource} to {@link DbSource#of(String) DbSource.of}("h2") to work on the secondary database.
- *
- * @see io.github.mmm.orm.spi.repository.AbstractDbRepository#getSource()
  */
 public final class DbSource {
 

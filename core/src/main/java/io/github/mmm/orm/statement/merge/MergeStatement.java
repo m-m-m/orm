@@ -2,7 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.merge;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
@@ -16,14 +16,14 @@ import io.github.mmm.orm.statement.upsert.UpsertInto;
 import io.github.mmm.orm.statement.upsert.UpsertValues;
 
 /**
- * {@link DbStatement} to {@link Merge} data into the database.
+ * {@link DbStatement} to {@link MergeClause} data into the database.
  *
  * @param <E> type of the {@link UpsertInto#getEntity() entity}.
  * @since 1.0.0
  */
 public class MergeStatement<E extends EntityBean> extends IntoValuesStatement<E> {
 
-  private final Merge merge;
+  private final MergeClause merge;
 
   private final MergeInto<E> into;
 
@@ -35,7 +35,7 @@ public class MergeStatement<E extends EntityBean> extends IntoValuesStatement<E>
    * @param merge the {@link #getMerge() MERGE}.
    * @param into the {@link #getInto() INTO}.
    */
-  public MergeStatement(Merge merge, MergeInto<E> into) {
+  public MergeStatement(MergeClause merge, MergeInto<E> into) {
 
     super();
     this.merge = merge;
@@ -48,15 +48,15 @@ public class MergeStatement<E extends EntityBean> extends IntoValuesStatement<E>
    */
   @Deprecated
   @Override
-  public Merge getStart() {
+  public MergeClause getStart() {
 
     return this.merge;
   }
 
   /**
-   * @return the opening {@link Merge}-{@link DbClause clause}.
+   * @return the opening {@link MergeClause}-{@link DbClause clause}.
    */
-  public Merge getMerge() {
+  public MergeClause getMerge() {
 
     return this.merge;
   }
@@ -80,11 +80,11 @@ public class MergeStatement<E extends EntityBean> extends IntoValuesStatement<E>
   }
 
   @Override
-  protected void addClauses(List<AbstractDbClause> list) {
+  protected void addClauses(Consumer<AbstractDbClause> consumer) {
 
-    list.add(this.merge);
-    list.add(this.into);
-    list.add(this.values);
+    consumer.accept(this.merge);
+    consumer.accept(this.into);
+    consumer.accept(this.values);
   }
 
   @Override

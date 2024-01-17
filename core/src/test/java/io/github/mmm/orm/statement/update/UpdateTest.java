@@ -10,36 +10,36 @@ import io.github.mmm.orm.statement.Person;
 import io.github.mmm.orm.statement.Song;
 
 /**
- * Test of {@link Update} and {@link UpdateStatement}.
+ * Test of {@link UpdateClause} and {@link UpdateStatement}.
  */
 public class UpdateTest extends DbStatementTest {
 
-  /** Test of {@link Update} for entire table. */
+  /** Test of {@link UpdateClause} for entire table. */
   @Test
   public void testUpdateAll() {
 
     // given
     Person p = Person.of();
     // when
-    UpdateStatement<Person> updateStatement = new Update<>(p).as("p").set(p.Single(), Boolean.TRUE).get();
+    UpdateStatement<Person> updateStatement = new UpdateClause<>(p).as("p").set(p.Single(), Boolean.TRUE).get();
     // then
     check(updateStatement, "UPDATE Person p SET p.Single=TRUE");
   }
 
-  /** Test of {@link Update} for with {@link UpdateWhere} clause. */
+  /** Test of {@link UpdateClause} for with {@link UpdateWhere} clause. */
   @Test
   public void testUpdateWhere() {
 
     // given
     Person p = Person.of();
     // when
-    UpdateStatement<Person> updateStatement = new Update<>(p).as("p").set(p.Single(), Boolean.FALSE)
+    UpdateStatement<Person> updateStatement = new UpdateClause<>(p).as("p").set(p.Single(), Boolean.FALSE)
         .where(p.Id().eq(LongId.of(4711L))).get();
     // then
     check(updateStatement, "UPDATE Person p SET p.Single=FALSE WHERE p.Id = 4711");
   }
 
-  /** Test of {@link Update} for with data from other entity. */
+  /** Test of {@link UpdateClause} for with data from other entity. */
   @Test
   public void testUpdateFromJoinTable() {
 
@@ -47,7 +47,7 @@ public class UpdateTest extends DbStatementTest {
     Song s = Song.of();
     Person p = Person.of();
     // when
-    UpdateStatement<Song> updateStatement = new Update<>(s).as("s").and(p).as("p").set(s.Title(), p.Name())
+    UpdateStatement<Song> updateStatement = new UpdateClause<>(s).as("s").and(p).as("p").set(s.Title(), p.Name())
         .where(s.Composer().eq(p.Id())).get();
     // then
     check(updateStatement, "UPDATE Song s, Person p SET s.Title=p.Name WHERE s.Composer = p.Id");

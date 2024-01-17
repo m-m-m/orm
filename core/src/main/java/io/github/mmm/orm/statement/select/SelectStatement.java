@@ -2,7 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.select;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import io.github.mmm.orm.statement.AbstractDbClause;
 import io.github.mmm.orm.statement.AbstractDbStatement;
@@ -13,41 +13,41 @@ import io.github.mmm.orm.statement.DbStatementType;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
- * {@link DbStatement} to query data from the database using a {@link Select}.
+ * {@link DbStatement} to query data from the database using a {@link SelectClause}.
  *
  * @param <R> type of the result of the selection.
  * @since 1.0.0
  */
 public class SelectStatement<R> extends AbstractDbStatement<R> {
 
-  private final Select<R> select;
+  private final SelectClause<R> select;
 
   private final SelectFrom<R, ?> from;
 
   private final SelectWhere<R> where;
 
-  private final GroupBy<R> groupBy;
+  private final GroupByClause<R> groupBy;
 
-  private final Having<R> having;
+  private final HavingClause<R> having;
 
-  private final OrderBy<R> orderBy;
+  private final OrderByClause<R> orderBy;
 
   /**
    * The constructor.
    *
-   * @param select the {@link #getStart() starting} {@link Select SELECT}.
+   * @param select the {@link #getStart() starting} {@link SelectClause SELECT}.
    * @param from the {@link #getFrom() FROM}.
    */
-  protected SelectStatement(Select<R> select, SelectFrom<R, ?> from) {
+  protected SelectStatement(SelectClause<R> select, SelectFrom<R, ?> from) {
 
     super();
     select.setStatement(this);
     this.select = select;
     this.from = from;
     this.where = new SelectWhere<>(this);
-    this.groupBy = new GroupBy<>(this);
-    this.having = new Having<>(this);
-    this.orderBy = new OrderBy<>(this);
+    this.groupBy = new GroupByClause<>(this);
+    this.having = new HavingClause<>(this);
+    this.orderBy = new OrderByClause<>(this);
   }
 
   /**
@@ -55,15 +55,15 @@ public class SelectStatement<R> extends AbstractDbStatement<R> {
    */
   @Deprecated
   @Override
-  public Select<R> getStart() {
+  public SelectClause<R> getStart() {
 
     return this.select;
   }
 
   /**
-   * @return the opening {@link Select}.
+   * @return the opening {@link SelectClause}.
    */
-  public Select<R> getSelect() {
+  public SelectClause<R> getSelect() {
 
     return this.select;
   }
@@ -85,38 +85,38 @@ public class SelectStatement<R> extends AbstractDbStatement<R> {
   }
 
   /**
-   * @return the {@link GroupBy}-{@link DbClause}.
+   * @return the {@link GroupByClause}-{@link DbClause}.
    */
-  public GroupBy<R> getGroupBy() {
+  public GroupByClause<R> getGroupBy() {
 
     return this.groupBy;
   }
 
   /**
-   * @return the {@link Having}-{@link DbClause}.
+   * @return the {@link HavingClause}-{@link DbClause}.
    */
-  public Having<R> getHaving() {
+  public HavingClause<R> getHaving() {
 
     return this.having;
   }
 
   /**
-   * @return the {@link OrderBy}-{@link DbClause}.
+   * @return the {@link OrderByClause}-{@link DbClause}.
    */
-  public OrderBy<R> getOrderBy() {
+  public OrderByClause<R> getOrderBy() {
 
     return this.orderBy;
   }
 
   @Override
-  protected void addClauses(List<AbstractDbClause> list) {
+  protected void addClauses(Consumer<AbstractDbClause> consumer) {
 
-    list.add(this.select);
-    list.add(this.from);
-    list.add(this.where);
-    list.add(this.groupBy);
-    list.add(this.having);
-    list.add(this.orderBy);
+    consumer.accept(this.select);
+    consumer.accept(this.from);
+    consumer.accept(this.where);
+    consumer.accept(this.groupBy);
+    consumer.accept(this.having);
+    consumer.accept(this.orderBy);
   }
 
   @Override

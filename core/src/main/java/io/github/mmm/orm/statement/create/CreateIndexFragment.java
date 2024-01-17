@@ -4,14 +4,14 @@ package io.github.mmm.orm.statement.create;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.ddl.DbColumnSpec;
-import io.github.mmm.orm.statement.alter.AlterTable;
+import io.github.mmm.orm.statement.alter.AlterTableClause;
 import io.github.mmm.orm.statement.alter.AlterTableOperations;
 import io.github.mmm.property.ReadableProperty;
 
 /**
  * Interface for a fragment or clause to add {@link DbColumnSpec #column(DbColumnName) columns} and #constraints.
  *
- * @param <E> type of the {@link AlterTable#getEntity() entity}.
+ * @param <E> type of the {@link AlterTableClause#getEntity() entity}.
  */
 public interface CreateIndexFragment<E extends EntityBean> {
 

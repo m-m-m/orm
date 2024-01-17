@@ -23,6 +23,8 @@ module io.github.mmm.orm.spi {
 
   exports io.github.mmm.orm.spi.repository;
 
+  exports io.github.mmm.orm.spi.sequence;
+
   exports io.github.mmm.orm.spi.session;
 
   exports io.github.mmm.orm.connection;

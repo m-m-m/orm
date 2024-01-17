@@ -3,6 +3,7 @@
 package io.github.mmm.orm.db.h2.dialect;
 
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
+import io.github.mmm.orm.statement.select.SelectSequenceNextValueClause;
 import io.github.mmm.property.criteria.CriteriaFormatter;
 
 /**
@@ -32,6 +33,13 @@ public class H2Formatter extends DbDialectStatementFormatter {
   public H2Formatter(H2Dialect dialect, CriteriaFormatter criteriaFormatter, String indentation) {
 
     super(dialect, criteriaFormatter, indentation);
+  }
+
+  @Override
+  protected void formatSelectSeqNextVal(SelectSequenceNextValueClause seq) {
+
+    write("NEXT VALUE FOR ");
+    formatQualifiedName(seq.getSequenceName());
   }
 
 }

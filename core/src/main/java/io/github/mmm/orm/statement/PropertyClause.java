@@ -12,7 +12,7 @@ import io.github.mmm.value.PropertyPath;
 
 /**
  * {@link DbClause} containing {@link #getProperties() properties} like a
- * {@link io.github.mmm.orm.statement.select.GroupBy}-clause.
+ * {@link io.github.mmm.orm.statement.select.GroupByClause}-clause.
  *
  * @param <E> type of the {@link EntityBean} to query.
  * @param <SELF> type of this class itself.

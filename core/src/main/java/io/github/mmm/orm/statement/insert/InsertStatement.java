@@ -2,7 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.insert;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
@@ -14,7 +14,7 @@ import io.github.mmm.orm.statement.IntoValuesStatement;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
- * {@link DbStatement} to {@link Insert insert} data into the database.
+ * {@link DbStatement} to {@link InsertClause insert} data into the database.
  *
  * @param <E> type of the {@link InsertInto#getEntity() entity}.
  * @since 1.0.0
@@ -27,7 +27,7 @@ import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 // INNER JOIN table3 n ON p.Id = n.Id
 public class InsertStatement<E extends EntityBean> extends IntoValuesStatement<E> {
 
-  private final Insert insert;
+  private final InsertClause insert;
 
   private final InsertInto<E> into;
 
@@ -39,7 +39,7 @@ public class InsertStatement<E extends EntityBean> extends IntoValuesStatement<E
    * @param insert the {@link #getInsert() insert}.
    * @param into the #getInto
    */
-  public InsertStatement(Insert insert, InsertInto<E> into) {
+  public InsertStatement(InsertClause insert, InsertInto<E> into) {
 
     super();
     this.insert = insert;
@@ -52,15 +52,15 @@ public class InsertStatement<E extends EntityBean> extends IntoValuesStatement<E
    */
   @Deprecated
   @Override
-  public Insert getStart() {
+  public InsertClause getStart() {
 
     return this.insert;
   }
 
   /**
-   * @return the opening {@link Insert}-{@link DbClause}.
+   * @return the opening {@link InsertClause}-{@link DbClause}.
    */
-  public Insert getInsert() {
+  public InsertClause getInsert() {
 
     return this.insert;
   }
@@ -77,17 +77,18 @@ public class InsertStatement<E extends EntityBean> extends IntoValuesStatement<E
   /**
    * @return the {@link InsertValues Values}-{@link DbClause} or {@code null} if none was added.
    */
+  @Override
   public InsertValues<E> getValues() {
 
     return this.values;
   }
 
   @Override
-  protected void addClauses(List<AbstractDbClause> list) {
+  protected void addClauses(Consumer<AbstractDbClause> consumer) {
 
-    list.add(this.insert);
-    list.add(this.into);
-    list.add(this.values);
+    consumer.accept(this.insert);
+    consumer.accept(this.into);
+    consumer.accept(this.values);
   }
 
   @Override

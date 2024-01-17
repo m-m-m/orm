@@ -8,7 +8,7 @@ import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.source.DbSource;
-import io.github.mmm.orm.statement.DbStatementFormatter;
+import io.github.mmm.orm.statement.AbstractDbStatementFormatter;
 
 /**
  * Implementation of {@link DbDialect} for Oracle database.
@@ -52,7 +52,7 @@ public class OracleDialect extends AbstractDbDialect<OracleDialect> {
   }
 
   @Override
-  public DbStatementFormatter createFormatter() {
+  public AbstractDbStatementFormatter createFormatter() {
 
     return new OracleFormatter(this);
   }

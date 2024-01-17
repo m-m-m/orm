@@ -2,6 +2,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement;
 
+import io.github.mmm.orm.impl.DbContextNone;
+
 /**
  * Abstract base class implementing {@link DbClause}.
  *
@@ -20,6 +22,8 @@ public abstract class AbstractDbClause implements DbClause {
   @Override
   public String toString() {
 
-    return new DbStatementFormatter().onClause(this).toString();
+    AbstractDbStatementFormatter formatter = new AbstractDbStatementFormatter();
+    formatter.formatClause(this, DbContextNone.INSTANCE);
+    return formatter.toString();
   }
 }

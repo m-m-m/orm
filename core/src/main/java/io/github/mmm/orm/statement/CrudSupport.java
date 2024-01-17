@@ -5,9 +5,9 @@ import java.util.Collection;
 import io.github.mmm.bean.BeanFactory;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
-import io.github.mmm.orm.statement.delete.Delete;
+import io.github.mmm.orm.statement.delete.DeleteClause;
 import io.github.mmm.orm.statement.delete.DeleteStatement;
-import io.github.mmm.orm.statement.select.SelectEntity;
+import io.github.mmm.orm.statement.select.SelectEntityClause;
 import io.github.mmm.orm.statement.select.SelectStatement;
 
 /**
@@ -44,7 +44,7 @@ public class CrudSupport<E extends EntityBean> {
       return null;
     }
     E entity = createBean(id);
-    return new Delete().from(entity).where(entity.Id().eq(id)).get();
+    return new DeleteClause().from(entity).where(entity.Id().eq(id)).get();
   }
 
   /**
@@ -58,7 +58,7 @@ public class CrudSupport<E extends EntityBean> {
       return null;
     }
     E entity = createBean(ids.iterator().next());
-    return new Delete().from(entity).where(entity.Id().in((Collection) ids)).get();
+    return new DeleteClause().from(entity).where(entity.Id().in((Collection) ids)).get();
   }
 
   /**
@@ -72,7 +72,7 @@ public class CrudSupport<E extends EntityBean> {
       return null;
     }
     E entity = createBean(ids.iterator().next());
-    SelectEntity<E> select = new SelectEntity<>(entity);
+    SelectEntityClause<E> select = new SelectEntityClause<>(entity);
     return select.from().where(entity.Id().in((Collection) ids)).get();
   }
 
@@ -86,7 +86,7 @@ public class CrudSupport<E extends EntityBean> {
       return null;
     }
     E entity = createBean(id);
-    SelectEntity<E> select = new SelectEntity<>(entity);
+    SelectEntityClause<E> select = new SelectEntityClause<>(entity);
     return select.from().where(entity.Id().eq(id)).get();
   }
 

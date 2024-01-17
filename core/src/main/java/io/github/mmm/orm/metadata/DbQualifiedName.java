@@ -1,10 +1,15 @@
+/* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.metadata;
 
 import java.util.Objects;
 
 /**
- * A qualified identifier consisting of {@link #getCatalog() catalog}, {@link #getSchema() schema}, and
- * {@link #getName() name}.
+ * A potentially qualified identifier consisting of {@link #getCatalog() catalog}, {@link #getSchema() schema}, and
+ * {@link #getName() name}. The {@link #getName() name} is always required, while the other attributes can be
+ * {@code null}. In such case the default values of the database connection will apply.
+ *
+ * @since 1.0.0
  */
 public final class DbQualifiedName {
 
@@ -26,6 +31,7 @@ public final class DbQualifiedName {
   public DbQualifiedName(DbName catalog, DbName schema, DbName name) {
 
     super();
+    Objects.requireNonNull(name);
     this.catalog = catalog;
     this.schema = schema;
     this.name = name;

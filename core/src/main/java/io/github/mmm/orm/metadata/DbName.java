@@ -7,7 +7,11 @@ import java.util.Objects;
 import io.github.mmm.orm.dialect.DbDialect;
 
 /**
- * Name of a database object (schema, table, column, etc.).
+ * Name of a database object (schema, table, column, etc.). It is more or less just a wrapper for a {@link String} but
+ * also handles abstraction of {@link #isQuoted() quotation} that may differ by {@link DbDialect database dialect}.
+ *
+ * @see #toString(DbDialect)
+ * @since 1.0.0
  */
 public final class DbName {
 

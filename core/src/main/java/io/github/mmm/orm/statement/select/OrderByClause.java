@@ -12,14 +12,14 @@ import io.github.mmm.orm.statement.MainDbClause;
 import io.github.mmm.property.criteria.CriteriaOrdering;
 
 /**
- * A {@link OrderBy}-{@link DbClause} of an SQL {@link SelectStatement}.
+ * A {@link OrderByClause}-{@link DbClause} of an SQL {@link SelectStatement}.
  *
  * @param <R> type of the result of the selection.
  * @since 1.0.0
  */
-public class OrderBy<R> extends AbstractTypedClause<R, OrderBy<R>> implements MainDbClause<R> {
+public class OrderByClause<R> extends AbstractTypedClause<R, OrderByClause<R>> implements MainDbClause<R> {
 
-  /** Name of {@link OrderBy} for marshaling. */
+  /** Name of {@link OrderByClause} for marshaling. */
   public static final String NAME_ORDER_BY = "ORDER BY";
 
   private final SelectStatement<R> statement;
@@ -31,7 +31,7 @@ public class OrderBy<R> extends AbstractTypedClause<R, OrderBy<R>> implements Ma
    *
    * @param statement the owning {@link SelectStatement}.
    */
-  public OrderBy(SelectStatement<R> statement) {
+  public OrderByClause(SelectStatement<R> statement) {
 
     super();
     this.statement = statement;
@@ -46,9 +46,9 @@ public class OrderBy<R> extends AbstractTypedClause<R, OrderBy<R>> implements Ma
 
   /**
    * @param ordering the {@link CriteriaOrdering} to add.
-   * @return this {@link OrderBy}-class itself for fluent API calls.
+   * @return this {@link OrderByClause}-class itself for fluent API calls.
    */
-  public OrderBy<R> and(CriteriaOrdering ordering) {
+  public OrderByClause<R> and(CriteriaOrdering ordering) {
 
     Objects.requireNonNull(ordering);
     this.orderings.add(ordering);
@@ -57,9 +57,9 @@ public class OrderBy<R> extends AbstractTypedClause<R, OrderBy<R>> implements Ma
 
   /**
    * @param criteriaOrderings the {@link CriteriaOrdering}s to add.
-   * @return this {@link OrderBy}-class itself for fluent API calls.
+   * @return this {@link OrderByClause}-class itself for fluent API calls.
    */
-  public OrderBy<R> and(CriteriaOrdering... criteriaOrderings) {
+  public OrderByClause<R> and(CriteriaOrdering... criteriaOrderings) {
 
     for (CriteriaOrdering ordering : criteriaOrderings) {
       and(ordering);

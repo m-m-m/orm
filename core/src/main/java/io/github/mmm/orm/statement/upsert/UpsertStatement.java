@@ -2,7 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.upsert;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
@@ -14,14 +14,14 @@ import io.github.mmm.orm.statement.IntoValuesStatement;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
- * {@link DbStatement} to {@link Upsert} data into the database.
+ * {@link DbStatement} to {@link UpsertClause} data into the database.
  *
  * @param <E> type of the {@link UpsertInto#getEntity() entity}.
  * @since 1.0.0
  */
 public class UpsertStatement<E extends EntityBean> extends IntoValuesStatement<E> {
 
-  private final Upsert upsert;
+  private final UpsertClause upsert;
 
   private final UpsertInto<E> into;
 
@@ -33,7 +33,7 @@ public class UpsertStatement<E extends EntityBean> extends IntoValuesStatement<E
    * @param upsert the {@link #getUpsert() upsert}.
    * @param into the #getInto
    */
-  public UpsertStatement(Upsert upsert, UpsertInto<E> into) {
+  public UpsertStatement(UpsertClause upsert, UpsertInto<E> into) {
 
     super();
     this.upsert = upsert;
@@ -46,15 +46,15 @@ public class UpsertStatement<E extends EntityBean> extends IntoValuesStatement<E
    */
   @Deprecated
   @Override
-  public Upsert getStart() {
+  public UpsertClause getStart() {
 
     return this.upsert;
   }
 
   /**
-   * @return the opening {@link Upsert}-{@link DbClause clause}.
+   * @return the opening {@link UpsertClause}-{@link DbClause clause}.
    */
-  public Upsert getUpsert() {
+  public UpsertClause getUpsert() {
 
     return this.upsert;
   }
@@ -78,11 +78,11 @@ public class UpsertStatement<E extends EntityBean> extends IntoValuesStatement<E
   }
 
   @Override
-  protected void addClauses(List<AbstractDbClause> list) {
+  protected void addClauses(Consumer<AbstractDbClause> consumer) {
 
-    list.add(this.upsert);
-    list.add(this.into);
-    list.add(this.values);
+    consumer.accept(this.upsert);
+    consumer.accept(this.into);
+    consumer.accept(this.values);
   }
 
   @Override

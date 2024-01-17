@@ -6,7 +6,7 @@ import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.entity.Entity;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
-import io.github.mmm.entity.id.IdGenerator;
+import io.github.mmm.entity.id.generator.IdGenerator;
 import io.github.mmm.orm.repository.EntityRepository;
 
 /**
@@ -23,23 +23,22 @@ public abstract class AbstractEntityRepository<E extends EntityBean> implements 
   /** @see #getEntityClass() */
   protected final Class<E> entityClass;
 
-  /** {@link IdGenerator} used to {@link IdGenerator#generate(Id) generate} new unique {@link Id}s. */
-  protected final IdGenerator idGenerator;
-
   /**
    * The constructor.
    *
    * @param prototype the {@link #getPrototype() prototype}.
-   * @param idGenerator the {@link IdGenerator} used to {@link IdGenerator#generate(Id) generate} new unique
-   *        {@link Id}s.
    */
-  public AbstractEntityRepository(E prototype, IdGenerator idGenerator) {
+  public AbstractEntityRepository(E prototype) {
 
     super();
     this.prototype = prototype;
     this.entityClass = ReadableBean.getJavaClass(this.prototype);
-    this.idGenerator = idGenerator;
   }
+
+  /**
+   * @return the {@link IdGenerator} to use.
+   */
+  protected abstract IdGenerator getIdGenerator();
 
   /**
    * @return an instance of the managed {@link EntityBean entity} to be used as template. Please note that this is an
@@ -65,7 +64,7 @@ public abstract class AbstractEntityRepository<E extends EntityBean> implements 
 
     Id<E> id = Id.from(entity);
     if (id.isTransient()) {
-      id = this.idGenerator.generate(id);
+      id = getIdGenerator().generate(id);
       entity.setId(id);
       insert(entity);
     } else {

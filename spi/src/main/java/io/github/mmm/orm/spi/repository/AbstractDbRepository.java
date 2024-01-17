@@ -4,9 +4,13 @@ package io.github.mmm.orm.spi.repository;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
-import io.github.mmm.entity.id.IdGenerator;
+import io.github.mmm.entity.id.generator.IdGenerator;
+import io.github.mmm.entity.id.generator.LongIdGenerator;
+import io.github.mmm.orm.metadata.DbName;
+import io.github.mmm.orm.metadata.DbQualifiedName;
 import io.github.mmm.orm.repository.DbRepository;
 import io.github.mmm.orm.source.DbSource;
+import io.github.mmm.orm.spi.access.AbstractDbAccess;
 import io.github.mmm.orm.spi.access.DbAccess;
 import io.github.mmm.orm.statement.select.SelectStatement;
 
@@ -18,20 +22,42 @@ import io.github.mmm.orm.statement.select.SelectStatement;
 public abstract class AbstractDbRepository<E extends EntityBean> extends AbstractEntityRepository<E>
     implements DbRepository<E> {
 
+  /** The default {@link #getSequenceName() sequence name}. */
+  public static final String DEFAULT_SEQUENCE = "ENTITY_SEQUENCE";
+
   private final DbAccess dbAccess;
+
+  /** {@link IdGenerator} used to {@link IdGenerator#generate(Id) generate} new unique {@link Id}s. */
+  protected final IdGenerator idGenerator;
 
   /**
    * The constructor.
    *
    * @param prototype the {@link #getPrototype() prototype}.
-   * @param idGenerator the {@link IdGenerator} used to {@link IdGenerator#generate(Id) generate} new unique
-   *        {@link Id}s.
    * @param dbAccess the {@link DbAccess}.
    */
-  public AbstractDbRepository(E prototype, IdGenerator idGenerator, DbAccess dbAccess) {
+  public AbstractDbRepository(E prototype, DbAccess dbAccess) {
 
-    super(prototype, idGenerator);
+    this(prototype, dbAccess, null);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param prototype the {@link #getPrototype() prototype}.
+   * @param dbAccess the {@link DbAccess}.
+   * @param idGenerator the {@link IdGenerator} used to {@link IdGenerator#generate(Id) generate} new unique
+   *        {@link Id}s.
+   */
+  public AbstractDbRepository(E prototype, DbAccess dbAccess, IdGenerator idGenerator) {
+
+    super(prototype);
     this.dbAccess = dbAccess;
+    if (idGenerator == null) {
+      DbQualifiedName sequenceName = new DbQualifiedName(null, null, DbName.of(getSequenceName()));
+      idGenerator = new LongIdGenerator(((AbstractDbAccess) dbAccess).createIdSequence(sequenceName));
+    }
+    this.idGenerator = idGenerator;
   }
 
   /**
@@ -42,6 +68,20 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   public DbSource getSource() {
 
     return DbSource.get();
+  }
+
+  @Override
+  protected IdGenerator getIdGenerator() {
+
+    return this.idGenerator;
+  }
+
+  /**
+   * @return the (unqualified) name of the database sequence.
+   */
+  protected String getSequenceName() {
+
+    return DEFAULT_SEQUENCE;
   }
 
   /**

@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.orm.statement.select.Having;
+import io.github.mmm.orm.statement.select.HavingClause;
 import io.github.mmm.orm.statement.select.SelectWhere;
 import io.github.mmm.property.criteria.CriteriaPredicate;
 import io.github.mmm.property.criteria.PredicateOperator;
 
 /**
- * {@link DbClause} containing {@link #getPredicates() predicates} like a {@link SelectWhere}- or {@link Having}-clause.
+ * {@link DbClause} containing {@link #getPredicates() predicates} like a {@link SelectWhere}- or {@link HavingClause}-clause.
  *
  * @param <E> type of the {@link EntityBean} to query.
  * @param <SELF> type of this class itself.

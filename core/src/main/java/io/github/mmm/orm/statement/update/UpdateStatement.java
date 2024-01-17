@@ -2,7 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement.update;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractDbClause;
@@ -12,18 +12,18 @@ import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.DbStatementType;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
-import io.github.mmm.orm.statement.insert.Insert;
+import io.github.mmm.orm.statement.insert.InsertClause;
 import io.github.mmm.orm.statement.insert.InsertInto;
 
 /**
- * {@link DbStatement} to {@link Insert insert} data into the database.
+ * {@link DbStatement} to {@link InsertClause insert} data into the database.
  *
  * @param <E> type of the {@link InsertInto#getEntity() entity}.
  * @since 1.0.0
  */
 public class UpdateStatement<E extends EntityBean> extends AbstractDbStatement<E> {
 
-  private final Update<E> update;
+  private final UpdateClause<E> update;
 
   private final UpdateSet<E> set;
 
@@ -34,7 +34,7 @@ public class UpdateStatement<E extends EntityBean> extends AbstractDbStatement<E
    *
    * @param update the {@link #getUpdate() update}.
    */
-  public UpdateStatement(Update<E> update) {
+  public UpdateStatement(UpdateClause<E> update) {
 
     super();
     this.update = update;
@@ -47,15 +47,15 @@ public class UpdateStatement<E extends EntityBean> extends AbstractDbStatement<E
    */
   @Deprecated
   @Override
-  public Update<E> getStart() {
+  public UpdateClause<E> getStart() {
 
     return this.update;
   }
 
   /**
-   * @return the opening {@link Update}-{@link DbClause}.
+   * @return the opening {@link UpdateClause}-{@link DbClause}.
    */
-  public Update<E> getUpdate() {
+  public UpdateClause<E> getUpdate() {
 
     return this.update;
   }
@@ -77,11 +77,11 @@ public class UpdateStatement<E extends EntityBean> extends AbstractDbStatement<E
   }
 
   @Override
-  protected void addClauses(List<AbstractDbClause> list) {
+  protected void addClauses(Consumer<AbstractDbClause> consumer) {
 
-    list.add(this.update);
-    list.add(this.set);
-    list.add(this.where);
+    consumer.accept(this.update);
+    consumer.accept(this.set);
+    consumer.accept(this.where);
   }
 
   @Override

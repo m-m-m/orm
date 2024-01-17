@@ -11,15 +11,15 @@ import io.github.mmm.orm.statement.StartClause;
  *
  * @since 1.0.0
  */
-public final class Delete extends AbstractDbClause implements StartClause {
+public final class DeleteClause extends AbstractDbClause implements StartClause {
 
-  /** Name of {@link Delete} for marshaling. */
+  /** Name of {@link DeleteClause} for marshaling. */
   public static final String NAME_DELETE = "DELETE";
 
   /**
    * The constructor.
    */
-  public Delete() {
+  public DeleteClause() {
 
     super();
   }

@@ -13,12 +13,12 @@ import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.MainDbClause;
 
 /**
- * A {@link CreateTableContents}-{@link DbClause} of an SQL {@link CreateTableStatement}.
+ * A {@link CreateTableContentsClause}-{@link DbClause} of an SQL {@link CreateTableStatement}.
  *
  * @param <E> type of the {@link io.github.mmm.orm.statement.AbstractEntityClause#getEntity() entity}.
  * @since 1.0.0
  */
-public class CreateTableContents<E extends EntityBean> extends AbstractTypedClause<E, CreateTableContents<E>>
+public class CreateTableContentsClause<E extends EntityBean> extends AbstractTypedClause<E, CreateTableContentsClause<E>>
     implements MainDbClause<E>, CreateTableFragment<E> {
 
   private final CreateTableStatement<E> statement;
@@ -32,7 +32,7 @@ public class CreateTableContents<E extends EntityBean> extends AbstractTypedClau
    *
    * @param statement the {@link CreateTableStatement}.
    */
-  public CreateTableContents(CreateTableStatement<E> statement) {
+  public CreateTableContentsClause(CreateTableStatement<E> statement) {
 
     super();
     this.statement = statement;
@@ -63,7 +63,7 @@ public class CreateTableContents<E extends EntityBean> extends AbstractTypedClau
   }
 
   @Override
-  public CreateTableContents<E> column(DbColumnSpec column) {
+  public CreateTableContentsClause<E> column(DbColumnSpec column) {
 
     this.columns.add(column);
     return this;
@@ -71,10 +71,10 @@ public class CreateTableContents<E extends EntityBean> extends AbstractTypedClau
 
   /**
    * @param constraint the {@link DbConstraint} to add.
-   * @return this {@link CreateTableContents} for fluent API calls.
+   * @return this {@link CreateTableContentsClause} for fluent API calls.
    */
   @Override
-  public CreateTableContents<E> constraint(DbConstraint constraint) {
+  public CreateTableContentsClause<E> constraint(DbConstraint constraint) {
 
     this.constraints.add(constraint);
     return this;

@@ -5,7 +5,7 @@ package io.github.mmm.orm.mapping;
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.entity.bean.typemapping.TypeMapping;
 import io.github.mmm.orm.naming.DbNamingStrategy;
-import io.github.mmm.orm.statement.select.Select;
+import io.github.mmm.orm.statement.select.SelectClause;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.ProjectionProperty;
@@ -49,11 +49,11 @@ public interface Orm {
 
   /**
    * @param <V> type of the Java value to select.
-   * @param select the {@link Select} clause.
+   * @param select the {@link SelectClause} clause.
    * @return the {@link DbMapper} to map from the Java object to the {@link io.github.mmm.orm.result.DbResult} and
    *         vice-versa.
    */
-  <V> DbMapper<V> createMapper(Select<V> select);
+  <V> DbMapper<V> createMapper(SelectClause<V> select);
 
   /**
    * @return the {@link DbNamingStrategy}.

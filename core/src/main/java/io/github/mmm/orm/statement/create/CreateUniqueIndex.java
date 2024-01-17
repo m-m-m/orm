@@ -9,7 +9,7 @@ import io.github.mmm.orm.statement.StartClause;
  *
  * @since 1.0.0
  */
-public class CreateUniqueIndex extends CreateIndex {
+public class CreateUniqueIndex extends CreateIndexClause {
 
   /** Name of {@link CreateUniqueIndex} for marshaling. */
   public static final String NAME_CREATE_UNIQUE_INDEX = "CREATE UNIQUE INDEX";

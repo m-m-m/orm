@@ -19,24 +19,27 @@ import io.github.mmm.entity.id.AbstractId;
 import io.github.mmm.entity.id.GenericId;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.OptimisicLockException;
+import io.github.mmm.entity.id.sequence.IdSequence;
 import io.github.mmm.entity.property.id.PkProperty;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.jdbc.connection.JdbcConnection;
 import io.github.mmm.orm.jdbc.result.JdbcResult;
+import io.github.mmm.orm.jdbc.sequence.JdbcSequence;
 import io.github.mmm.orm.jdbc.session.JdbcEntitySession;
 import io.github.mmm.orm.jdbc.session.JdbcSession;
 import io.github.mmm.orm.metadata.DbName;
+import io.github.mmm.orm.metadata.DbQualifiedName;
 import io.github.mmm.orm.metadata.DbTable;
 import io.github.mmm.orm.naming.DbNamingStrategy;
 import io.github.mmm.orm.param.AbstractCriteriaParameters;
 import io.github.mmm.orm.result.DbResult;
 import io.github.mmm.orm.spi.access.AbstractDbAccess;
 import io.github.mmm.orm.statement.NonUniqueResultException;
-import io.github.mmm.orm.statement.insert.Insert;
+import io.github.mmm.orm.statement.insert.InsertClause;
 import io.github.mmm.orm.statement.insert.InsertStatement;
-import io.github.mmm.orm.statement.select.SelectEntity;
+import io.github.mmm.orm.statement.select.SelectEntityClause;
 import io.github.mmm.orm.statement.select.SelectStatement;
-import io.github.mmm.orm.statement.update.Update;
+import io.github.mmm.orm.statement.update.UpdateClause;
 import io.github.mmm.orm.statement.update.UpdateSet;
 import io.github.mmm.orm.statement.update.UpdateStatement;
 import io.github.mmm.property.WritableProperty;
@@ -81,7 +84,7 @@ public class JdbcAccess extends AbstractDbAccess {
 
   private <E extends EntityBean> void doInsert(E entity) {
 
-    InsertStatement<E> insert = new Insert().into(entity).valuesAll().get();
+    InsertStatement<E> insert = new InsertClause().into(entity).valuesAll().get();
     insert(insert);
     E managed = ReadableBean.copy(entity);
     JdbcEntitySession<E> entitySession = getSession().get(entity);
@@ -91,7 +94,7 @@ public class JdbcAccess extends AbstractDbAccess {
   @Override
   public <E extends EntityBean> E selectById(Id<E> id, E prototype) {
 
-    SelectStatement<E> select = new SelectEntity<>(prototype).from().where(prototype.Id().eq(id)).get();
+    SelectStatement<E> select = new SelectEntityClause<>(prototype).from().where(prototype.Id().eq(id)).get();
     E entity = selectOne(select);
     return entity;
   }
@@ -120,7 +123,7 @@ public class JdbcAccess extends AbstractDbAccess {
       throw new OptimisicLockException(id, entity.getType().getQualifiedName());
     }
     GenericId<?, ?, ?> newId = id.updateRevision();
-    Update<EntityBean> updateEntity = new Update<>(entity);
+    UpdateClause<EntityBean> updateEntity = new UpdateClause<>(entity);
     UpdateSet<EntityBean> set = updateEntity.setAll();
     for (WritableProperty<?> property : entity.getProperties()) {
       if (!property.isTransient()) {
@@ -198,6 +201,12 @@ public class JdbcAccess extends AbstractDbAccess {
       // TODO proper custom runtinme exception class and error message including the SQL
       throw new IllegalStateException("Failed to execute SQL: " + sql, e);
     }
+  }
+
+  @Override
+  public IdSequence createIdSequence(DbQualifiedName sequenceName) {
+
+    return new JdbcSequence(sequenceName);
   }
 
   @Override

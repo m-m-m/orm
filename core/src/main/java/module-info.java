@@ -25,6 +25,8 @@ module io.github.mmm.orm {
 
   uses io.github.mmm.orm.tx.DbTransactionExecutorProvider;
 
+  exports io.github.mmm.orm.criteria;
+
   exports io.github.mmm.orm.ddl;
 
   exports io.github.mmm.orm.ddl.constraint;

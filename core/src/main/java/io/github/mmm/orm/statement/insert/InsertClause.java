@@ -11,15 +11,15 @@ import io.github.mmm.orm.statement.StartClause;
  *
  * @since 1.0.0
  */
-public final class Insert extends AbstractDbClause implements StartClause {
+public final class InsertClause extends AbstractDbClause implements StartClause {
 
-  /** Name of {@link Insert} for marshaling. */
+  /** Name of {@link InsertClause} for marshaling. */
   public static final String NAME_INSERT = "INSERT";
 
   /**
    * The constructor.
    */
-  public Insert() {
+  public InsertClause() {
 
     super();
   }

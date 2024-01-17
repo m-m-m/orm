@@ -6,14 +6,14 @@ import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.PropertyClause;
 
 /**
- * A {@link GroupBy}-{@link DbClause} of an SQL {@link SelectStatement}.
+ * A {@link GroupByClause}-{@link DbClause} of an SQL {@link SelectStatement}.
  *
  * @param <R> type of the result of the selection.
  * @since 1.0.0
  */
-public class GroupBy<R> extends PropertyClause<R, GroupBy<R>> implements ClauseWithHaving<R>, ClauseWithOrderBy<R> {
+public class GroupByClause<R> extends PropertyClause<R, GroupByClause<R>> implements ClauseWithHaving<R>, ClauseWithOrderBy<R> {
 
-  /** Name of {@link GroupBy} for marshaling. */
+  /** Name of {@link GroupByClause} for marshaling. */
   public static final String NAME_GROUP_BY = "GROUP BY";
 
   /** @see #get() */
@@ -24,7 +24,7 @@ public class GroupBy<R> extends PropertyClause<R, GroupBy<R>> implements ClauseW
    *
    * @param statement the owning {@link SelectStatement}.
    */
-  public GroupBy(SelectStatement<R> statement) {
+  public GroupByClause(SelectStatement<R> statement) {
 
     super();
     this.statement = statement;
