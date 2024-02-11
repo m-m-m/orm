@@ -33,7 +33,7 @@ public final class DerbyDialect extends AbstractDbDialect<DerbyDialect> {
   @Override
   public String getId() {
 
-    return "h2";
+    return "derby";
   }
 
   @Override
