@@ -23,6 +23,10 @@ import io.github.mmm.orm.criteria.SequenceNextValue;
 import io.github.mmm.orm.ddl.DbColumnSpec;
 import io.github.mmm.orm.ddl.constraint.CheckConstraint;
 import io.github.mmm.orm.ddl.constraint.DbConstraint;
+import io.github.mmm.orm.ddl.constraint.DbConstraintDeferrable;
+import io.github.mmm.orm.ddl.constraint.DbConstraintInitially;
+import io.github.mmm.orm.ddl.constraint.DbConstraintRely;
+import io.github.mmm.orm.ddl.constraint.DbConstraintState;
 import io.github.mmm.orm.ddl.constraint.ForeignKeyConstraint;
 import io.github.mmm.orm.ddl.constraint.NotNullConstraint;
 import io.github.mmm.orm.ddl.constraint.PrimaryKeyConstraint;
@@ -91,7 +95,7 @@ import io.github.mmm.value.SimplePath;
 /**
  * {@link CharScannerParser} for {@link DbStatement}s.<br>
  * <b>ATTENTION:</b> This is NOT a generic SQL parser. It will only support the exact syntax produced by
- * {@link AbstractDbStatementFormatter} with the defaults (as used by {@link DbStatement#toString()}).
+ * {@link BasicDbStatementFormatter} with the defaults (as used by {@link DbStatement#toString()}).
  *
  * @since 1.0.0
  */
@@ -356,7 +360,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
 
     if (constraintName == null) {
       constraintName = parseSegment(scanner);
-      scanner.skipWhile(NEWLINE_OR_SPACE);
+      scanner.requireOneOrMore(NEWLINE_OR_SPACE);
     }
     DbConstraint constraint = null;
     if (scanner.expect(ForeignKeyConstraint.TYPE, true)) {
@@ -379,7 +383,61 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
       CriteriaPredicate predicate = this.criteriaSelectionParser.parsePredicate(scanner, pathParser);
       constraint = new CheckConstraint(constraintName, predicate);
     }
+    if (constraint != null) {
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+      DbConstraintInitially initially = parseConstraintInitially(scanner);
+      DbConstraintDeferrable deferrable = parseConstraintDeferrable(scanner);
+      if ((initially == DbConstraintInitially.DEFAULT) && (deferrable != DbConstraintDeferrable.DEFAULT)) {
+        initially = parseConstraintInitially(scanner);
+      }
+      DbConstraintRely rely = parseConstraintRely(scanner);
+      DbConstraintState state = DbConstraintState.of(deferrable, initially, rely);
+      constraint = constraint.withState(state);
+    }
     return constraint;
+  }
+
+  private DbConstraintDeferrable parseConstraintDeferrable(CharStreamScanner scanner) {
+
+    DbConstraintDeferrable deferrable = DbConstraintDeferrable.DEFAULT;
+    if (scanner.expect("DEFERRABLE", true)) {
+      deferrable = DbConstraintDeferrable.DEFERRABLE;
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+    } else if (scanner.expect("NOT DEFERRABLE", true)) {
+      deferrable = DbConstraintDeferrable.NOT_DEFERRABLE;
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+    }
+    return deferrable;
+  }
+
+  private DbConstraintInitially parseConstraintInitially(CharStreamScanner scanner) {
+
+    DbConstraintInitially initially = DbConstraintInitially.DEFAULT;
+    if (scanner.expect("INITIALLY", true)) {
+      scanner.requireOneOrMore(NEWLINE_OR_SPACE);
+      if (scanner.expect("DEFERRED", true)) {
+        initially = DbConstraintInitially.INITIALLY_DEFERRED;
+      } else if (scanner.expect("IMMEDIATE", true)) {
+        initially = DbConstraintInitially.INITIALLY_IMMEDIATE;
+      } else {
+        throw new IllegalStateException();
+      }
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+    }
+    return initially;
+  }
+
+  private DbConstraintRely parseConstraintRely(CharStreamScanner scanner) {
+
+    DbConstraintRely deferrable = DbConstraintRely.DEFAULT;
+    if (scanner.expect("RELY", true)) {
+      deferrable = DbConstraintRely.RELY;
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+    } else if (scanner.expect("NORELY", true)) {
+      deferrable = DbConstraintRely.NORELY;
+      scanner.skipWhile(NEWLINE_OR_SPACE);
+    }
+    return deferrable;
   }
 
   private DbColumnSpec parseColumn(String name, ReadableBean bean, boolean withDeclaration, CharStreamScanner scanner) {

@@ -2,6 +2,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.ddl.constraint;
 
+import java.util.Objects;
+
 import io.github.mmm.entity.property.id.IdProperty;
 import io.github.mmm.orm.ddl.DbColumnSpec;
 
@@ -20,6 +22,8 @@ public final class ForeignKeyConstraint extends DbConstraint {
   public static final String PREFIX = "FK_";
 
   private final DbColumnSpec referenceColumn;
+
+  private final DbConstraintOnDelete onDelete;
 
   /**
    * The constructor.
@@ -41,8 +45,44 @@ public final class ForeignKeyConstraint extends DbConstraint {
    */
   public ForeignKeyConstraint(String name, DbColumnSpec column, DbColumnSpec referenceColumn) {
 
-    super(name, column);
+    this(name, column, referenceColumn, DbConstraintState.DEFAULT);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param name the {@link #getName() name}.
+   * @param column the {@link DbColumnSpec column}.
+   * @param referenceColumn the {@link #getReferenceColumn() referenced column}.
+   * @param state the {@link #getState() state}.
+   */
+  public ForeignKeyConstraint(String name, DbColumnSpec column, DbColumnSpec referenceColumn, DbConstraintState state) {
+
+    this(name, column, referenceColumn, state, DbConstraintOnDelete.DEFAULT);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param name the {@link #getName() name}.
+   * @param column the {@link DbColumnSpec column}.
+   * @param referenceColumn the {@link #getReferenceColumn() referenced column}.
+   * @param state the {@link #getState() state}.
+   * @param onDelete the {@link #getOnDelete() on delete behavior}.
+   */
+  public ForeignKeyConstraint(String name, DbColumnSpec column, DbColumnSpec referenceColumn, DbConstraintState state,
+      DbConstraintOnDelete onDelete) {
+
+    this(name, referenceColumn, state, onDelete, column);
+  }
+
+  private ForeignKeyConstraint(String name, DbColumnSpec referenceColumn, DbConstraintState state,
+      DbConstraintOnDelete onDelete, DbColumnSpec... columns) {
+
+    super(name, state, columns);
+    Objects.requireNonNull(onDelete);
     this.referenceColumn = referenceColumn;
+    this.onDelete = onDelete;
   }
 
   /**
@@ -51,6 +91,14 @@ public final class ForeignKeyConstraint extends DbConstraint {
   public DbColumnSpec getReferenceColumn() {
 
     return this.referenceColumn;
+  }
+
+  /**
+   * @return the {@link DbConstraintOnDelete on delete} behavior.
+   */
+  public DbConstraintOnDelete getOnDelete() {
+
+    return this.onDelete;
   }
 
   @Override
@@ -66,7 +114,16 @@ public final class ForeignKeyConstraint extends DbConstraint {
   }
 
   @Override
-  protected void toString(StringBuilder sb) {
+  public ForeignKeyConstraint withState(DbConstraintState newState) {
+
+    if (this.state == newState) {
+      return this;
+    }
+    return new ForeignKeyConstraint(this.name, this.referenceColumn, newState, this.onDelete, this.columns);
+  }
+
+  @Override
+  protected void toStringByType(StringBuilder sb) {
 
     super.toString(sb);
     sb.append(" REFERENCES ");
@@ -74,6 +131,10 @@ public final class ForeignKeyConstraint extends DbConstraint {
     sb.append('(');
     sb.append(this.referenceColumn.getName());
     sb.append(')');
+    if (this.onDelete != DbConstraintOnDelete.DEFAULT) {
+      sb.append(' ');
+      sb.append(this.onDelete.toString());
+    }
   }
 
 }

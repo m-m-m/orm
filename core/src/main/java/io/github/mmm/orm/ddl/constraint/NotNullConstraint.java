@@ -5,8 +5,8 @@ package io.github.mmm.orm.ddl.constraint;
 import io.github.mmm.orm.ddl.DbColumnSpec;
 
 /**
- * Not null {@link DbConstraint} ensuring that the {@link #iterator() contained} {@link DbColumnSpec columns} cannot have
- * a {@code null} value.
+ * Not null {@link DbConstraint} ensuring that the {@link #iterator() contained} {@link DbColumnSpec columns} cannot
+ * have a {@code null} value.
  *
  * @since 1.0.0
  */
@@ -36,7 +36,24 @@ public final class NotNullConstraint extends DbConstraint {
    */
   public NotNullConstraint(String name, DbColumnSpec column) {
 
-    super(name, column);
+    this(name, column, DbConstraintState.DEFAULT);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param name the {@link #getName() name}.
+   * @param column the {@link DbColumnSpec column}.
+   * @param state the {@link #getState() state}.
+   */
+  public NotNullConstraint(String name, DbColumnSpec column, DbConstraintState state) {
+
+    this(name, state, column);
+  }
+
+  private NotNullConstraint(String name, DbConstraintState state, DbColumnSpec... column) {
+
+    super(name, state, column);
   }
 
   @Override
@@ -49,6 +66,15 @@ public final class NotNullConstraint extends DbConstraint {
   public String getType() {
 
     return TYPE;
+  }
+
+  @Override
+  public NotNullConstraint withState(DbConstraintState newState) {
+
+    if (this.state == newState) {
+      return this;
+    }
+    return new NotNullConstraint(this.name, newState, this.columns);
   }
 
 }

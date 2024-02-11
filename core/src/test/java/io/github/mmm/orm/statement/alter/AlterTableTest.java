@@ -4,7 +4,14 @@ package io.github.mmm.orm.statement.alter;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.mmm.orm.ddl.DbColumnSpec;
+import io.github.mmm.orm.ddl.constraint.DbConstraintDeferrable;
+import io.github.mmm.orm.ddl.constraint.DbConstraintInitially;
+import io.github.mmm.orm.ddl.constraint.DbConstraintRely;
+import io.github.mmm.orm.ddl.constraint.DbConstraintState;
+import io.github.mmm.orm.ddl.constraint.ForeignKeyConstraint;
 import io.github.mmm.orm.statement.DbStatementTest;
+import io.github.mmm.orm.statement.Person;
 import io.github.mmm.orm.statement.Song;
 
 /**
@@ -37,6 +44,26 @@ public class AlterTableTest extends DbStatementTest {
     check(alterTableStatement, "ALTER TABLE Song\n" //
         + "ADD Composer Link,\n" //
         + "ADD CONSTRAINT FK_Song_Composer FOREIGN KEY (Composer) REFERENCES Person(Id)");
+  }
+
+  /** Test of {@link AlterTableClause} that adds a single column with a custom constraint. */
+  @Test
+  public void testAddColumnCustomConstraint() {
+
+    // given
+    Song s = Song.of();
+    Person p = Person.of();
+    DbColumnSpec column = new DbColumnSpec(s.Composer());
+    DbColumnSpec referenceColumn = new DbColumnSpec(p.Id());
+    DbConstraintState state = DbConstraintState.of(DbConstraintDeferrable.DEFERRABLE,
+        DbConstraintInitially.INITIALLY_IMMEDIATE, DbConstraintRely.RELY);
+    // when
+    AlterTableStatement<Song> alterTableStatement = new AlterTableClause<>(s).addColumn(s.Composer())
+        .addConstraint(new ForeignKeyConstraint("MY_FK_CONSTRAINT", column, referenceColumn, state)).get();
+    // then
+    check(alterTableStatement, "ALTER TABLE Song\n" //
+        + "ADD Composer Link,\n" //
+        + "ADD CONSTRAINT MY_FK_CONSTRAINT FOREIGN KEY (Composer) REFERENCES Person(Id) INITIALLY IMMEDIATE DEFERRABLE RELY");
   }
 
 }

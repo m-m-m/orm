@@ -9,7 +9,8 @@ import io.github.mmm.orm.naming.DbNamingStrategy;
  */
 public abstract class DbElement {
 
-  private final String name;
+  /** @see #getName() */
+  protected final String name;
 
   /**
    * The constructor.

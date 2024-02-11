@@ -18,6 +18,10 @@ import io.github.mmm.orm.ddl.DbColumnSpec;
 import io.github.mmm.orm.ddl.DbElement;
 import io.github.mmm.orm.ddl.constraint.CheckConstraint;
 import io.github.mmm.orm.ddl.constraint.DbConstraint;
+import io.github.mmm.orm.ddl.constraint.DbConstraintDeferrable;
+import io.github.mmm.orm.ddl.constraint.DbConstraintInitially;
+import io.github.mmm.orm.ddl.constraint.DbConstraintRely;
+import io.github.mmm.orm.ddl.constraint.DbConstraintState;
 import io.github.mmm.orm.ddl.constraint.ForeignKeyConstraint;
 import io.github.mmm.orm.ddl.constraint.PrimaryKeyConstraint;
 import io.github.mmm.orm.ddl.operation.TableColumnOperation;
@@ -75,12 +79,12 @@ import io.github.mmm.value.converter.TypeMapper;
  *
  * @since 1.0.0
  */
-public class AbstractDbStatementFormatter implements DbStatementFormatter {
+public class BasicDbStatementFormatter implements DbStatementFormatter {
 
   /** Default value for {@link #getIndentation() indentation}. */
   protected static final String INDENTATION = "  ";
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractDbStatementFormatter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BasicDbStatementFormatter.class);
 
   private static final CriteriaPredicate PARENT_AND = PredicateOperator.AND.expression(List.of(BooleanLiteral.TRUE));
 
@@ -95,12 +99,12 @@ public class AbstractDbStatementFormatter implements DbStatementFormatter {
 
   private int line;
 
-  AbstractDbStatementFormatter() {
+  BasicDbStatementFormatter() {
 
     this(new CriteriaSqlFormatterInline());
   }
 
-  AbstractDbStatementFormatter(String indentation) {
+  BasicDbStatementFormatter(String indentation) {
 
     this(null, new CriteriaSqlFormatterInline(), indentation);
   }
@@ -110,7 +114,7 @@ public class AbstractDbStatementFormatter implements DbStatementFormatter {
    *
    * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to SQL.
    */
-  public AbstractDbStatementFormatter(CriteriaFormatter criteriaFormatter) {
+  public BasicDbStatementFormatter(CriteriaFormatter criteriaFormatter) {
 
     this(null, criteriaFormatter, INDENTATION);
   }
@@ -122,7 +126,7 @@ public class AbstractDbStatementFormatter implements DbStatementFormatter {
    * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to SQL.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public AbstractDbStatementFormatter(AbstractDbDialect<?> dialect, CriteriaFormatter criteriaFormatter,
+  public BasicDbStatementFormatter(AbstractDbDialect<?> dialect, CriteriaFormatter criteriaFormatter,
       String indentation) {
 
     super();
@@ -226,7 +230,7 @@ public class AbstractDbStatementFormatter implements DbStatementFormatter {
   }
 
   @Override
-  public AbstractDbStatementFormatter formatStatement(DbStatement<?> statement, DbContext context) {
+  public BasicDbStatementFormatter formatStatement(DbStatement<?> statement, DbContext context) {
 
     for (DbClause clause : statement.getClauses()) {
       formatClause(clause, context);
@@ -884,6 +888,101 @@ public class AbstractDbStatementFormatter implements DbStatementFormatter {
     if (constraint instanceof ForeignKeyConstraint fk) {
       formatConstraintFkReference(fk.getReferenceColumn());
     }
+    formatConstraintState(constraint.getState());
+  }
+
+  private void formatConstraintType(DbConstraint constraint) {
+
+    write(constraint.getType());
+  }
+
+  /**
+   * @param referenceColumn the referenced {@link DbColumnSpec column} (the primary key to use as foreign key).
+   */
+  protected void formatConstraintFkReference(DbColumnSpec referenceColumn) {
+
+    write(" REFERENCES ");
+    formatName(referenceColumn.getTable());
+    write("(");
+    formatName(referenceColumn);
+    write(")");
+
+  }
+
+  /**
+   * Writes "CONSTRAINT «constraint_name»". May be overridden as needed for specific dialect (e.g. for MySQL flaws).
+   *
+   * @param type the {@link TableOperationType}.
+   * @param constraint the {@link DbConstraint}.
+   */
+  protected void formatConstraintKeywordWithName(TableOperationType type, DbConstraint constraint) {
+
+    write("CONSTRAINT ");
+    formatName(constraint);
+  }
+
+  /**
+   * @param state the {@link DbConstraintState}.
+   * @see #formatConstraintStateInitially(DbConstraintInitially)
+   * @see #formatConstraintStateDeferrable(DbConstraintDeferrable)
+   * @see #formatConstraintStateRely(DbConstraintRely)
+   */
+  protected void formatConstraintState(DbConstraintState state) {
+
+    formatConstraintStateInitially(state.getInitially());
+    formatConstraintStateDeferrable(state.getDeferrable());
+    formatConstraintStateRely(state.getRely());
+  }
+
+  /**
+   * @param rely the {@link DbConstraintRely} to format.
+   */
+  protected void formatConstraintStateRely(DbConstraintRely rely) {
+
+    switch (rely) {
+      case RELY -> {
+        write(" RELY");
+      }
+      case NORELY -> {
+        write(" NORELY");
+      }
+      case DEFAULT -> {
+      }
+    }
+  }
+
+  /**
+   * @param initially the {@link DbConstraintInitially} to format.
+   */
+  protected void formatConstraintStateInitially(DbConstraintInitially initially) {
+
+    switch (initially) {
+      case INITIALLY_DEFERRED -> {
+        write(" INITIALLY DEFERRED");
+      }
+      case INITIALLY_IMMEDIATE -> {
+        write(" INITIALLY IMMEDIATE");
+      }
+      case DEFAULT -> {
+      }
+    }
+  }
+
+  /**
+   * @param deferrable the {@link DbConstraintDeferrable} to format.
+   */
+  protected void formatConstraintStateDeferrable(DbConstraintDeferrable deferrable) {
+
+    switch (deferrable) {
+      case DEFERRABLE -> {
+        write(" DEFERRABLE");
+      }
+      case NOT_DEFERRABLE -> {
+        write(" NOT DEFERRABLE");
+      }
+      case DEFAULT -> {
+      }
+    }
   }
 
   /**
@@ -973,36 +1072,6 @@ public class AbstractDbStatementFormatter implements DbStatementFormatter {
   }
 
   /**
-   * @param referenceColumn the referenced {@link DbColumnSpec column} (the primary key to use as foreign key).
-   */
-  protected void formatConstraintFkReference(DbColumnSpec referenceColumn) {
-
-    write(" REFERENCES ");
-    formatName(referenceColumn.getTable());
-    write("(");
-    formatName(referenceColumn);
-    write(")");
-
-  }
-
-  /**
-   * Writes "CONSTRAINT «constraint_name»". May be overridden as needed for specific dialect (e.g. for MySQL flaws).
-   *
-   * @param type the {@link TableOperationType}.
-   * @param constraint the {@link DbConstraint}.
-   */
-  protected void formatConstraintKeywordWithName(TableOperationType type, DbConstraint constraint) {
-
-    write("CONSTRAINT ");
-    formatName(constraint);
-  }
-
-  private void formatConstraintType(DbConstraint constraint) {
-
-    write(constraint.getType());
-  }
-
-  /**
    * @param createIndex the {@link CreateIndexClause}-{@link DbClause} to format.
    * @param context the {@link DbContext}.
    */
@@ -1057,6 +1126,10 @@ public class AbstractDbStatementFormatter implements DbStatementFormatter {
     }
   }
 
+  /**
+   * @param attribute the attribute to format.
+   * @param value the {@link Number} value to format.
+   */
   protected void formatCreateSequenceAttribute(String attribute, Number value) {
 
     if (value == null) {
@@ -1066,6 +1139,11 @@ public class AbstractDbStatementFormatter implements DbStatementFormatter {
     write(value.toString());
   }
 
+  /**
+   * Formats the explicit cycle attribute of a sequence.
+   *
+   * @param cycle {@code true} for cycle, {@code false} otherwise (nocycle).
+   */
   protected void formatCreateSequenceCycle(boolean cycle) {
 
     if (cycle) {

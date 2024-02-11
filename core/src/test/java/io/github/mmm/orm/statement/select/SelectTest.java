@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.metadata.DbName;
 import io.github.mmm.orm.param.CriteriaParametersNamed;
-import io.github.mmm.orm.statement.AbstractDbStatementFormatter;
+import io.github.mmm.orm.statement.BasicDbStatementFormatter;
 import io.github.mmm.orm.statement.City;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.DbStatementTest;
@@ -37,7 +37,7 @@ public class SelectTest extends DbStatementTest {
     check(query, sql, '"' + sql + '"');
     AbstractDbDialect<?> dialect = new TestDialect();
     // and when
-    AbstractDbStatementFormatter sqlFormatter = new AbstractDbStatementFormatter(
+    BasicDbStatementFormatter sqlFormatter = new BasicDbStatementFormatter(
         CriteriaFormatter.of(new CriteriaParametersNamed(dialect, true))) {
 
       @Override

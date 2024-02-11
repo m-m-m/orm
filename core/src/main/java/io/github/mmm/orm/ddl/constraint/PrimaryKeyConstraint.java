@@ -36,7 +36,24 @@ public final class PrimaryKeyConstraint extends DbConstraint {
    */
   public PrimaryKeyConstraint(String name, DbColumnSpec column) {
 
-    super(name, column);
+    this(name, column, DbConstraintState.DEFAULT);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param name the {@link #getName() name}.
+   * @param column the {@link DbColumnSpec column}.
+   * @param state the {@link #getState() state}.
+   */
+  public PrimaryKeyConstraint(String name, DbColumnSpec column, DbConstraintState state) {
+
+    this(name, state, column);
+  }
+
+  private PrimaryKeyConstraint(String name, DbConstraintState state, DbColumnSpec... columns) {
+
+    super(name, state, columns);
   }
 
   @Override
@@ -55,6 +72,15 @@ public final class PrimaryKeyConstraint extends DbConstraint {
   protected boolean isAddColumnToName() {
 
     return false;
+  }
+
+  @Override
+  public PrimaryKeyConstraint withState(DbConstraintState newState) {
+
+    if (this.state == newState) {
+      return this;
+    }
+    return new PrimaryKeyConstraint(this.name, newState, this.columns);
   }
 
 }

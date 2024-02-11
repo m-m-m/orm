@@ -10,14 +10,14 @@ import io.github.mmm.orm.param.CriteriaParametersIndexed;
 import io.github.mmm.orm.result.DbResult;
 import io.github.mmm.orm.result.DbResultValue;
 import io.github.mmm.orm.statement.AbstractEntityClause;
-import io.github.mmm.orm.statement.AbstractDbStatementFormatter;
+import io.github.mmm.orm.statement.BasicDbStatementFormatter;
 import io.github.mmm.orm.statement.select.SelectFrom;
 import io.github.mmm.property.criteria.CriteriaFormatter;
 
 /**
- * {@link AbstractDbStatementFormatter} for any real {@link DbDialect database dialect}.
+ * {@link BasicDbStatementFormatter} for any real {@link DbDialect database dialect}.
  */
-public class DbDialectStatementFormatter extends AbstractDbStatementFormatter {
+public class DbDialectStatementFormatter extends BasicDbStatementFormatter {
 
   /**
    * The constructor.

@@ -15,7 +15,7 @@ import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.metadata.DbQualifiedName;
 import io.github.mmm.orm.param.AbstractCriteriaParameters;
 import io.github.mmm.orm.result.DbResult;
-import io.github.mmm.orm.statement.AbstractDbStatementFormatter;
+import io.github.mmm.orm.statement.BasicDbStatementFormatter;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.create.CreateIndexStatement;
 import io.github.mmm.orm.statement.create.CreateSequenceStatement;
@@ -49,7 +49,7 @@ public abstract class AbstractDbAccess implements DbAccess {
 
   protected long executeStatement(DbStatement<?> statement, Consumer<DbResult> receiver, boolean unique) {
 
-    AbstractDbStatementFormatter formatter = getDialect().createFormatter();
+    BasicDbStatementFormatter formatter = getDialect().createFormatter();
     String sql = formatter.formatStatement(statement).toString();
     AbstractCriteriaParameters parameters = (AbstractCriteriaParameters) formatter.getCriteriaFormatter()
         .getParameters();

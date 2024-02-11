@@ -6,9 +6,9 @@ import java.util.Map;
 
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
+import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.source.DbSource;
-import io.github.mmm.orm.statement.AbstractDbStatementFormatter;
 
 /**
  * Implementation of {@link DbDialect} for Oracle database.
@@ -52,7 +52,7 @@ public class OracleDialect extends AbstractDbDialect<OracleDialect> {
   }
 
   @Override
-  public AbstractDbStatementFormatter createFormatter() {
+  public DbDialectStatementFormatter createFormatter() {
 
     return new OracleFormatter(this);
   }

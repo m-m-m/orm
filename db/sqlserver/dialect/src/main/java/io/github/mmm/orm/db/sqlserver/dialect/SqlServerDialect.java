@@ -4,8 +4,8 @@ package io.github.mmm.orm.db.sqlserver.dialect;
 
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
+import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
 import io.github.mmm.orm.mapping.Orm;
-import io.github.mmm.orm.statement.AbstractDbStatementFormatter;
 
 /**
  * Implementation of {@link DbDialect} for <a href="https://docs.microsoft.com/en-us/sql/">MS SQL Server</a>.
@@ -45,7 +45,7 @@ public class SqlServerDialect extends AbstractDbDialect<SqlServerDialect> {
   }
 
   @Override
-  public AbstractDbStatementFormatter createFormatter() {
+  public DbDialectStatementFormatter createFormatter() {
 
     return new SqlServerFormatter(this);
   }

@@ -30,7 +30,18 @@ public final class CheckConstraint extends DbConstraint {
    */
   public CheckConstraint(CriteriaPredicate predicate) {
 
-    this(null, getColumn(predicate), predicate);
+    this(null, getColumn(predicate), predicate, DbConstraintState.DEFAULT);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param predicate the {@link #getPredicate() predicate} to check.
+   * @param state the {@link #getState() state}.
+   */
+  public CheckConstraint(CriteriaPredicate predicate, DbConstraintState state) {
+
+    this(null, getColumn(predicate), predicate, state);
   }
 
   /**
@@ -41,12 +52,29 @@ public final class CheckConstraint extends DbConstraint {
    */
   public CheckConstraint(String name, CriteriaPredicate predicate) {
 
-    this(name, getColumn(predicate), predicate);
+    this(name, predicate, DbConstraintState.DEFAULT);
   }
 
-  private CheckConstraint(String name, DbColumnSpec column, CriteriaPredicate predicate) {
+  /**
+   * The constructor.
+   *
+   * @param name the {@link #getName() name}.
+   * @param predicate the {@link #getPredicate() predicate} to check.
+   * @param state the {@link #getState() state}.
+   */
+  public CheckConstraint(String name, CriteriaPredicate predicate, DbConstraintState state) {
 
-    super(name, column);
+    this(name, getColumn(predicate), predicate, state);
+  }
+
+  private CheckConstraint(String name, DbColumnSpec column, CriteriaPredicate predicate, DbConstraintState state) {
+
+    this(name, state, predicate, column);
+  }
+
+  private CheckConstraint(String name, DbConstraintState state, CriteriaPredicate predicate, DbColumnSpec... columns) {
+
+    super(name, state, columns);
     this.predicate = predicate;
   }
 
@@ -89,6 +117,15 @@ public final class CheckConstraint extends DbConstraint {
   public String getType() {
 
     return TYPE;
+  }
+
+  @Override
+  public CheckConstraint withState(DbConstraintState newState) {
+
+    if (newState == this.state) {
+      return this;
+    }
+    return new CheckConstraint(this.name, newState, this.predicate, this.columns);
   }
 
   @Override

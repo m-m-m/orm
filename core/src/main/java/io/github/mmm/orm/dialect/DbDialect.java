@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import io.github.mmm.base.exception.RuntimeIoException;
 import io.github.mmm.orm.naming.DbNamingStrategy;
-import io.github.mmm.orm.statement.AbstractDbStatementFormatter;
+import io.github.mmm.orm.statement.BasicDbStatementFormatter;
 import io.github.mmm.orm.statement.DbStatementFormatter;
 
 /**
@@ -51,7 +51,7 @@ public interface DbDialect {
   }
 
   /**
-   * @return a new {@link AbstractDbStatementFormatter} using this SQL dialect.
+   * @return a new {@link BasicDbStatementFormatter} using this SQL dialect.
    */
   DbStatementFormatter createFormatter();
 

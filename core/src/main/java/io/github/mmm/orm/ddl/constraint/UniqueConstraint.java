@@ -5,8 +5,8 @@ package io.github.mmm.orm.ddl.constraint;
 import io.github.mmm.orm.ddl.DbColumnSpec;
 
 /**
- * Unique {@link DbConstraint} ensuring that all values in the {@link #iterator() contained} {@link DbColumnSpec columns}
- * are different (no duplicates).
+ * Unique {@link DbConstraint} ensuring that all values in the {@link #iterator() contained} {@link DbColumnSpec
+ * columns} are different (no duplicates).
  *
  * @since 1.0.0
  */
@@ -36,7 +36,19 @@ public final class UniqueConstraint extends DbConstraint {
    */
   public UniqueConstraint(String name, DbColumnSpec... columns) {
 
-    super(name, columns);
+    this(name, DbConstraintState.DEFAULT, columns);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param name the {@link #getName() name}.
+   * @param state the {@link #getState() state}.
+   * @param columns the {@link DbColumnSpec columns}.
+   */
+  public UniqueConstraint(String name, DbConstraintState state, DbColumnSpec... columns) {
+
+    super(name, state, columns);
   }
 
   @Override
@@ -49,6 +61,15 @@ public final class UniqueConstraint extends DbConstraint {
   public String getType() {
 
     return TYPE;
+  }
+
+  @Override
+  public UniqueConstraint withState(DbConstraintState newState) {
+
+    if (this.state == newState) {
+      return this;
+    }
+    return new UniqueConstraint(this.name, newState, this.columns);
   }
 
 }

@@ -4,8 +4,8 @@ package io.github.mmm.orm.db.sqlite.dialect;
 
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
+import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
 import io.github.mmm.orm.mapping.Orm;
-import io.github.mmm.orm.statement.AbstractDbStatementFormatter;
 
 /**
  * Implementation of {@link DbDialect} for SQLite database.
@@ -43,7 +43,7 @@ public class SqliteDialect extends AbstractDbDialect<SqliteDialect> {
   }
 
   @Override
-  public AbstractDbStatementFormatter createFormatter() {
+  public DbDialectStatementFormatter createFormatter() {
 
     return new SqliteFormatter(this);
   }

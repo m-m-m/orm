@@ -3,6 +3,7 @@
 package io.github.mmm.orm.ddl.constraint;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import io.github.mmm.base.collection.ArrayIterator;
 import io.github.mmm.orm.ddl.DbColumnSpec;
@@ -17,18 +18,25 @@ import io.github.mmm.orm.naming.DbNamingStrategy;
  */
 public abstract class DbConstraint extends DbElement implements Iterable<DbColumnSpec> {
 
-  private final DbColumnSpec[] columns;
+  /** @see #getFirstColumn() */
+  protected final DbColumnSpec[] columns;
+
+  /** @see #getState() */
+  protected final DbConstraintState state;
 
   /**
    * The constructor.
    *
    * @param name the {@link #getName() name}.
+   * @param state the {@link #getState state}.
    * @param columns the {@link DbColumnSpec columns}.
    */
-  public DbConstraint(String name, DbColumnSpec... columns) {
+  public DbConstraint(String name, DbConstraintState state, DbColumnSpec... columns) {
 
     super(name);
+    Objects.requireNonNull(state);
     assert (columns.length > 0);
+    this.state = state;
     this.columns = columns;
   }
 
@@ -75,6 +83,20 @@ public abstract class DbConstraint extends DbElement implements Iterable<DbColum
     return this.columns[0];
   }
 
+  /**
+   * @return the {@link DbConstraintState} configuring e.g. if deferrable.
+   */
+  public DbConstraintState getState() {
+
+    return this.state;
+  }
+
+  /**
+   * @param newState the new {@link #getState() state}.
+   * @return a copy of this {@link DbConstraint} with the given {@link #getState() state}.
+   */
+  public abstract DbConstraint withState(DbConstraintState newState);
+
   @Override
   public Iterator<DbColumnSpec> iterator() {
 
@@ -99,6 +121,21 @@ public abstract class DbConstraint extends DbElement implements Iterable<DbColum
     sb.append(' ');
     sb.append(getType());
     toStringColumns(sb);
+    toStringByType(sb);
+    if (this.state != DbConstraintState.DEFAULT) {
+      sb.append(' ');
+      sb.append(this.state);
+    }
+  }
+
+  /**
+   * Appends additional clauses or keywords specific for this type of constraint.
+   *
+   * @param sb the {@link StringBuilder} to append to.
+   */
+  protected void toStringByType(StringBuilder sb) {
+
+    // nothing by default
   }
 
   /**

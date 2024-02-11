@@ -22,7 +22,7 @@ public abstract class AbstractDbClause implements DbClause {
   @Override
   public String toString() {
 
-    AbstractDbStatementFormatter formatter = new AbstractDbStatementFormatter();
+    BasicDbStatementFormatter formatter = new BasicDbStatementFormatter();
     formatter.formatClause(this, DbContextNone.INSTANCE);
     return formatter.toString();
   }

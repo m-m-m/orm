@@ -9,7 +9,7 @@ import io.github.mmm.property.criteria.CriteriaFormatter;
 /**
  * Interface for
  *
- * @see AbstractDbStatementFormatter
+ * @see BasicDbStatementFormatter
  */
 public interface DbStatementFormatter {
 

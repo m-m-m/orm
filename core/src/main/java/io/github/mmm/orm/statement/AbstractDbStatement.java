@@ -48,7 +48,7 @@ public abstract class AbstractDbStatement<E> implements DbStatement<E> {
   public void write(StructuredWriter writer) {
 
     String indendation = writer.getFormat().getConfig().get(MarshallingConfig.VAR_INDENTATION);
-    AbstractDbStatementFormatter formatter = new AbstractDbStatementFormatter(indendation);
+    BasicDbStatementFormatter formatter = new BasicDbStatementFormatter(indendation);
     formatter.formatStatement(this, DbContextNone.INSTANCE);
     writer.writeValueAsString(formatter.get());
   }
@@ -67,7 +67,7 @@ public abstract class AbstractDbStatement<E> implements DbStatement<E> {
   @Override
   public String toString() {
 
-    AbstractDbStatementFormatter formatter = new AbstractDbStatementFormatter();
+    BasicDbStatementFormatter formatter = new BasicDbStatementFormatter();
     formatter.formatStatement(this);
     return formatter.toString();
   }
