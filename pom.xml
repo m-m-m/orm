@@ -19,7 +19,7 @@
     <r2dbc.version>1.0.0.RELEASE</r2dbc.version>
     <r2dbc.pool.version>1.0.1.RELEASE</r2dbc.pool.version>
     <r2dbc.postgresql.version>1.0.2.RELEASE</r2dbc.postgresql.version>
-    <r2dbc.mariadb.version>1.1.1-rc</r2dbc.mariadb.version>
+    <r2dbc.mariadb.version>1.1.4</r2dbc.mariadb.version>
     <r2dbc.mssql.version>1.0.2.RELEASE</r2dbc.mssql.version>
     <r2dbc.h2.version>1.0.0.RELEASE</r2dbc.h2.version>
     <r2dbc.oracle.version>1.2.0</r2dbc.oracle.version>
@@ -48,11 +48,6 @@
         <version>${r2dbc.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.r2dbc</groupId>
-        <artifactId>r2dbc-pool</artifactId>
-        <version>${r2dbc.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>r2dbc-postgresql</artifactId>
         <version>${r2dbc.postgresql.version}</version>
@@ -61,6 +56,21 @@
         <groupId>org.mariadb</groupId>
         <artifactId>r2dbc-mariadb</artifactId>
         <version>${r2dbc.mariadb.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mariadb.jdbc</groupId>
+        <artifactId>mariadb-java-client</artifactId>
+        <version>3.3.2</version>
+      </dependency>
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>8.0.33</version>
+      </dependency>
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>2.2.224</version>
       </dependency>
       <dependency>
         <groupId>io.r2dbc</groupId>
@@ -76,6 +86,27 @@
         <groupId>com.oracle.database.r2dbc</groupId>
         <artifactId>oracle-r2dbc</artifactId>
         <version>${r2dbc.oracle.version}</version>
+      </dependency>
+      <!-- Pools -->
+      <dependency>
+        <groupId>io.r2dbc</groupId>
+        <artifactId>r2dbc-pool</artifactId>
+        <version>${r2dbc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.mchange</groupId>
+        <artifactId>c3p0</artifactId>
+        <version>0.9.5.5</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-dbcp2</artifactId>
+        <version>2.11.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP</artifactId>
+        <version>5.1.0</version>
       </dependency>
       <!-- own modules -->
       <dependency>
