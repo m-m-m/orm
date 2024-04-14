@@ -6,18 +6,22 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.generator.IdGenerator;
 import io.github.mmm.entity.id.generator.LongIdGenerator;
+import io.github.mmm.entity.id.generator.UuidIdGenerator;
 import io.github.mmm.orm.metadata.DbName;
 import io.github.mmm.orm.metadata.DbQualifiedName;
 import io.github.mmm.orm.repository.DbRepository;
 import io.github.mmm.orm.source.DbSource;
 import io.github.mmm.orm.spi.access.AbstractDbAccess;
 import io.github.mmm.orm.spi.access.DbAccess;
+import io.github.mmm.orm.statement.create.CreateSequenceClause;
+import io.github.mmm.orm.statement.create.CreateSequenceStatement;
 import io.github.mmm.orm.statement.select.SelectStatement;
 
 /**
  * Abstract base implementation of {@link DbRepository}.
  *
  * @param <E> type of the managed {@link EntityBean}.
+ * @since 1.0.0
  */
 public abstract class AbstractDbRepository<E extends EntityBean> extends AbstractEntityRepository<E>
     implements DbRepository<E> {
@@ -25,37 +29,39 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   /** The default {@link #getSequenceName() sequence name}. */
   public static final String DEFAULT_SEQUENCE = "ENTITY_SEQUENCE";
 
-  private final DbAccess dbAccess;
+  private final AbstractDbAccess dbAccess;
 
   /** {@link IdGenerator} used to {@link IdGenerator#generate(Id) generate} new unique {@link Id}s. */
-  protected final IdGenerator idGenerator;
+  private final IdGenerator idGenerator;
 
   /**
    * The constructor.
    *
    * @param prototype the {@link #getPrototype() prototype}.
-   * @param dbAccess the {@link DbAccess}.
    */
-  public AbstractDbRepository(E prototype, DbAccess dbAccess) {
+  public AbstractDbRepository(E prototype) {
 
-    this(prototype, dbAccess, null);
+    this(prototype, null);
   }
 
   /**
    * The constructor.
    *
    * @param prototype the {@link #getPrototype() prototype}.
-   * @param dbAccess the {@link DbAccess}.
    * @param idGenerator the {@link IdGenerator} used to {@link IdGenerator#generate(Id) generate} new unique
    *        {@link Id}s.
    */
-  public AbstractDbRepository(E prototype, DbAccess dbAccess, IdGenerator idGenerator) {
+  public AbstractDbRepository(E prototype, IdGenerator idGenerator) {
 
     super(prototype);
-    this.dbAccess = dbAccess;
+    this.dbAccess = (AbstractDbAccess) DbAccess.get(getSource());
     if (idGenerator == null) {
-      DbQualifiedName sequenceName = new DbQualifiedName(null, null, DbName.of(getSequenceName()));
-      idGenerator = new LongIdGenerator(((AbstractDbAccess) dbAccess).createIdSequence(sequenceName));
+      DbQualifiedName sequenceName = getQualifiedSequenceName();
+      if (sequenceName == null) {
+        idGenerator = new UuidIdGenerator();
+      } else {
+        idGenerator = new LongIdGenerator(this.dbAccess.createIdSequence(sequenceName));
+      }
     }
     this.idGenerator = idGenerator;
   }
@@ -77,11 +83,25 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   }
 
   /**
-   * @return the (unqualified) name of the database sequence.
+   * @return the (unqualified) name of the database sequence for the managed entity. May be {@code null} for non
+   *         sequence based IDs (e.g. UUID).
    */
   protected String getSequenceName() {
 
     return DEFAULT_SEQUENCE;
+  }
+
+  /**
+   * @return the {@link DbQualifiedName} of the database sequence for the managed entity.
+   * @see #getSequenceName()
+   */
+  protected DbQualifiedName getQualifiedSequenceName() {
+
+    String sequenceName = getSequenceName();
+    if (sequenceName == null) {
+      return null;
+    }
+    return new DbQualifiedName(null, null, DbName.of(sequenceName));
   }
 
   /**
@@ -139,6 +159,29 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   protected void update(E entity) {
 
     this.dbAccess.update(entity);
+  }
+
+  /**
+   * Create the table for the managed entity.
+   */
+  public void createTable() {
+
+    this.dbAccess.createTable(this.prototype);
+  }
+
+  /**
+   * Create the ID sequence for the managed entity.
+   */
+  public void createSequence() {
+
+    String sequenceName = getSequenceName();
+    // if ((sequenceName == null) || (DEFAULT_SEQUENCE.equals(sequenceName))) {
+    if (sequenceName == null) {
+      return;
+    }
+    CreateSequenceStatement createSequenceStatement = new CreateSequenceClause(sequenceName).incrementBy(10)
+        .startWith(1000000000000L).minValue(1000000000000L).maxValue(9123456789123456789L).nocycle().get();
+    this.dbAccess.createSequence(createSequenceStatement);
   }
 
 }

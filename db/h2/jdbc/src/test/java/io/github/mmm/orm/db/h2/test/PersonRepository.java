@@ -1,22 +1,18 @@
 package io.github.mmm.orm.db.h2.test;
 
-import io.github.mmm.orm.spi.access.DbAccess;
 import io.github.mmm.orm.spi.repository.AbstractDbRepository;
 
 /**
- * TODO hohwille This type ...
- *
+ * {@link AbstractDbRepository Repository} for {@link Person}.
  */
 public class PersonRepository extends AbstractDbRepository<Person> {
 
   /**
    * The constructor.
-   *
-   * @param dbAccess
    */
-  public PersonRepository(DbAccess dbAccess) {
+  public PersonRepository() {
 
-    super(Person.of(), dbAccess);
+    super(Person.of());
   }
 
   @Override

@@ -31,6 +31,8 @@ import io.github.mmm.orm.statement.upsert.UpsertStatement;
 
 /**
  * Abstract base implementation of {@link DbAccess}.
+ *
+ * @since 1.0.0
  */
 public abstract class AbstractDbAccess implements DbAccess {
 

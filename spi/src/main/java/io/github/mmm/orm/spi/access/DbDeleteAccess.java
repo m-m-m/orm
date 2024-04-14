@@ -8,6 +8,8 @@ import io.github.mmm.orm.statement.delete.DeleteStatement;
 
 /**
  * Interface providing support for {@link #delete(DeleteStatement)}.
+ *
+ * @since 1.0.0
  */
 public interface DbDeleteAccess {
 

@@ -4,35 +4,26 @@ package io.github.mmm.orm.jdbc.session;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
-import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.connection.DbConnectionData;
 import io.github.mmm.orm.jdbc.connection.JdbcConnection;
 import io.github.mmm.orm.jdbc.connection.JdbcConnectionPool;
 import io.github.mmm.orm.jdbc.tx.JdbcTransactionExecutor;
 import io.github.mmm.orm.source.DbSource;
-import io.github.mmm.orm.spi.session.DbSession;
+import io.github.mmm.orm.spi.session.AbstractDbSession;
 import io.github.mmm.orm.tx.DbTransaction;
 
 /**
  * Database session data for a single transaction.
  */
-public class JdbcSession implements DbSession, DbTransaction {
+public class JdbcSession extends AbstractDbSession implements DbTransaction {
 
-  // private static final ScopedValue<JdbcSession> SESSION_HOLDER = ScopedValue.newInstance();
-
-  private static final ThreadLocal<JdbcSession> SESSION = new ThreadLocal<>();
-
-  private Map<String, JdbcEntitySession<?>> entitySessions;
+  private static final ScopedValue<JdbcSession> SESSION_HOLDER = ScopedValue.newInstance();
 
   final Connection connection;
 
   final JdbcConnection jdbcConnection;
-
-  final DbConnectionData connectionData;
 
   /**
    * The constructor.
@@ -42,20 +33,9 @@ public class JdbcSession implements DbSession, DbTransaction {
    */
   private JdbcSession(JdbcConnection jdbcConnection, DbConnectionData connectionData) {
 
-    super();
+    super(connectionData);
     this.jdbcConnection = jdbcConnection;
     this.connection = jdbcConnection.getConnection();
-    this.connectionData = connectionData;
-    this.entitySessions = new HashMap<>();
-  }
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  @Override
-  public <E extends EntityBean> JdbcEntitySession<E> get(E entity) {
-
-    String key = entity.getType().getQualifiedName();
-    JdbcEntitySession session = this.entitySessions.computeIfAbsent(key, k -> new JdbcEntitySession<>(this.connection));
-    return session;
   }
 
   /**
@@ -72,14 +52,6 @@ public class JdbcSession implements DbSession, DbTransaction {
   public JdbcConnection getJdbcConnection() {
 
     return this.jdbcConnection;
-  }
-
-  /**
-   * @return the {@link DbConnectionData}.
-   */
-  public DbConnectionData getConnectionData() {
-
-    return this.connectionData;
   }
 
   @Override
@@ -99,7 +71,7 @@ public class JdbcSession implements DbSession, DbTransaction {
    */
   public static JdbcSession get() {
 
-    JdbcSession session = SESSION.get();
+    JdbcSession session = SESSION_HOLDER.get();
     if (session == null) {
       throw new IllegalStateException("No session found - missing transactional context!");
     }
@@ -115,17 +87,14 @@ public class JdbcSession implements DbSession, DbTransaction {
    */
   public static <R> R doInTx(DbConnectionData connectionData, Callable<R> task) {
 
-    JdbcSession parent = SESSION.get(); // obsolete with ScopedValue
     Connection connection = null;
     JdbcConnection jdbcConnection = null;
     JdbcConnectionPool connectionPool = (JdbcConnectionPool) connectionData.getPool();
     try {
       jdbcConnection = connectionPool.acquire();
       JdbcSession session = new JdbcSession(jdbcConnection, connectionData);
-      // R result = ScopedValue.where(SESSION, session).call(task);
-      SESSION.set(session);
+      R result = ScopedValue.where(SESSION_HOLDER, session).call(task);
       connection = session.getConnection();
-      R result = task.call();
       connection.commit();
       return result;
     } catch (Throwable t) {
@@ -143,7 +112,6 @@ public class JdbcSession implements DbSession, DbTransaction {
       }
       throw new IllegalStateException(t);
     } finally {
-      SESSION.set(parent); // obsolete with ScopedValue
       connectionPool.release(jdbcConnection);
     }
   }

@@ -8,6 +8,7 @@ import io.github.mmm.orm.source.DbSource;
  * Provider of {@link DbTransactionExecutor}.
  *
  * @see DbTransactionExecutor#get(DbSource)
+ * @since 1.0.0
  */
 public interface DbTransactionExecutorProvider {
 

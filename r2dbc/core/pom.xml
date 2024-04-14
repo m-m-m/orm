@@ -22,4 +22,17 @@
       <artifactId>r2dbc-pool</artifactId>
     </dependency>
   </dependencies>
+
+  <!-- Required for ScopedValue with Java21, can be removed after next JDK update -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <enablePreview>true</enablePreview>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

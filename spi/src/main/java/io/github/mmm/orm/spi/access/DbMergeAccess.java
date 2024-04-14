@@ -7,6 +7,8 @@ import io.github.mmm.orm.statement.upsert.UpsertStatement;
 
 /**
  * Interface providing support for {@link #execute(MergeStatement)}.
+ *
+ * @since 1.0.0
  */
 public interface DbMergeAccess {
 

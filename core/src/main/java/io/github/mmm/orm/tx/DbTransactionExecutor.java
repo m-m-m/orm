@@ -26,6 +26,8 @@ import io.github.mmm.orm.tx.impl.DbTransactionExceutorProviderAdapter;
  * nested transaction.</li>
  * <li></li>
  * </ul>
+ *
+ * @since 1.0.0
  */
 public interface DbTransactionExecutor {
 

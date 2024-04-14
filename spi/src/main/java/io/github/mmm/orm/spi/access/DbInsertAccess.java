@@ -7,6 +7,8 @@ import io.github.mmm.orm.statement.insert.InsertStatement;
 
 /**
  * Interface providing support for {@link #insert(InsertStatement)}.
+ *
+ * @since 1.0.0
  */
 public interface DbInsertAccess {
 

@@ -16,7 +16,7 @@ public class JdbcTransactionExecutorProvider implements DbTransactionExecutorPro
   public DbTransactionExecutor create(DbSource source) {
 
     DbConnectionData data = DbConnectionData.of(source);
-    if ("jdbc".equals(data.getKind())) {
+    if (DbSource.VALUE_KIND_JDBC.equals(data.getKind())) {
       return new JdbcTransactionExecutor(data);
     }
     return null;

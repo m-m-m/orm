@@ -1,6 +1,6 @@
 /* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0 */
-package io.github.mmm.orm.spi.repository.impl;
+package io.github.mmm.orm.spi.repository;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,19 +14,13 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.connection.DbConnectionData;
 import io.github.mmm.orm.repository.EntityRepository;
 import io.github.mmm.orm.source.DbSource;
-import io.github.mmm.orm.spi.repository.AbstractDbRepository;
-import io.github.mmm.orm.spi.repository.AbstractEntityRepositoryManager;
-import io.github.mmm.orm.spi.repository.EntityRepositoryManager;
 
 /**
- * Implementation of {@link EntityRepositoryManager}.
+ * Abstract base implementation of {@link EntityRepositoryManager}.
  *
  * @since 1.0.0
  */
-public class EntityRepositoryManagerImpl extends AbstractEntityRepositoryManager {
-
-  /** The singleton instance. */
-  public static final EntityRepositoryManagerImpl INSTANCE = new EntityRepositoryManagerImpl();
+public abstract class AbstractEntityRepositoryManager implements EntityRepositoryManager {
 
   private final Map<Class<?>, EntityRepository<?>> repositoryMap;
 
@@ -34,12 +28,12 @@ public class EntityRepositoryManagerImpl extends AbstractEntityRepositoryManager
    * The constructor.
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public EntityRepositoryManagerImpl() {
+  public AbstractEntityRepositoryManager() {
 
     super();
     this.repositoryMap = new HashMap<>();
     ServiceLoader<EntityRepository<?>> serviceLoader = (ServiceLoader) ServiceLoader.load(EntityRepository.class);
-    ServiceHelper.all(serviceLoader, this.repositoryMap, EntityRepositoryManagerImpl::getEntityClass);
+    ServiceHelper.all(serviceLoader, this.repositoryMap, AbstractEntityRepositoryManager::getEntityClass);
   }
 
   private static Class<?> getEntityClass(EntityRepository<?> repository) {

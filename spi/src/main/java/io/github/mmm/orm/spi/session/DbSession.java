@@ -6,6 +6,8 @@ import io.github.mmm.entity.bean.EntityBean;
 
 /**
  * Database session data for a single transaction.
+ *
+ * @since 1.0.0
  */
 public interface DbSession {
 

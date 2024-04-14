@@ -7,9 +7,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.github.mmm.entity.id.Id;
-import io.github.mmm.orm.jdbc.access.JdbcAccess;
-import io.github.mmm.orm.statement.create.CreateSequenceClause;
-import io.github.mmm.orm.statement.create.CreateSequenceStatement;
 import io.github.mmm.orm.tx.DbTransaction;
 import io.github.mmm.orm.tx.DbTransactionExecutor;
 
@@ -37,18 +34,17 @@ public class H2JdbcTest extends Assertions {
 
     DbTransaction tx = executor.getTransaction();
     assertThat(tx.isOpen()).isTrue();
-    JdbcAccess access = new JdbcAccess();
     Person person = Person.of();
-    access.createTable(person);
-    PersonRepository repository = new PersonRepository(access);
-    CreateSequenceStatement createSequenceStatement = new CreateSequenceClause(repository.getSequenceName())
-        .incrementBy(10).startWith(1000000000000L).minValue(1000000000000L).maxValue(9123456789123456789L).nocycle()
-        .get();
-    access.createSequence(createSequenceStatement);
+    PersonRepository repository = new PersonRepository();
+    repository.createTable();
+    repository.createSequence();
     person.Name().set("John Doe");
     person.Birthday().set(LocalDate.of(1999, 12, 31));
     repository.save(person);
     person.Name().set("Joe Doe");
+    // to force OptimisticLockException...
+    // LongVersionId<Person> id = (LongVersionId<Person>) Id.from(person);
+    // person.Id().set(id.withRevision(0L));
     repository.save(person);
     Person person2 = repository.findById(Id.from(person));
     assertThat(person.isEqual(person2)).isTrue();

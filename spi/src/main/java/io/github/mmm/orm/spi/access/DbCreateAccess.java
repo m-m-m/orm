@@ -12,6 +12,8 @@ import io.github.mmm.orm.statement.create.CreateTableStatement;
  * Interface providing support for {@link #createTable(CreateTableStatement) createTable},
  * {@link #createIndex(CreateIndexStatement) createIndex}, and {@link #createSequence(CreateSequenceStatement)
  * createSequence}.
+ *
+ * @since 1.0.0
  */
 public interface DbCreateAccess {
 

@@ -11,7 +11,9 @@
   <packaging>pom</packaging>
   <name>${project.artifactId}</name>
   <description>ORM support for all kind of databases (dialects, driver dependencies).</description>
-
+  <properties>
+    <argLine>--enable-preview</argLine>
+  </properties>
   <modules>
     <module>derby</module>
     <module>h2</module>

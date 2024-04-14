@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.mmm.bean.BeanHelper;
 import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.AbstractId;
@@ -25,7 +24,6 @@ import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.jdbc.connection.JdbcConnection;
 import io.github.mmm.orm.jdbc.result.JdbcResult;
 import io.github.mmm.orm.jdbc.sequence.JdbcSequence;
-import io.github.mmm.orm.jdbc.session.JdbcEntitySession;
 import io.github.mmm.orm.jdbc.session.JdbcSession;
 import io.github.mmm.orm.metadata.DbName;
 import io.github.mmm.orm.metadata.DbQualifiedName;
@@ -34,6 +32,8 @@ import io.github.mmm.orm.naming.DbNamingStrategy;
 import io.github.mmm.orm.param.AbstractCriteriaParameters;
 import io.github.mmm.orm.result.DbResult;
 import io.github.mmm.orm.spi.access.AbstractDbAccess;
+import io.github.mmm.orm.spi.session.DbEntityHolder;
+import io.github.mmm.orm.spi.session.DbEntitySession;
 import io.github.mmm.orm.statement.NonUniqueResultException;
 import io.github.mmm.orm.statement.insert.InsertClause;
 import io.github.mmm.orm.statement.insert.InsertStatement;
@@ -50,7 +50,7 @@ import io.github.mmm.value.PropertyPath;
 import io.github.mmm.value.SimplePath;
 
 /**
- * Abstract implementation of {@link io.github.mmm.orm.spi.access.DbAccess} using JDBC.
+ * Implementation of {@link io.github.mmm.orm.spi.access.DbAccess} using JDBC.
  *
  * @since 1.0.0
  */
@@ -87,15 +87,22 @@ public class JdbcAccess extends AbstractDbAccess {
     InsertStatement<E> insert = new InsertClause().into(entity).valuesAll().get();
     insert(insert);
     E managed = ReadableBean.copy(entity);
-    JdbcEntitySession<E> entitySession = getSession().get(entity);
+    DbEntitySession<E> entitySession = getSession().get(entity);
     entitySession.put(managed);
   }
 
   @Override
   public <E extends EntityBean> E selectById(Id<E> id, E prototype) {
 
-    SelectStatement<E> select = new SelectEntityClause<>(prototype).from().where(prototype.Id().eq(id)).get();
-    E entity = selectOne(select);
+    DbEntitySession<E> entitySession = getSession().get(prototype);
+    DbEntityHolder<E> holder = entitySession.get(id);
+    E entity;
+    if (holder == null) {
+      SelectStatement<E> select = new SelectEntityClause<>(prototype).from().where(prototype.Id().eq(id)).get();
+      entity = selectOne(select);
+    } else {
+      entity = holder.getExternal();
+    }
     return entity;
   }
 
@@ -114,12 +121,14 @@ public class JdbcAccess extends AbstractDbAccess {
       throw new IllegalStateException(
           "Cannot update entity of type " + entity.getType().getQualifiedName() + " because it is transient.");
     }
-    JdbcEntitySession<E> entitySession = getSession().get(entity);
-    E managed = entitySession.get(id);
-    if (managed == null) {
+    DbEntitySession<E> entitySession = getSession().get(entity);
+    DbEntityHolder<E> holder = entitySession.get(id);
+    if (holder == null) {
       throw new IllegalStateException("Cannot update entity of type " + entity.getType().getQualifiedName()
           + " with ID " + id + " because it is not managed in the current transaction!");
-    } else if (managed.getId().getRevision() != id.getRevision()) {
+    }
+    E managed = holder.getManaged();
+    if (managed.getId().getRevision() != id.getRevision()) {
       throw new OptimisicLockException(id, entity.getType().getQualifiedName());
     }
     GenericId<?, ?, ?> newId = id.updateRevision();
@@ -153,8 +162,7 @@ public class JdbcAccess extends AbstractDbAccess {
     }
     assert (updateCount == 1);
     pk.set(newId);
-    // TODO only copy non-transient properties...
-    BeanHelper.copy(entity, managed);
+    holder.update(entity);
   }
 
   @Override

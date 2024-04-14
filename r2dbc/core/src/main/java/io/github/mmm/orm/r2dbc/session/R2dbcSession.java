@@ -2,17 +2,14 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.r2dbc.session;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
-import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.connection.DbConnectionData;
 import io.github.mmm.orm.r2dbc.connection.R2dbcConnection;
 import io.github.mmm.orm.r2dbc.connection.R2dbcConnectionPool;
 import io.github.mmm.orm.r2dbc.tx.R2dbcTransactionExecutor;
 import io.github.mmm.orm.source.DbSource;
-import io.github.mmm.orm.spi.session.DbSession;
+import io.github.mmm.orm.spi.session.AbstractDbSession;
 import io.github.mmm.orm.tx.DbTransaction;
 import io.r2dbc.spi.Connection;
 import reactor.core.publisher.Mono;
@@ -20,17 +17,11 @@ import reactor.core.publisher.Mono;
 /**
  * Database session data for a single transaction.
  */
-public class R2dbcSession implements DbSession, DbTransaction {
+public class R2dbcSession extends AbstractDbSession implements DbTransaction {
 
-  // private static final ScopedValue<JdbcSession> SESSION_HOLDER = ScopedValue.newInstance();
-
-  private static final ThreadLocal<R2dbcSession> SESSION = new ThreadLocal<>();
-
-  private Map<String, R2dbcEntitySession<?>> entitySessions;
+  private static final ScopedValue<R2dbcSession> SESSION = ScopedValue.newInstance();
 
   final R2dbcConnection r2dbcConnection;
-
-  final DbConnectionData connectionData;
 
   /**
    * The constructor.
@@ -40,19 +31,8 @@ public class R2dbcSession implements DbSession, DbTransaction {
    */
   private R2dbcSession(R2dbcConnection jdbcConnection, DbConnectionData connectionData) {
 
-    super();
+    super(connectionData);
     this.r2dbcConnection = jdbcConnection;
-    this.connectionData = connectionData;
-    this.entitySessions = new HashMap<>();
-  }
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  @Override
-  public <E extends EntityBean> R2dbcEntitySession<E> get(E entity) {
-
-    String key = entity.getType().getQualifiedName();
-    R2dbcEntitySession session = this.entitySessions.computeIfAbsent(key, k -> new R2dbcEntitySession<>());
-    return session;
   }
 
   /**
@@ -66,6 +46,7 @@ public class R2dbcSession implements DbSession, DbTransaction {
   /**
    * @return the {@link DbConnectionData}.
    */
+  @Override
   public DbConnectionData getConnectionData() {
 
     return this.connectionData;
@@ -104,16 +85,13 @@ public class R2dbcSession implements DbSession, DbTransaction {
    */
   public static <R> R doInTx(DbConnectionData connectionData, Callable<R> task) {
 
-    R2dbcSession parent = SESSION.get(); // obsolete with ScopedValue
     R2dbcConnection jdbcConnection = null;
     R2dbcConnectionPool connectionPool = (R2dbcConnectionPool) connectionData.getPool();
     try {
       jdbcConnection = connectionPool.acquire();
       R2dbcSession session = new R2dbcSession(jdbcConnection, connectionData);
-      // R result = ScopedValue.where(SESSION, session).call(task);
-      SESSION.set(session);
       Mono<Connection> connection = session.getR2dbcConnection().getConnection();
-      R result = task.call();
+      R result = ScopedValue.where(SESSION, session).call(task);
       return result;
     } catch (Throwable t) {
       // if (connection != null) {
@@ -130,7 +108,6 @@ public class R2dbcSession implements DbSession, DbTransaction {
       }
       throw new IllegalStateException(t);
     } finally {
-      SESSION.set(parent); // obsolete with ScopedValue
       connectionPool.release(jdbcConnection);
     }
   }

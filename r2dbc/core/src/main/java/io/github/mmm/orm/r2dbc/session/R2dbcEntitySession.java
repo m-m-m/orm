@@ -10,7 +10,7 @@ import io.github.mmm.orm.spi.session.DbEntitySession;
  *
  * @param <E> type of the managed {@link EntityBean}.
  */
-public class R2dbcEntitySession<E extends EntityBean> extends DbEntitySession<E> {
+public abstract class R2dbcEntitySession<E extends EntityBean> implements DbEntitySession<E> {
 
   /**
    * The constructor.
