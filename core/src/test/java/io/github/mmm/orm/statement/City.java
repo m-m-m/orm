@@ -27,8 +27,6 @@ public interface City extends EntityBean {
    */
   static City of() {
 
-    City city = BeanFactory.get().create(City.class);
-    city.GeoLocation().set(GeoLocation.of());
-    return city;
+    return BeanFactory.get().create(City.class);
   }
 }
