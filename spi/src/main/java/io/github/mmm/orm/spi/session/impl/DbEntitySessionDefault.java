@@ -8,34 +8,27 @@ import io.github.mmm.orm.spi.session.DbEntityHolder;
 import io.github.mmm.orm.spi.session.DbSession;
 
 /**
- * Session data for a specific {@link EntityBean#getType() type} of {@link EntityBean}. Represents the internal
- * first-level cache and shall not be exposed externally.
+ * Default implementation of {@link io.github.mmm.orm.spi.session.DbEntitySession}.
  *
  * @param <E> type of the managed {@link EntityBean}.
  *
  * @see DbSession#get(EntityBean)
  * @since 1.0.0
  */
-public class DbEntitySessionImplCopy<E extends EntityBean> extends AbstractDbEntitySession<E> {
-
-  private final boolean readOnly;
+public class DbEntitySessionDefault<E extends EntityBean> extends AbstractDbEntitySession<E> {
 
   /**
    * The constructor.
-   *
-   * @param readOnly to create read-only copies for {@link DbEntityHolder#getExternal() external entities},
-   *        {@code false} otherwise (mutable copies).
    */
-  public DbEntitySessionImplCopy(boolean readOnly) {
+  public DbEntitySessionDefault() {
 
     super();
-    this.readOnly = readOnly;
   }
 
   @Override
   protected DbEntityHolder<E> createHolder(E managed) {
 
-    return new DbEntityHolderDynamic<>(managed, this.readOnly);
+    return new DbEntityHolderStatic<>(managed);
   }
 
 }

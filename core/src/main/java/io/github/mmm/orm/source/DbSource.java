@@ -95,31 +95,6 @@ public final class DbSource {
   public static final String VALUE_KIND_JDBC = "jdbc";
 
   /**
-   * {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} with the mode how to handle entity instances retrieved
-   * by API users. The default value is {@link #VALUE_ENTITY_MODE_READONLY_COPY}.<br>
-   * Please note that unlike JPA we never auto-commit changes of entities to the database. You always need to explicitly
-   * save an entity to write changes to the database.
-   *
-   * @see #VALUE_ENTITY_MODE_COPY
-   * @see #VALUE_ENTITY_MODE_INSTANCE
-   * @see #VALUE_ENTITY_MODE_READONLY_COPY
-   * @see #VALUE_ENTITY_MODE_READONLY_INSTANCE
-   */
-  public static final String KEY_ENTITY_MODE = "entity-mode";
-
-  /** Value of {@link #KEY_ENTITY_MODE entity-mode} to retrieve the same mutable instance on every call. */
-  public static final String VALUE_ENTITY_MODE_INSTANCE = "instance";
-
-  /** Value of {@link #KEY_ENTITY_MODE entity-mode} to retrieve the mutable copy of the entity every call. */
-  public static final String VALUE_ENTITY_MODE_COPY = "copy";
-
-  /** Value of {@link #KEY_ENTITY_MODE entity-mode} to retrieve the same read-only instance of the entity every call. */
-  public static final String VALUE_ENTITY_MODE_READONLY_INSTANCE = "readonly-instance";
-
-  /** Value of {@link #KEY_ENTITY_MODE entity-mode} to retrieve a read-only copy of the entity every call. */
-  public static final String VALUE_ENTITY_MODE_READONLY_COPY = "readonly-copy";
-
-  /**
    * The standard keys for the database connection. Other keys will be specific for particular implementations (e.g.
    * connection pools).
    */

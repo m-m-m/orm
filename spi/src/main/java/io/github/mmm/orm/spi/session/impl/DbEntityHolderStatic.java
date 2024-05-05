@@ -1,6 +1,7 @@
 package io.github.mmm.orm.spi.session.impl;
 
 import io.github.mmm.bean.BeanHelper;
+import io.github.mmm.bean.WritableBean;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.spi.session.AbstractDbEntityHolder;
 import io.github.mmm.orm.spi.session.DbEntityHolder;
@@ -14,6 +15,16 @@ import io.github.mmm.orm.spi.session.DbEntityHolder;
 public class DbEntityHolderStatic<E extends EntityBean> extends AbstractDbEntityHolder<E> {
 
   private final E external;
+
+  /**
+   * The constructor.
+   *
+   * @param managed the {@link #getManaged() managed entity}.
+   */
+  public DbEntityHolderStatic(E managed) {
+
+    this(managed, WritableBean.getReadOnly(managed));
+  }
 
   /**
    * The constructor.

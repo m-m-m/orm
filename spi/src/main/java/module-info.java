@@ -19,14 +19,6 @@ module io.github.mmm.orm.spi {
 
   uses io.github.mmm.orm.connection.DbConnectionPoolProvider;
 
-  uses io.github.mmm.orm.spi.session.DbEntitySessionFactory;
-
-  provides io.github.mmm.orm.spi.session.DbEntitySessionFactory with //
-      io.github.mmm.orm.spi.session.impl.DbEntitySessionFactoryInstance,
-      io.github.mmm.orm.spi.session.impl.DbEntitySessionFactoryCopy,
-      io.github.mmm.orm.spi.session.impl.DbEntitySessionFactoryReadOnlyInstance,
-      io.github.mmm.orm.spi.session.impl.DbEntitySessionFactoryReadOnlyCopy;
-
   uses io.github.mmm.orm.spi.access.DbAccessProvider;
 
   exports io.github.mmm.orm.spi.access;

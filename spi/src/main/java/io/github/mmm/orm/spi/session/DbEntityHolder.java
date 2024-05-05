@@ -19,7 +19,6 @@ public interface DbEntityHolder<E extends EntityBean> {
 
   /**
    * @return the external "copy" of the {@link #getManaged() managed} entity.
-   * @see io.github.mmm.orm.source.DbSource#KEY_ENTITY_MODE
    */
   E getExternal();
 
