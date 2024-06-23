@@ -15,7 +15,9 @@ import io.github.mmm.orm.spi.access.AbstractDbAccess;
 import io.github.mmm.orm.spi.access.DbAccess;
 import io.github.mmm.orm.statement.create.CreateSequenceClause;
 import io.github.mmm.orm.statement.create.CreateSequenceStatement;
+import io.github.mmm.orm.statement.delete.DeleteStatement;
 import io.github.mmm.orm.statement.select.SelectStatement;
+import io.github.mmm.orm.statement.update.UpdateStatement;
 
 /**
  * Abstract base implementation of {@link DbRepository}.
@@ -125,6 +127,12 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   }
 
   @Override
+  public long delete(DeleteStatement<E> statement) {
+
+    return this.dbAccess.delete(statement);
+  }
+
+  @Override
   protected boolean doDeleteById(Id<E> id) {
 
     return this.dbAccess.deleteById(id, this.prototype);
@@ -146,6 +154,12 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   protected void doUpdate(E entity) {
 
     this.dbAccess.update(entity);
+  }
+
+  @Override
+  public long update(UpdateStatement<E> statement) {
+
+    return this.dbAccess.update(statement);
   }
 
   /**
