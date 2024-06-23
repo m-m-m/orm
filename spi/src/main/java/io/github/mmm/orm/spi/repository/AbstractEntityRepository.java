@@ -8,7 +8,7 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.generator.IdGenerator;
 import io.github.mmm.entity.link.Link;
-import io.github.mmm.orm.repository.EntityListener;
+import io.github.mmm.orm.listener.EntityListener;
 import io.github.mmm.orm.repository.EntityRepository;
 
 /**

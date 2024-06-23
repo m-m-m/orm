@@ -1,8 +1,9 @@
-package io.github.mmm.orm.repository;
+package io.github.mmm.orm.listener;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.link.Link;
+import io.github.mmm.orm.repository.EntityRepository;
 
 /**
  * Interface for a listener of changes to an {@link EntityBean}. Methods are implemented to do nothing by default. You

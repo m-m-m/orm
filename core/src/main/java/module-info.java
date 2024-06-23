@@ -35,6 +35,8 @@ module io.github.mmm.orm {
 
   exports io.github.mmm.orm.dialect;
 
+  exports io.github.mmm.orm.listener;
+
   exports io.github.mmm.orm.mapping;
 
   exports io.github.mmm.orm.metadata;

@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
-import io.github.mmm.orm.repository.EntityListener;
+import io.github.mmm.orm.listener.EntityListener;
 
 /**
  * Adapter for {@link EntityListener}s.
@@ -16,7 +16,7 @@ import io.github.mmm.orm.repository.EntityListener;
  * @see EntityListener
  * @see AbstractEntityRepository
  */
-public abstract class EntityListenerAdapter<E extends EntityBean> implements EntityListener<E> {
+abstract class EntityListenerAdapter<E extends EntityBean> implements EntityListener<E> {
 
   private static final Empty EMPTY = new Empty();
 
@@ -42,7 +42,7 @@ public abstract class EntityListenerAdapter<E extends EntityBean> implements Ent
    * @return the number of {@link #add(EntityListener) registered} {@link EntityListener}s.
    * @see #get(int)
    */
-  public abstract int size();
+  abstract int size();
 
   /**
    * @param index the index of the requested {@link EntityListener} in the range from {@code 0} to
@@ -50,7 +50,7 @@ public abstract class EntityListenerAdapter<E extends EntityBean> implements Ent
    * @return the requested {@link EntityListener} or {@code null} if index is out of bounds.
    * @see #size()
    */
-  public abstract EntityListener<? super E> get(int index);
+  abstract EntityListener<? super E> get(int index);
 
   /**
    * @param <E> type of the {@link EntityBean}s.
@@ -58,7 +58,7 @@ public abstract class EntityListenerAdapter<E extends EntityBean> implements Ent
    *         absolutely no resources until a listener gets {@link #add(EntityListener) added}.
    */
   @SuppressWarnings("unchecked")
-  public static <E extends EntityBean> EntityListenerAdapter<E> empty() {
+  static <E extends EntityBean> EntityListenerAdapter<E> empty() {
 
     return EMPTY;
   }
