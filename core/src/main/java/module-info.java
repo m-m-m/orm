@@ -47,6 +47,8 @@ module io.github.mmm.orm {
 
   exports io.github.mmm.orm.repository;
 
+  exports io.github.mmm.orm.repository.operation;
+
   exports io.github.mmm.orm.result;
 
   exports io.github.mmm.orm.source;

@@ -104,21 +104,9 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
     return new DbQualifiedName(null, null, DbName.of(sequenceName));
   }
 
-  /**
-   * Verifies that an entity {@link Class} (e.g. from an {@link Id}) is valid for this repository.
-   *
-   * @param entityType the {@link Class} reflecting the {@link EntityBean} to process.
-   */
-  protected void verifyEntityClass(Class<?> entityType) {
-
-    // TODO support inheritance via isAssignableFrom
-    assert (entityType == this.prototype.getJavaClass());
-  }
-
   @Override
-  public E findById(Id<E> id) {
+  public E doFindById(Id<E> id) {
 
-    verifyEntityClass(id.getEntityClass());
     return this.dbAccess.selectById(id, this.prototype);
   }
 
@@ -137,26 +125,25 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   }
 
   @Override
-  public boolean deleteById(Id<E> id) {
+  protected boolean doDeleteById(Id<E> id) {
 
-    verifyEntityClass(id.getEntityClass());
     return this.dbAccess.deleteById(id, this.prototype);
   }
 
   @Override
-  public int deleteAllById(Iterable<Id<E>> ids) {
+  protected int doDeleteAllById(Iterable<Id<E>> ids) {
 
     return this.dbAccess.deleteAllById(ids, this.prototype);
   }
 
   @Override
-  protected void insert(E entity) {
+  protected void doInsert(E entity) {
 
     this.dbAccess.insert(entity);
   }
 
   @Override
-  protected void update(E entity) {
+  protected void doUpdate(E entity) {
 
     this.dbAccess.update(entity);
   }

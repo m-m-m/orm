@@ -3,7 +3,9 @@
 package io.github.mmm.orm.repository;
 
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.orm.statement.NonUniqueResultException;
+import io.github.mmm.orm.repository.operation.DbDeleteOperations;
+import io.github.mmm.orm.repository.operation.DbFindOperations;
+import io.github.mmm.orm.repository.operation.DbUpdateOperations;
 import io.github.mmm.orm.statement.select.SelectStatement;
 
 /**
@@ -11,20 +13,7 @@ import io.github.mmm.orm.statement.select.SelectStatement;
  *
  * @param <E> type of the managed {@link EntityBean}.
  */
-public interface DbRepository<E extends EntityBean> extends EntityRepository<E> {
-
-  /**
-   * @param statement the {@link SelectStatement} to query the requested entities.
-   * @return an {@link Iterable} with the matching {@link EntityBean entities}.
-   */
-  Iterable<E> findByQuery(SelectStatement<E> statement);
-
-  /**
-   * @param statement the {@link SelectStatement} to query the requested entity. Should produce a single result or no
-   *        result.
-   * @return the matching {@link EntityBean entity} or {@code null} if not found.
-   * @throws NonUniqueResultException if the given {@code statement} produced more than one result.
-   */
-  E findOneByQuery(SelectStatement<E> statement);
+public interface DbRepository<E extends EntityBean>
+    extends EntityRepository<E>, DbFindOperations<E>, DbDeleteOperations<E>, DbUpdateOperations<E> {
 
 }
