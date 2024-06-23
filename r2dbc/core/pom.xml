@@ -33,6 +33,13 @@
           <enablePreview>true</enablePreview>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalOptions>--enable-preview</additionalOptions>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
