@@ -18,8 +18,8 @@ public class InsertTest extends DbStatementTest {
     // given
     Person p = Person.of();
     // when
-    InsertStatement<Person> insertStatement = new InsertClause().into(p).value(p.Name(), "John Doe").value(p.Single(), true)
-        .get();
+    InsertStatement<Person> insertStatement = new InsertClause().into(p).value(p.Name(), "John Doe")
+        .value(p.Single(), true).get();
     // then
     check(insertStatement, "INSERT INTO Person(Name, Single) VALUES ('John Doe', TRUE)");
   }
@@ -32,7 +32,7 @@ public class InsertTest extends DbStatementTest {
     Person p = Person.of();
     p.Name().set("John Doe");
     p.Single().setValue(true);
-    p.Id().set(LongId.of(4711L).updateRevision());
+    p.Id().set(LongId.of(4711L, Person.class, 1L));
     // when
     InsertStatement<Person> insertStatement = new InsertClause().into(p).valuesAll().get();
     // then
