@@ -33,13 +33,14 @@ public class OrmTest {
 
     // arrange
     long id = 4711L;
+    long revision = 1L;
     String name = "Frankfurt";
     int inhabitants = 773070;
     double longitude = 50.110924;
     double latitude = 8.682127;
 
     City city = City.of();
-    city.Id().set(LongId.of(id).updateRevision());
+    city.Id().set(LongId.of(id, null, revision));
     city.Name().set(name);
     city.Inhabitants().setValue(inhabitants);
     GeoLocation geoLocation = city.GeoLocation().get();
@@ -57,7 +58,7 @@ public class OrmTest {
     checkCell(dbValueIterator, "GEO_LOCATION_LATITUDE", latitude, "DOUBLE PRECISION");
     checkCell(dbValueIterator, "GEO_LOCATION_LONGITUDE", longitude, "DOUBLE PRECISION");
     checkCell(dbValueIterator, "ID", id, "BIGINT");
-    checkCell(dbValueIterator, "REV", 1L, "BIGINT");
+    checkCell(dbValueIterator, "REV", revision, "BIGINT");
     checkCell(dbValueIterator, "INHABITANTS", inhabitants, "INTEGER");
     checkCell(dbValueIterator, "NAME", name, "VARCHAR");
     assertThat(dbValueIterator.hasNext()).isFalse();
