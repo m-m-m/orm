@@ -17,9 +17,4 @@ import io.github.mmm.orm.repository.operation.EntitySaveOperations;
 public interface EntityRepository<E extends EntityBean>
     extends EntityFindOperations<E>, EntitySaveOperations<E>, EntityDeleteOperations<E> {
 
-  /**
-   * @return the {@link Class} reflecting the managed {@link EntityBean}.
-   */
-  Class<E> getEntityClass();
-
 }

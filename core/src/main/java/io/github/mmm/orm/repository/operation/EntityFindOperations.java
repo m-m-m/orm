@@ -5,9 +5,14 @@ package io.github.mmm.orm.repository.operation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
+import io.github.mmm.entity.id.IdFactory;
+import io.github.mmm.entity.id.LongId;
+import io.github.mmm.entity.id.StringId;
+import io.github.mmm.entity.id.UuidId;
 import io.github.mmm.entity.link.Link;
 import io.github.mmm.orm.repository.EntityRepository;
 
@@ -20,10 +25,36 @@ import io.github.mmm.orm.repository.EntityRepository;
 public interface EntityFindOperations<E extends EntityBean> {
 
   /**
+   * @return the {@link Class} reflecting the managed {@link EntityBean}.
+   */
+  Class<E> getEntityClass();
+
+  /**
    * @param id the {@link Id} of the requested {@link EntityBean entity}.
    * @return the requested {@link EntityBean entity} or {@code null} if no such entity exists.
    */
   E findById(Id<E> id);
+
+  /**
+   * @param pk the {@link Id#get() primary key} of the requested {@link EntityBean entity}.
+   * @return the requested {@link EntityBean entity} or {@code null} if no such entity exists.
+   */
+  default E findByPk(Object pk) {
+
+    if (pk == null) {
+      return null;
+    } else if (pk instanceof Long l) {
+      return findById(LongId.of(l, getEntityClass()));
+    } else if (pk instanceof UUID u) {
+      return findById(UuidId.of(u, getEntityClass()));
+    } else if (pk instanceof String s) {
+      return findById(StringId.of(s, getEntityClass()));
+    } else {
+      // fallback that should never happen
+      return findById(IdFactory.get().createGeneric(getEntityClass(), pk, null));
+    }
+
+  }
 
   /**
    * @param link the {@link Link} to the requested {@link EntityBean entity}.
