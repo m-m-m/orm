@@ -48,7 +48,7 @@ public class H2JdbcTest extends Assertions {
     repository.save(person);
     Person person2 = repository.findById(Id.from(person));
     assertThat(person.isEqual(person2)).isTrue();
-    assertThat(person.getId().get()).isEqualTo(1000000000000L);
+    assertThat(person.getId().getPk()).isEqualTo(1000000000000L);
     assertThat(person.getId().getRevision()).isEqualTo(2L);
     return tx;
   }

@@ -38,7 +38,7 @@ public abstract class AbstractDbEntitySession<E extends EntityBean> implements D
     if (id == null) {
       return null;
     }
-    Object pk = id.get();
+    Object pk = id.getPk();
     if (pk == null) {
       return null;
     }
@@ -56,7 +56,7 @@ public abstract class AbstractDbEntitySession<E extends EntityBean> implements D
 
     Objects.requireNonNull(managedEntity);
     Objects.requireNonNull(id);
-    Object pk = id.get();
+    Object pk = id.getPk();
     if (pk == null) {
       throw new IllegalArgumentException("Missing primary key for given ID " + id);
     }

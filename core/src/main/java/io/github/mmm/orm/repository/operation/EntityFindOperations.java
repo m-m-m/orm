@@ -36,7 +36,7 @@ public interface EntityFindOperations<E extends EntityBean> {
   E findById(Id<E> id);
 
   /**
-   * @param pk the {@link Id#get() primary key} of the requested {@link EntityBean entity}.
+   * @param pk the {@link Id#getPk() primary key} of the requested {@link EntityBean entity}.
    * @return the requested {@link EntityBean entity} or {@code null} if no such entity exists.
    */
   default E findByPk(Object pk) {

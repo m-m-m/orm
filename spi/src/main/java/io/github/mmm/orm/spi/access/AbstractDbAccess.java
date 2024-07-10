@@ -88,7 +88,7 @@ public abstract class AbstractDbAccess implements DbAccess {
   @Override
   public <E extends EntityBean> boolean deleteById(Id<E> id, E prototype) {
 
-    if ((id == null) || (id.get() == null)) {
+    if ((id == null) || (id.getPk() == null)) {
       return false;
     }
     DeleteStatement<E> statement = new DeleteClause().from(prototype).where(prototype.Id().eq(id)).get();

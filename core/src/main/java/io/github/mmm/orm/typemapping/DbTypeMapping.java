@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import io.github.mmm.entity.bean.typemapping.ComposedTypeMapping;
-import io.github.mmm.entity.id.IdMapper;
+import io.github.mmm.entity.id.FkMapper;
 import io.github.mmm.entity.id.LongInstantId;
 import io.github.mmm.entity.id.LongVersionId;
 import io.github.mmm.entity.id.StringInstantId;
@@ -31,12 +31,12 @@ public class DbTypeMapping extends ComposedTypeMapping {
   public DbTypeMapping() {
 
     super();
-    add(IdMapper.of(LongVersionId.getEmpty()));
-    add(IdMapper.of(LongInstantId.getEmpty()));
-    add(IdMapper.of(StringVersionId.getEmpty()));
-    add(IdMapper.of(StringInstantId.getEmpty()));
-    add(IdMapper.of(UuidVersionId.getEmpty()));
-    add(IdMapper.of(UuidInstantId.getEmpty()));
+    add(FkMapper.of(LongVersionId.getEmpty()));
+    add(FkMapper.of(LongInstantId.getEmpty()));
+    add(FkMapper.of(StringVersionId.getEmpty()));
+    add(FkMapper.of(StringInstantId.getEmpty()));
+    add(FkMapper.of(UuidVersionId.getEmpty()));
+    add(FkMapper.of(UuidInstantId.getEmpty()));
   }
 
   /**

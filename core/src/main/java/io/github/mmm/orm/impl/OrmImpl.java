@@ -7,7 +7,7 @@ import java.util.Objects;
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.entity.bean.typemapping.TypeMapping;
 import io.github.mmm.entity.id.Id;
-import io.github.mmm.entity.id.IdMapper;
+import io.github.mmm.entity.id.FkMapper;
 import io.github.mmm.orm.mapping.DbBeanMapper;
 import io.github.mmm.orm.mapping.DbMapper;
 import io.github.mmm.orm.mapping.Orm;
@@ -130,7 +130,7 @@ public class OrmImpl implements Orm {
       typeMapper = property.getTypeMapper();
     }
     if ((typeMapper == null) && (Id.class.equals(valueClass))) {
-      typeMapper = (TypeMapper) IdMapper.of();
+      typeMapper = (TypeMapper) FkMapper.of();
     }
     if (typeMapper == null) {
       throw new UnmappedTypeException(valueClass, selection);
