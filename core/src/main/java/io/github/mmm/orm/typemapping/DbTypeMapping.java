@@ -7,12 +7,11 @@ import java.math.BigInteger;
 
 import io.github.mmm.entity.bean.typemapping.ComposedTypeMapping;
 import io.github.mmm.entity.id.FkMapper;
-import io.github.mmm.entity.id.LongInstantId;
-import io.github.mmm.entity.id.LongVersionId;
-import io.github.mmm.entity.id.StringInstantId;
-import io.github.mmm.entity.id.StringVersionId;
-import io.github.mmm.entity.id.UuidInstantId;
-import io.github.mmm.entity.id.UuidVersionId;
+import io.github.mmm.entity.id.PkIdLong;
+import io.github.mmm.entity.id.PkIdString;
+import io.github.mmm.entity.id.PkIdUuid;
+import io.github.mmm.entity.id.RevisionedIdInstant;
+import io.github.mmm.entity.id.RevisionedIdVersion;
 import io.github.mmm.orm.dialect.DbDialect;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.value.converter.IdentityTypeMapper;
@@ -31,12 +30,12 @@ public class DbTypeMapping extends ComposedTypeMapping {
   public DbTypeMapping() {
 
     super();
-    add(FkMapper.of(LongVersionId.getEmpty()));
-    add(FkMapper.of(LongInstantId.getEmpty()));
-    add(FkMapper.of(StringVersionId.getEmpty()));
-    add(FkMapper.of(StringInstantId.getEmpty()));
-    add(FkMapper.of(UuidVersionId.getEmpty()));
-    add(FkMapper.of(UuidInstantId.getEmpty()));
+    add(FkMapper.of(new RevisionedIdVersion<>(PkIdLong.getEmpty(), null)));
+    add(FkMapper.of(new RevisionedIdInstant<>(PkIdLong.getEmpty(), null)));
+    add(FkMapper.of(new RevisionedIdVersion<>(PkIdString.getEmpty(), null)));
+    add(FkMapper.of(new RevisionedIdInstant<>(PkIdString.getEmpty(), null)));
+    add(FkMapper.of(new RevisionedIdVersion<>(PkIdUuid.getEmpty(), null)));
+    add(FkMapper.of(new RevisionedIdInstant<>(PkIdUuid.getEmpty(), null)));
   }
 
   /**

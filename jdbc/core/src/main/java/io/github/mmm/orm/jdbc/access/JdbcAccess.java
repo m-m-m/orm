@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.entity.id.AbstractId;
 import io.github.mmm.entity.id.GenericId;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.OptimisicLockException;
@@ -112,11 +111,10 @@ public class JdbcAccess extends AbstractDbAccess {
     doUpdate(entity);
   }
 
-  @SuppressWarnings("unchecked")
   private <E extends EntityBean> void doUpdate(E entity) {
 
     PkProperty pk = entity.Id();
-    AbstractId<E, ?, ?> id = (AbstractId<E, ?, ?>) pk.get();
+    Id<E> id = Id.from(entity);
     if (id.isTransient()) {
       throw new IllegalStateException(
           "Cannot update entity of type " + entity.getType().getQualifiedName() + " because it is transient.");
@@ -131,7 +129,7 @@ public class JdbcAccess extends AbstractDbAccess {
     if (managed.getId().getRevision() != id.getRevision()) {
       throw new OptimisicLockException(id, entity.getType().getQualifiedName());
     }
-    GenericId<?, ?, ?> newId = id.updateRevision();
+    Id<?> newId = ((GenericId<E, ?, ?, ?>) id).updateRevision();
     UpdateClause<EntityBean> updateEntity = new UpdateClause<>(entity);
     UpdateSet<EntityBean> set = updateEntity.setAll();
     for (WritableProperty<?> property : entity.getProperties()) {

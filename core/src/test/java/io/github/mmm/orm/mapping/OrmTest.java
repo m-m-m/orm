@@ -8,7 +8,8 @@ import java.util.Iterator;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.mmm.entity.id.LongId;
+import io.github.mmm.entity.id.PkId;
+import io.github.mmm.entity.id.RevisionedIdVersion;
 import io.github.mmm.orm.impl.OrmImpl;
 import io.github.mmm.orm.naming.DbNamingStrategy;
 import io.github.mmm.orm.result.DbResult;
@@ -40,7 +41,7 @@ public class OrmTest {
     double latitude = 8.682127;
 
     City city = City.of();
-    city.Id().set(LongId.of(id, null, revision));
+    city.Id().set(new RevisionedIdVersion<>(PkId.of(City.class, id), revision));
     city.Name().set(name);
     city.Inhabitants().setValue(inhabitants);
     GeoLocation geoLocation = city.GeoLocation().get();

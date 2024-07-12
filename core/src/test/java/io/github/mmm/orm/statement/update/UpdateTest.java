@@ -4,7 +4,7 @@ package io.github.mmm.orm.statement.update;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.mmm.entity.id.LongId;
+import io.github.mmm.entity.id.PkId;
 import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
 import io.github.mmm.orm.statement.Song;
@@ -34,7 +34,7 @@ public class UpdateTest extends DbStatementTest {
     Person p = Person.of();
     // when
     UpdateStatement<Person> updateStatement = new UpdateClause<>(p).as("p").set(p.Single(), Boolean.FALSE)
-        .where(p.Id().eq(LongId.of(4711L))).get();
+        .where(p.Id().eq(PkId.of(Person.class, 4711L))).get();
     // then
     check(updateStatement, "UPDATE Person p SET p.Single=FALSE WHERE p.Id = 4711");
   }

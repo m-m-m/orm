@@ -5,14 +5,10 @@ package io.github.mmm.orm.repository.operation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
-import io.github.mmm.entity.id.IdFactory;
-import io.github.mmm.entity.id.LongId;
-import io.github.mmm.entity.id.StringId;
-import io.github.mmm.entity.id.UuidId;
+import io.github.mmm.entity.id.PkId;
 import io.github.mmm.entity.link.Link;
 import io.github.mmm.orm.repository.EntityRepository;
 
@@ -43,17 +39,9 @@ public interface EntityFindOperations<E extends EntityBean> {
 
     if (pk == null) {
       return null;
-    } else if (pk instanceof Long l) {
-      return findById(LongId.of(l, getEntityClass()));
-    } else if (pk instanceof UUID u) {
-      return findById(UuidId.of(u, getEntityClass()));
-    } else if (pk instanceof String s) {
-      return findById(StringId.of(s, getEntityClass()));
-    } else {
-      // fallback that should never happen
-      return findById(IdFactory.get().createGeneric(getEntityClass(), pk, null));
     }
-
+    PkId<E, ?, ?> id = PkId.of(getEntityClass(), pk);
+    return findById(id);
   }
 
   /**

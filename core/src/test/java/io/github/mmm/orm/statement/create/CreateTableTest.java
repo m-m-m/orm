@@ -4,7 +4,7 @@ package io.github.mmm.orm.statement.create;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.mmm.entity.id.LongId;
+import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.link.Link;
 import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
@@ -22,7 +22,7 @@ public class CreateTableTest extends DbStatementTest {
     // given
     Song s = Song.of();
     // temporary workaround
-    s.Composer().set(Link.of(LongId.of(4711L, Person.class)));
+    s.Composer().set(Link.of(Id.of(Person.class, 4711L)));
     // when
     CreateTableStatement<Song> createTableStatement = new CreateTableClause<>(s).columns().get();
     // then

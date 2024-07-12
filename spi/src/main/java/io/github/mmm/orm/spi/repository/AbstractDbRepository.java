@@ -5,7 +5,7 @@ package io.github.mmm.orm.spi.repository;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.generator.IdGenerator;
-import io.github.mmm.entity.id.generator.LongIdGenerator;
+import io.github.mmm.entity.id.generator.SequenceIdGenerator;
 import io.github.mmm.entity.id.generator.UuidIdGenerator;
 import io.github.mmm.orm.metadata.DbName;
 import io.github.mmm.orm.metadata.DbQualifiedName;
@@ -62,7 +62,7 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
       if (sequenceName == null) {
         idGenerator = new UuidIdGenerator();
       } else {
-        idGenerator = new LongIdGenerator(this.dbAccess.createIdSequence(sequenceName));
+        idGenerator = new SequenceIdGenerator(this.dbAccess.createIdSequence(sequenceName));
       }
     }
     this.idGenerator = idGenerator;

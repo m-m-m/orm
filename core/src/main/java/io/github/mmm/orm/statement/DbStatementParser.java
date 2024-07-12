@@ -17,8 +17,8 @@ import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.bean.mapping.ClassNameMapper;
 import io.github.mmm.entity.bean.EntityBean;
-import io.github.mmm.entity.id.GenericId;
-import io.github.mmm.entity.id.IdFactory;
+import io.github.mmm.entity.id.Id;
+import io.github.mmm.entity.id.PkId;
 import io.github.mmm.orm.criteria.SequenceNextValue;
 import io.github.mmm.orm.ddl.DbColumnSpec;
 import io.github.mmm.orm.ddl.constraint.CheckConstraint;
@@ -706,8 +706,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
           if (rev == null) {
             i--; // edge-case
           }
-          GenericId<?, Object, Comparable<?>> id = IdFactory.get().create(entity.getJavaClass(), pk,
-              (Comparable<?>) rev);
+          Id<?> id = PkId.of(entity.getJavaClass(), pk).withRevisionGeneric((Comparable<?>) rev);
           literal = Literal.of(id);
         }
         values.value(PropertyAssignment.of(property, literal));

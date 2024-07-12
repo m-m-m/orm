@@ -2,7 +2,8 @@ package io.github.mmm.orm.statement.insert;
 
 import org.junit.jupiter.api.Test;
 
-import io.github.mmm.entity.id.LongId;
+import io.github.mmm.entity.id.PkId;
+import io.github.mmm.entity.id.RevisionedIdVersion;
 import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
 
@@ -32,7 +33,7 @@ public class InsertTest extends DbStatementTest {
     Person p = Person.of();
     p.Name().set("John Doe");
     p.Single().setValue(true);
-    p.Id().set(LongId.of(4711L, Person.class, 1L));
+    p.Id().set(new RevisionedIdVersion<>(PkId.of(Person.class, 4711L), 1L));
     // when
     InsertStatement<Person> insertStatement = new InsertClause().into(p).valuesAll().get();
     // then
