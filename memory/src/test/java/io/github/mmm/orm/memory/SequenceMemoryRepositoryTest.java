@@ -44,7 +44,7 @@ public class SequenceMemoryRepositoryTest extends Assertions {
 
   private Person verifyJohnDoe(Person john) {
 
-    return verify(john, 3L, "John Doe", 66, "JD", "Johnyboy");
+    return verify(john, 3L, "John Doe", 66, "JD", "Jonnyboy");
   }
 
   private Person verifyAliceBob(Person alice) {

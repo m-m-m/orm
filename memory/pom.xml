@@ -17,10 +17,5 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>mmm-orm</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <version>3.26.3</version>
-    </dependency>
   </dependencies>
 </project>
