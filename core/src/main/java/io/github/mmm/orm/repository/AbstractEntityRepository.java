@@ -1,15 +1,13 @@
 /* Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0 */
-package io.github.mmm.orm.spi.repository;
+package io.github.mmm.orm.repository;
 
 import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.entity.Entity;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.generator.IdGenerator;
-import io.github.mmm.entity.link.Link;
 import io.github.mmm.orm.listener.EntityListener;
-import io.github.mmm.orm.repository.EntityRepository;
 
 /**
  * Abstract base implementation of {@link EntityRepository}.
@@ -92,13 +90,6 @@ public abstract class AbstractEntityRepository<E extends EntityBean> implements 
    * @see #findById(Id)
    */
   protected abstract E doFindById(Id<E> id);
-
-  @Override
-  public E findByLink(Link<E> link) {
-
-    // TODO Auto-generated method stub
-    return EntityRepository.super.findByLink(link);
-  }
 
   @Override
   public final Id<E> save(E entity) {

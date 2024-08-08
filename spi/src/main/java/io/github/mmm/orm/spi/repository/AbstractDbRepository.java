@@ -9,6 +9,7 @@ import io.github.mmm.entity.id.generator.SequenceIdGenerator;
 import io.github.mmm.entity.id.generator.UuidIdGenerator;
 import io.github.mmm.orm.metadata.DbName;
 import io.github.mmm.orm.metadata.DbQualifiedName;
+import io.github.mmm.orm.repository.AbstractEntityRepository;
 import io.github.mmm.orm.repository.DbRepository;
 import io.github.mmm.orm.source.DbSource;
 import io.github.mmm.orm.spi.access.AbstractDbAccess;

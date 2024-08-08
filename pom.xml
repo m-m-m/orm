@@ -28,6 +28,7 @@
   <modules>
     <module>core</module>
     <module>spi</module>
+    <module>memory</module>
     <module>jdbc</module>
     <module>r2dbc</module>
     <module>db</module>
@@ -117,6 +118,11 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>mmm-orm-spi</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mmm-orm-memory</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

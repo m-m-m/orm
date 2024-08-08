@@ -1,4 +1,4 @@
-package io.github.mmm.entity.repository.memory;
+package io.github.mmm.orm.memory;
 
 import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.entity.bean.EntityBean;

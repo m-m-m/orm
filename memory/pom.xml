@@ -4,10 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.m-m-m</groupId>
-    <artifactId>mmm-entity-parent</artifactId>
+    <artifactId>mmm-orm-parent</artifactId>
     <version>${revision}</version>
   </parent>
-  <artifactId>mmm-entity-repository</artifactId>
+  <artifactId>mmm-orm-memory</artifactId>
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
   <description>Repository support for entity beans.</description>
@@ -15,7 +15,12 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mmm-entity-bean</artifactId>
+      <artifactId>mmm-orm</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.26.3</version>
     </dependency>
   </dependencies>
 </project>
