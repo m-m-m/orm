@@ -7,7 +7,7 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.property.booleans.BooleanProperty;
 import io.github.mmm.property.number.integers.IntegerProperty;
 import io.github.mmm.property.string.StringProperty;
-import io.github.mmm.property.temporal.localdate.LocalDateProperty;
+import io.github.mmm.property.time.localdate.LocalDateProperty;
 
 /**
  * {@link EntityBean} for a human person used for testing.

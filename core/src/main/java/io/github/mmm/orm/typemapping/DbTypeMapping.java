@@ -7,11 +7,14 @@ import java.math.BigInteger;
 
 import io.github.mmm.entity.bean.typemapping.ComposedTypeMapping;
 import io.github.mmm.entity.id.FkMapper;
+import io.github.mmm.entity.id.PkId;
 import io.github.mmm.entity.id.PkIdLong;
 import io.github.mmm.entity.id.PkIdString;
 import io.github.mmm.entity.id.PkIdUuid;
 import io.github.mmm.entity.id.RevisionedIdInstant;
 import io.github.mmm.entity.id.RevisionedIdVersion;
+import io.github.mmm.entity.link.Link;
+import io.github.mmm.entity.link.LinkMapper;
 import io.github.mmm.orm.dialect.DbDialect;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.value.converter.IdentityTypeMapper;
@@ -30,12 +33,16 @@ public class DbTypeMapping extends ComposedTypeMapping {
   public DbTypeMapping() {
 
     super();
-    add(FkMapper.of(new RevisionedIdVersion<>(PkIdLong.getEmpty(), null)));
-    add(FkMapper.of(new RevisionedIdInstant<>(PkIdLong.getEmpty(), null)));
-    add(FkMapper.of(new RevisionedIdVersion<>(PkIdString.getEmpty(), null)));
-    add(FkMapper.of(new RevisionedIdInstant<>(PkIdString.getEmpty(), null)));
-    add(FkMapper.of(new RevisionedIdVersion<>(PkIdUuid.getEmpty(), null)));
-    add(FkMapper.of(new RevisionedIdInstant<>(PkIdUuid.getEmpty(), null)));
+    addPkId(PkIdLong.getEmpty());
+    addPkId(PkIdString.getEmpty());
+    addPkId(PkIdUuid.getEmpty());
+  }
+
+  private void addPkId(PkId<?, ?, ?> pkId) {
+
+    add(FkMapper.of(pkId));
+    add(FkMapper.of(new RevisionedIdVersion<>(pkId, null)));
+    add(FkMapper.of(new RevisionedIdInstant<>(pkId, null)));
   }
 
   /**
@@ -70,6 +77,8 @@ public class DbTypeMapping extends ComposedTypeMapping {
         typeMapper = new IdentityTypeMapper<>(valueType, getDeclarationDecimal(30, 10));
       } else if (BigInteger.class.equals(valueType)) {
         typeMapper = new IdentityTypeMapper<>(valueType, getDeclarationDecimal(36));
+      } else if (Link.class.isAssignableFrom(valueType)) {
+        typeMapper = (TypeMapper) new LinkMapper(null);
       }
     }
     return typeMapper;

@@ -6,7 +6,6 @@ import java.util.Objects;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.mapping.DbBeanMapper;
-import io.github.mmm.orm.param.CriteriaParametersIndexed;
 import io.github.mmm.orm.result.DbResult;
 import io.github.mmm.orm.result.DbResultValue;
 import io.github.mmm.orm.statement.AbstractEntityClause;
@@ -26,7 +25,7 @@ public class DbDialectStatementFormatter extends BasicDbStatementFormatter {
    */
   public DbDialectStatementFormatter(AbstractDbDialect<?> dialect) {
 
-    this(dialect, CriteriaFormatter.of(new CriteriaParametersIndexed(dialect)), INDENTATION);
+    this(dialect, DbCriteriaFormatter.of(dialect), INDENTATION);
   }
 
   /**

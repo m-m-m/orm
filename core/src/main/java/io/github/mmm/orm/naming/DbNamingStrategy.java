@@ -30,14 +30,6 @@ public interface DbNamingStrategy {
     if (columnName == null) {
       columnName = getColumnName(property.getName());
     }
-    ReadablePath parent = property.parentPath();
-    ;
-    if (parent != null) {
-      PathBuilder builder = PathBuilder.of();
-      parent.path(builder);
-      builder.add(columnName);
-      return builder.toString();
-    }
     return columnName;
   }
 

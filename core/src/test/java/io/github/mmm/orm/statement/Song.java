@@ -8,7 +8,7 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.property.link.LinkProperty;
 import io.github.mmm.property.number.integers.IntegerProperty;
 import io.github.mmm.property.string.StringProperty;
-import io.github.mmm.property.temporal.DurationInSecondsProperty;
+import io.github.mmm.property.time.DurationInSecondsProperty;
 
 /**
  * {@link EntityBean} for a musical song.

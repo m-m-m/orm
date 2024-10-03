@@ -39,19 +39,16 @@ public abstract class AbstractDbSession implements DbSession {
   public <E extends EntityBean> DbEntitySession<E> get(E entity) {
 
     String key = entity.getType().getQualifiedName();
-    DbEntitySession session = this.entitySessions.computeIfAbsent(key, this::newEntitySession);
+    DbEntitySession session = this.entitySessions.computeIfAbsent(key, k -> newEntitySession(entity));
     return session;
   }
 
-  private <E extends EntityBean> DbEntitySession<E> newEntitySession(String key) {
+  private <E extends EntityBean> DbEntitySession<E> newEntitySession(E entity) {
 
-    return new DbEntitySessionDefault<>();
-    // DbEntitySessionFactoryManager.get().getFactory(this.entityMode).create();
+    return new DbEntitySessionDefault<>(entity);
   }
 
-  /**
-   * @return the {@link DbConnectionData}.
-   */
+  @Override
   public DbConnectionData getConnectionData() {
 
     return this.connectionData;

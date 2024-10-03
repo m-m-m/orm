@@ -7,10 +7,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import io.github.mmm.base.collection.AbstractIterator;
 import io.github.mmm.base.exception.RuntimeIoException;
 import io.github.mmm.bean.BeanHelper;
 import io.github.mmm.bean.ReadableBean;
@@ -30,6 +32,7 @@ import io.github.mmm.orm.memory.index.IndexOperation;
 import io.github.mmm.orm.memory.index.MemoryIndex;
 import io.github.mmm.orm.repository.AbstractEntityRepository;
 import io.github.mmm.orm.repository.EntityRepository;
+import io.github.mmm.orm.repository.operation.EntityFindAllOperation;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.container.collection.CollectionProperty;
 import io.github.mmm.property.container.collection.ReadableCollectionProperty;
@@ -41,11 +44,14 @@ import io.github.mmm.property.string.StringCollectionProperty;
  * @param <E> type of the managed {@link EntityBean}.
  * @see SequenceMemoryRepository
  */
-public abstract class MemoryRepository<E extends EntityBean> extends AbstractEntityRepository<E> {
+public abstract class MemoryRepository<E extends EntityBean> extends AbstractEntityRepository<E>
+    implements EntityFindAllOperation<E> {
 
   private final Map<Id<E>, EntityHolder<E>> entityMap;
 
   private final Function<Id<?>, EntityBean> resolver;
+
+  private final FindAll findAll;
 
   /**
    * The constructor.
@@ -88,6 +94,7 @@ public abstract class MemoryRepository<E extends EntityBean> extends AbstractEnt
     } else {
       this.entityMap = entityMap;
     }
+    this.findAll = new FindAll();
   }
 
   /**
@@ -250,6 +257,12 @@ public abstract class MemoryRepository<E extends EntityBean> extends AbstractEnt
     BeanHelper.copy(entity, internal);
   }
 
+  @Override
+  public Iterable<E> findAll() {
+
+    return this.findAll;
+  }
+
   /**
    * Loads an entire array of {@link EntityBean entities} from the given {@link StructuredReader} and insert them into
    * this repository.
@@ -326,6 +339,38 @@ public abstract class MemoryRepository<E extends EntityBean> extends AbstractEnt
       }
       return null;
     }
+  }
+
+  private class FindAll implements Iterable<E> {
+
+    @Override
+    public Iterator<E> iterator() {
+
+      return new FindAllIterator<>(MemoryRepository.this.entityMap.values().iterator());
+    }
+  }
+
+  private static class FindAllIterator<E extends EntityBean> extends AbstractIterator<E> {
+
+    private final Iterator<EntityHolder<E>> iterator;
+
+    private FindAllIterator(Iterator<EntityHolder<E>> iterator) {
+
+      super();
+      this.iterator = iterator;
+      findFirst();
+    }
+
+    @Override
+    protected E findNext() {
+
+      if (this.iterator.hasNext()) {
+        EntityHolder<E> holder = this.iterator.next();
+        return holder.externalEntity;
+      }
+      return null;
+    }
+
   }
 
 }

@@ -4,13 +4,14 @@ package io.github.mmm.orm.db.h2.test;
 
 import io.github.mmm.bean.BeanFactory;
 import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.entity.link.Link;
+import io.github.mmm.property.container.list.ListProperty;
 import io.github.mmm.property.string.StringProperty;
-import io.github.mmm.property.time.localdate.LocalDateProperty;
 
 /**
- * {@link EntityBean} for a human person used for testing.
+ * {@link EntityBean} for a list of {@link TaskItem}s used for testing.
  */
-public interface Person extends EntityBean {
+public interface TaskList extends EntityBean {
 
   /**
    * @return full name of the person including first and last name.
@@ -18,16 +19,16 @@ public interface Person extends EntityBean {
   StringProperty Name();
 
   /**
-   * @return date of birth.
+   * @return the list of {@link TaskItem}s owned by this task-list.
    */
-  LocalDateProperty Birthday();
+  ListProperty<Link<TaskItem>> Items();
 
   /**
-   * @return a new instance of {@link Person}.
+   * @return a new instance of {@link TaskList}.
    */
-  static Person of() {
+  static TaskList of() {
 
-    return BeanFactory.get().create(Person.class);
+    return BeanFactory.get().create(TaskList.class);
   }
 
 }

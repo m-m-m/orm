@@ -19,6 +19,11 @@ import io.github.mmm.entity.id.Id;
 public interface DbEntitySession<E extends EntityBean> {
 
   /**
+   * @return the {@link Class} reflecting the managed {@link EntityBean}.
+   */
+  Class<E> getEntityClass();
+
+  /**
    * @param id the {@link Id} of the requested {@link EntityBean}.
    * @return the {@link DbEntityHolder} containing the {@link EntityBean} with the given {@link Id} from the first-level
    *         cache or {@code null} if not present.

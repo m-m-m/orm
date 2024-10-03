@@ -4,6 +4,7 @@ package io.github.mmm.orm.result;
 
 import java.util.Iterator;
 
+import io.github.mmm.base.exception.ObjectNotFoundException;
 import io.github.mmm.orm.result.impl.DbResultValueIterator;
 
 /**
@@ -40,6 +41,45 @@ public interface DbResult extends Iterable<DbResultValue<?>> {
       return null;
     }
     return "";
+  }
+
+  /**
+   * @param name the potential {@link #getName(int) name} (column).
+   * @return the index {@code i} such that {@link #getName(int) getName(i)} will return the given {@code name} or
+   *         {@code -1} if no such index exists (name not found).
+   */
+  default int indexOf(String name) {
+
+    int size = getSize();
+    for (int i = 0; i < size; i++) {
+      String dbName = getName(i);
+      if (name.equalsIgnoreCase(dbName)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * @param name the potential {@link #getName(int) name} (column).
+   * @return the index {@code i} such that {@link #getName(int) getName(i)} will return the given {@code name}.
+   * @throws IllegalStateException if no such index exists as the given {@link #getName(int) name} was not found.
+   */
+  default int indexOfRequired(String name) {
+
+    int index = indexOf(name);
+    if (index >= 0) {
+      return index;
+    }
+    StringBuilder sb = new StringBuilder();
+    int size = getSize();
+    for (int i = 0; i < size; i++) {
+      if (i > 0) {
+        sb.append(", ");
+      }
+      sb.append(getName(i));
+    }
+    throw new ObjectNotFoundException("DB-column", name, sb.toString(), null);
   }
 
   /**

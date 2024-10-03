@@ -6,7 +6,7 @@ import io.github.mmm.bean.BeanFactory;
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.property.number.integers.IntegerProperty;
 import io.github.mmm.property.string.StringProperty;
-import io.github.mmm.property.temporal.DurationInSecondsProperty;
+import io.github.mmm.property.time.DurationInSecondsProperty;
 
 /**
  * {@link WritableBean} for the result of a projection example.

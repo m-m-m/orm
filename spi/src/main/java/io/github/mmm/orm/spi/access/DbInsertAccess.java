@@ -14,8 +14,9 @@ public interface DbInsertAccess {
 
   /**
    * @param statement the {@link InsertStatement} to execute.
+   * @return the number of rows that have been inserted. Typically {@code 1}.
    */
-  void insert(InsertStatement<?> statement);
+  long insert(InsertStatement<?> statement);
 
   /**
    * @param entity the {@link EntityBean} to insert.

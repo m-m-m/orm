@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import io.github.mmm.orm.mapping.DbMapper;
+import io.github.mmm.orm.mapping.DbMapper2Java;
 import io.github.mmm.orm.result.DbResult;
 
 /**
@@ -22,9 +22,9 @@ public class DbResultReceiverMultiple<R> extends DbResultReceiver<R> {
   /**
    * The constructor.
    *
-   * @param mapper the {@link DbMapper}.
+   * @param mapper the {@link DbMapper2Java}.
    */
-  public DbResultReceiverMultiple(DbMapper<R> mapper) {
+  public DbResultReceiverMultiple(DbMapper2Java<R> mapper) {
 
     super(mapper);
     this.results = new ArrayList<>();

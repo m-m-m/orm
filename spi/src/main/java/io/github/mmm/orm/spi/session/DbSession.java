@@ -3,6 +3,7 @@
 package io.github.mmm.orm.spi.session;
 
 import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.orm.connection.DbConnectionData;
 
 /**
  * Database session data for a single transaction.
@@ -10,6 +11,11 @@ import io.github.mmm.entity.bean.EntityBean;
  * @since 1.0.0
  */
 public interface DbSession {
+
+  /**
+   * @return the {@link DbConnectionData}.
+   */
+  DbConnectionData getConnectionData();
 
   /**
    * @param <E> type of the {@link EntityBean}.

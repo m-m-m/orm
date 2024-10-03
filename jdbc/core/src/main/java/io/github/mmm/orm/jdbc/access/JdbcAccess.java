@@ -59,7 +59,8 @@ public class JdbcAccess extends AbstractDbAccess {
 
   private static final PropertyPath<Object> COLUMN_REVISION = SimplePath.of("REV"); // see PkMapper
 
-  private JdbcSession getSession() {
+  @Override
+  protected JdbcSession getSession() {
 
     return JdbcSession.get();
   }
@@ -84,7 +85,8 @@ public class JdbcAccess extends AbstractDbAccess {
   private <E extends EntityBean> void doInsert(E entity) {
 
     InsertStatement<E> insert = new InsertClause().into(entity).valuesAll().get();
-    insert(insert);
+    long rowCount = insert(insert);
+    assert (rowCount == 1);
     E managed = ReadableBean.copy(entity);
     DbEntitySession<E> entitySession = getSession().get(entity);
     entitySession.put(managed);
@@ -125,7 +127,7 @@ public class JdbcAccess extends AbstractDbAccess {
       throw new IllegalStateException("Cannot update entity of type " + entity.getType().getQualifiedName()
           + " with ID " + id + " because it is not managed in the current transaction!");
     }
-    E managed = holder.getManaged();
+    E managed = holder.getInternal();
     if (managed.getId().getRevision() != id.getRevision()) {
       throw new OptimisicLockException(id, entity.getType().getQualifiedName());
     }
@@ -189,13 +191,13 @@ public class JdbcAccess extends AbstractDbAccess {
               }
               while (resultSet.next()) {
                 receiver.accept(jdbcResult);
-                if (!unique) {
+                count++;
+                if (unique) {
                   resultSet.last();
                   int size = resultSet.getRow();
                   throw new NonUniqueResultException(size, sql);
                 }
               }
-              count++;
             }
           } while (statement.getMoreResults());
         } else {

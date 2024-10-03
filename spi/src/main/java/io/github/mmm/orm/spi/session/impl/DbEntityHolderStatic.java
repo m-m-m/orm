@@ -19,22 +19,22 @@ public class DbEntityHolderStatic<E extends EntityBean> extends AbstractDbEntity
   /**
    * The constructor.
    *
-   * @param managed the {@link #getManaged() managed entity}.
+   * @param internal the {@link #getInternal() internal entity}.
    */
-  public DbEntityHolderStatic(E managed) {
+  public DbEntityHolderStatic(E internal) {
 
-    this(managed, WritableBean.getReadOnly(managed));
+    this(internal, WritableBean.getReadOnly(internal));
   }
 
   /**
    * The constructor.
    *
-   * @param managed the {@link #getManaged() managed entity}.
+   * @param internal the {@link #getInternal() internal entity}.
    * @param external the {@link #getExternal() external entity}.
    */
-  public DbEntityHolderStatic(E managed, E external) {
+  public DbEntityHolderStatic(E internal, E external) {
 
-    super(managed);
+    super(internal);
     this.external = external;
   }
 

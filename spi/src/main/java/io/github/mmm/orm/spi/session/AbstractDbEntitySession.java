@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import io.github.mmm.base.exception.DuplicateObjectException;
-import io.github.mmm.bean.ReadableBean;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.entity.id.Id;
 
@@ -20,16 +19,28 @@ import io.github.mmm.entity.id.Id;
  */
 public abstract class AbstractDbEntitySession<E extends EntityBean> implements DbEntitySession<E> {
 
+  /** @see #getEntityClass() */
+  protected final Class<E> entityClass;
+
   private final Map<Object, DbEntityHolder<E>> entityMap; // first-level cache
 
   /**
    * The constructor.
+   *
+   * @param entityClass the {@link #getEntityClass() entity class}.
    */
-  public AbstractDbEntitySession() {
+  public AbstractDbEntitySession(Class<E> entityClass) {
 
     super();
+    this.entityClass = entityClass;
     // TODO with project loom will we have sub-threads accessing repos and need ConcurrentMap?
     this.entityMap = new HashMap<>();
+  }
+
+  @Override
+  public Class<E> getEntityClass() {
+
+    return this.entityClass;
   }
 
   @Override
@@ -60,17 +71,16 @@ public abstract class AbstractDbEntitySession<E extends EntityBean> implements D
     if (pk == null) {
       throw new IllegalArgumentException("Missing primary key for given ID " + id);
     }
-    E managed = ReadableBean.copy(managedEntity); // TODO should we do this out of DbEntitySession?
-    DbEntityHolder<E> holder = createHolder(managed);
+    DbEntityHolder<E> holder = createHolder(managedEntity);
     DbEntityHolder<E> duplicate = this.entityMap.putIfAbsent(pk, holder);
     if (duplicate != null) {
-      throw new DuplicateObjectException(managed, id, duplicate); // should never happen
+      throw new DuplicateObjectException(managedEntity, id, duplicate); // should never happen
     }
     return holder;
   }
 
   /**
-   * @param managed the {@link DbEntityHolder#getManaged() managed entity}.
+   * @param managed the {@link DbEntityHolder#getInternal() managed entity}.
    * @return the new {@link DbEntityHolder} instance.
    */
   protected abstract DbEntityHolder<E> createHolder(E managed);

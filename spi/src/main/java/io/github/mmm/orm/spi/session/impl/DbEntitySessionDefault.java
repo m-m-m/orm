@@ -2,6 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.spi.session.impl;
 
+import io.github.mmm.entity.Entity;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.spi.session.AbstractDbEntitySession;
 import io.github.mmm.orm.spi.session.DbEntityHolder;
@@ -19,10 +20,12 @@ public class DbEntitySessionDefault<E extends EntityBean> extends AbstractDbEnti
 
   /**
    * The constructor.
+   *
+   * @param entity the {@link EntityBean} prototype.
    */
-  public DbEntitySessionDefault() {
+  public DbEntitySessionDefault(E entity) {
 
-    super();
+    super(Entity.getJavaClass(entity));
   }
 
   @Override

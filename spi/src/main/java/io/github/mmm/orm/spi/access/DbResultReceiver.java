@@ -5,6 +5,7 @@ package io.github.mmm.orm.spi.access;
 import java.util.function.Consumer;
 
 import io.github.mmm.orm.mapping.DbMapper;
+import io.github.mmm.orm.mapping.DbMapper2Java;
 import io.github.mmm.orm.result.DbResult;
 
 /**
@@ -15,14 +16,14 @@ import io.github.mmm.orm.result.DbResult;
  */
 public abstract class DbResultReceiver<R> implements Consumer<DbResult> {
 
-  private final DbMapper<R> mapper;
+  private final DbMapper2Java<R> mapper;
 
   /**
    * The constructor.
    *
    * @param mapper the {@link DbMapper}.
    */
-  public DbResultReceiver(DbMapper<R> mapper) {
+  public DbResultReceiver(DbMapper2Java<R> mapper) {
 
     super();
     this.mapper = mapper;

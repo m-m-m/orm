@@ -2,12 +2,14 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.impl;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 import io.github.mmm.bean.WritableBean;
 import io.github.mmm.entity.bean.typemapping.TypeMapping;
-import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.FkMapper;
+import io.github.mmm.entity.id.Id;
 import io.github.mmm.orm.mapping.DbBeanMapper;
 import io.github.mmm.orm.mapping.DbMapper;
 import io.github.mmm.orm.mapping.Orm;
@@ -84,8 +86,10 @@ public class OrmImpl implements Orm {
     for (ReadableProperty<?> property : properties) {
       if (!property.isTransient()) {
         DbSegmentMapper valueMapper = createSegmentMapper(property);
-        DbPropertyMapper propertyMapper = new DbPropertyMapperImpl<>(property.getName(), valueMapper);
-        beanMapper.add(propertyMapper);
+        if (valueMapper != null) {
+          DbPropertyMapper propertyMapper = new DbPropertyMapperImpl<>(property.getName(), valueMapper);
+          beanMapper.add(propertyMapper);
+        }
       }
     }
     return beanMapper;
@@ -117,7 +121,7 @@ public class OrmImpl implements Orm {
 
   private <V> DbSegmentMapper<V, ?> createSegmentMapper(ReadableProperty<V> property) {
 
-    String columnName = property.getName();
+    String columnName = this.namingStrategy.getColumnName(property);
     return createSegmentMapper(property, columnName, property.getValueClass(), property);
   }
 
@@ -129,11 +133,16 @@ public class OrmImpl implements Orm {
     if ((typeMapper == null) && (property != null)) {
       typeMapper = property.getTypeMapper();
     }
-    if ((typeMapper == null) && (Id.class.equals(valueClass))) {
-      typeMapper = (TypeMapper) FkMapper.of();
-    }
     if (typeMapper == null) {
-      throw new UnmappedTypeException(valueClass, selection);
+      if (Id.class.equals(valueClass)) {
+        typeMapper = (TypeMapper) FkMapper.get();
+      } else if (Collection.class.isAssignableFrom(valueClass)) {
+        return null; // ignore
+      } else if (Map.class.isAssignableFrom(valueClass)) {
+        return null; // ignore
+      } else {
+        throw new UnmappedTypeException(valueClass, selection);
+      }
     }
     return createSegmentMapper(selection, columnName, typeMapper);
   }

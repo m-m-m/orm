@@ -11,10 +11,14 @@ import io.github.mmm.entity.id.sequence.IdSequence;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.dialect.DbDialect;
 import io.github.mmm.orm.mapping.DbMapper;
+import io.github.mmm.orm.mapping.DbMapper2Java;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.metadata.DbQualifiedName;
 import io.github.mmm.orm.param.AbstractCriteriaParameters;
 import io.github.mmm.orm.result.DbResult;
+import io.github.mmm.orm.spi.access.impl.DbMapperRetrievalAdapter;
+import io.github.mmm.orm.spi.session.DbEntitySession;
+import io.github.mmm.orm.spi.session.DbSession;
 import io.github.mmm.orm.statement.BasicDbStatementFormatter;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.create.CreateIndexStatement;
@@ -37,18 +41,44 @@ import io.github.mmm.orm.statement.upsert.UpsertStatement;
 public abstract class AbstractDbAccess implements DbAccess {
 
   /**
+   * @return the current {@link DbSession}.
+   */
+  protected abstract DbSession getSession();
+
+  /**
    * @return the {@link DbDialect}.
    */
-  protected abstract AbstractDbDialect<?> getDialect();
+  protected AbstractDbDialect<?> getDialect() {
 
-  protected abstract long executeSql(String sql, AbstractCriteriaParameters parameters, Consumer<DbResult> receiver,
-      boolean unique);
+    return (AbstractDbDialect<?>) getSession().getConnectionData().getDialect();
+  }
 
+  /**
+   * Generic method to execute a {@link DbStatement}. Convenient for statements that do not return a {@link DbResult
+   * result}. Otherwise use {@link #executeStatement(DbStatement, Consumer, boolean)}.
+   *
+   * @param statement the {@link DbStatement} to execute.
+   * @return the number of rows that have been updated or selected.
+   * @see #executeStatement(DbStatement, Consumer, boolean)
+   */
   protected long executeStatement(DbStatement<?> statement) {
 
     return executeStatement(statement, null, true);
   }
 
+  /**
+   * Generic method to execute a {@link DbStatement}.
+   *
+   * @param statement the {@link DbStatement} to execute.
+   * @param receiver the {@link Consumer} of a potential {@link DbResult} (e.g. for SELECT) or {@code null} if no result
+   *        is expected (e.g. for INSERT or DELETE).
+   * @param unique {@code true} if a unique {@link DbResult} is expected and an
+   *        {@link io.github.mmm.orm.statement.NonUniqueResultException} should be thrown if multiple results have been
+   *        received.
+   * @return the number of rows that have been updated or selected.
+   * @see #executeStatement(DbStatement)
+   * @see #executeSql(String, AbstractCriteriaParameters, Consumer, boolean)
+   */
   protected long executeStatement(DbStatement<?> statement, Consumer<DbResult> receiver, boolean unique) {
 
     BasicDbStatementFormatter formatter = getDialect().createFormatter();
@@ -60,6 +90,23 @@ public abstract class AbstractDbAccess implements DbAccess {
     }
     return executeSql(sql, parameters, receiver, unique);
   }
+
+  /**
+   * Low-level and DB/orm specific method method to execute a query.
+   *
+   * @param sql the DB statement as {@link String}. Typically SQL but may be any statement syntax also for NO-SQL
+   *        solutions.
+   * @param parameters the {@link AbstractCriteriaParameters dynamic parameters} to bind to the given DB statement
+   *        ({@code sql}).
+   * @param receiver the {@link Consumer} of a potential {@link DbResult} (e.g. for SELECT) or {@code null} if no result
+   *        is expected (e.g. for INSERT or DELETE).
+   * @param unique {@code true} if a unique {@link DbResult} is expected and an
+   *        {@link io.github.mmm.orm.statement.NonUniqueResultException} should be thrown if multiple results have been
+   *        received.
+   * @return the number of rows that have been updated or selected.
+   */
+  protected abstract long executeSql(String sql, AbstractCriteriaParameters parameters, Consumer<DbResult> receiver,
+      boolean unique);
 
   @Override
   public void createTable(CreateTableStatement<?> statement) {
@@ -128,9 +175,9 @@ public abstract class AbstractDbAccess implements DbAccess {
   }
 
   @Override
-  public void insert(InsertStatement<?> statement) {
+  public long insert(InsertStatement<?> statement) {
 
-    executeStatement(statement);
+    return executeStatement(statement);
   }
 
   @Override
@@ -151,12 +198,17 @@ public abstract class AbstractDbAccess implements DbAccess {
     return executeStatement(statement);
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public <R> Iterable<R> select(SelectStatement<R> statement) {
 
     Orm orm = getDialect().getOrm();
     SelectClause<R> select = statement.getSelect();
-    DbMapper<R> mapper = orm.createMapper(select);
+    DbMapper2Java<R> mapper = orm.createMapper(select);
+    if (select.isSelectEntity()) {
+      DbEntitySession dbEntitySession = getSession().get((EntityBean) select.getResultBean());
+      mapper = new DbMapperRetrievalAdapter(mapper, dbEntitySession);
+    }
     DbResultReceiverMultiple<R> receiver = new DbResultReceiverMultiple<>(mapper);
     executeStatement(statement, receiver, false);
     return receiver.getResults();

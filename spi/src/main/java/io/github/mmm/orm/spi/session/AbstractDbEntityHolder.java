@@ -11,31 +11,31 @@ import io.github.mmm.entity.bean.EntityBean;
  */
 public abstract class AbstractDbEntityHolder<E extends EntityBean> implements DbEntityHolder<E> {
 
-  /** @see #getManaged() */
-  protected final E managed;
+  /** @see #getInternal() */
+  protected final E internal;
 
   /**
    * The constructor.
    *
-   * @param managed the {@link #getManaged() managed entity}.
+   * @param internal the {@link #getInternal() internal entity}.
    */
-  public AbstractDbEntityHolder(E managed) {
+  public AbstractDbEntityHolder(E internal) {
 
     super();
-    this.managed = managed;
+    this.internal = internal;
   }
 
   @Override
-  public E getManaged() {
+  public E getInternal() {
 
-    return this.managed;
+    return this.internal;
   }
 
   @Override
   public void update(E entity) {
 
     // TODO only copy non-transient properties...
-    BeanHelper.copy(entity, this.managed);
+    BeanHelper.copy(entity, this.internal);
   }
 
 }

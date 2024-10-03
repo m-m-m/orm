@@ -123,7 +123,7 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   @Override
   public Iterable<E> findByQuery(SelectStatement<E> statement) {
 
-    verifyEntityClass(statement.getSelect().getResultBean().getType().getClass());
+    verifyEntityClass(statement.getSelect().getResultBean().getJavaClass());
     return this.dbAccess.select(statement);
   }
 
