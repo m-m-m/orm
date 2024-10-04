@@ -46,6 +46,7 @@ import io.github.mmm.orm.statement.create.CreateSequenceClause;
 import io.github.mmm.orm.statement.create.CreateTableClause;
 import io.github.mmm.orm.statement.create.CreateTableContentsClause;
 import io.github.mmm.orm.statement.delete.DeleteClause;
+import io.github.mmm.orm.statement.impl.CriteriaJqlFormatterInline;
 import io.github.mmm.orm.statement.insert.InsertClause;
 import io.github.mmm.orm.statement.insert.InsertValues;
 import io.github.mmm.orm.statement.merge.MergeClause;
@@ -101,12 +102,12 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
 
   BasicDbStatementFormatter() {
 
-    this(new CriteriaSqlFormatterInline());
+    this(new CriteriaJqlFormatterInline());
   }
 
   BasicDbStatementFormatter(String indentation) {
 
-    this(null, new CriteriaSqlFormatterInline(), indentation);
+    this(null, new CriteriaJqlFormatterInline(), indentation);
   }
 
   /**
@@ -760,7 +761,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
   @SuppressWarnings("rawtypes")
   private PropertyPath<?> mapProperty(PropertyPath<?> property, TypeMapper typeMapper) {
 
-    String name = typeMapper.mapName(property.getName());
+    String name = this.dialect.getNamingStrategy().getColumnName(property, typeMapper);
     return new SimplePath(property.parentPath(), name);
   }
 
@@ -768,11 +769,11 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
   private int onAssignment(PropertyPath<?> property, CriteriaObject<?> value, int index, boolean assign,
       List<CriteriaObject<?>> args) {
 
-    if (property instanceof ReadableProperty<?> p) {
+    if ((this.dialect != null) && (property instanceof ReadableProperty<?> p)) {
       TypeMapper typeMapper = p.getTypeMapper();
       if (typeMapper != null) {
         do {
-          String name = typeMapper.mapName(property.getName());
+          String name = this.dialect.getNamingStrategy().getColumnName(property, typeMapper);
           index = onAssignment(new SimplePath(property.parentPath(), name), mapValue(value, typeMapper), index, assign,
               args);
           typeMapper = typeMapper.next();
@@ -1231,15 +1232,6 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
   public String toString() {
 
     return out().toString();
-  }
-
-  private static class CriteriaSqlFormatterInline extends CriteriaFormatter {
-
-    CriteriaSqlFormatterInline() {
-
-      super();
-    }
-
   }
 
 }

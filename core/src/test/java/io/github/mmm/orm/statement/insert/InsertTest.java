@@ -22,7 +22,7 @@ public class InsertTest extends DbStatementTest {
     InsertStatement<Person> insertStatement = new InsertClause().into(p).value(p.Name(), "John Doe")
         .value(p.Single(), true).get();
     // then
-    check(insertStatement, "INSERT INTO Person(Name, Single) VALUES ('John Doe', TRUE)");
+    check(insertStatement, "INSERT INTO Person(Name, Single) VALUES ('John Doe', TRUE)", true);
   }
 
   /** Test {@link InsertClause} with simple literal values. */
@@ -37,7 +37,8 @@ public class InsertTest extends DbStatementTest {
     // when
     InsertStatement<Person> insertStatement = new InsertClause().into(p).valuesAll().get();
     // then
-    check(insertStatement, "INSERT INTO Person(Id, Rev, Name, Single) VALUES (4711, 1, 'John Doe', TRUE)");
+    check(insertStatement, "INSERT INTO Person(Id, Name, Single) VALUES (4711@1, 'John Doe', TRUE)",
+        "INSERT INTO PERSON(ID, REV, NAME, SINGLE) VALUES (4711, 1, 'John Doe', TRUE)");
   }
 
 }

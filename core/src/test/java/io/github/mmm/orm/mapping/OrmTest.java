@@ -56,8 +56,8 @@ public class OrmTest {
 
     // assert
     Iterator<DbResultValue<?>> dbValueIterator = dbResult.iterator();
-    checkCell(dbValueIterator, "GEO_LOCATION_LATITUDE", latitude, "DOUBLE PRECISION");
-    checkCell(dbValueIterator, "GEO_LOCATION_LONGITUDE", longitude, "DOUBLE PRECISION");
+    checkCell(dbValueIterator, "GEO_LOCATION$LATITUDE", latitude, "DOUBLE PRECISION");
+    checkCell(dbValueIterator, "GEO_LOCATION$LONGITUDE", longitude, "DOUBLE PRECISION");
     checkCell(dbValueIterator, "ID", id, "BIGINT");
     checkCell(dbValueIterator, "REV", revision, "BIGINT");
     checkCell(dbValueIterator, "INHABITANTS", inhabitants, "INTEGER");

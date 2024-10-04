@@ -238,7 +238,7 @@ public abstract class MemoryRepository<E extends EntityBean> extends AbstractEnt
   protected void doUpdate(E entity) {
 
     Id<?> id = entity.getId();
-    Object pk = id.get();
+    Object pk = id.getPk();
     EntityHolder<E> holder = this.entityMap.get(pk);
     if (holder == null) {
       throw new IllegalArgumentException("Cannot save transient entity with persistent id " + id);

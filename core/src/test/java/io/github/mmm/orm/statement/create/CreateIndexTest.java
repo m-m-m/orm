@@ -21,7 +21,7 @@ public class CreateIndexTest extends DbStatementTest {
     // when
     CreateIndexStatement<Song> createIndexStatement = new CreateIndexClause("IDX_GENRE").on(s).column(s.Genre()).get();
     // then
-    check(createIndexStatement, "CREATE INDEX IDX_GENRE ON Song (Genre)");
+    check(createIndexStatement, "CREATE INDEX IDX_GENRE ON Song (Genre)", true);
   }
 
   /** Test of {@link CreateIndexClause} on multiple columns. */
@@ -34,7 +34,7 @@ public class CreateIndexTest extends DbStatementTest {
     CreateIndexStatement<Song> createIndexStatement = new CreateIndexClause("IDX_GENRE").on(s).as("S")
         .columns(s.Title(), s.Genre()).get();
     // then
-    check(createIndexStatement, "CREATE INDEX IDX_GENRE ON Song S (S.Title,S.Genre)");
+    check(createIndexStatement, "CREATE INDEX IDX_GENRE ON Song S (S.Title,S.Genre)", true);
   }
 
 }

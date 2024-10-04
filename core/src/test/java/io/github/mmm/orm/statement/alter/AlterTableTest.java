@@ -28,8 +28,9 @@ public class AlterTableTest extends DbStatementTest {
     // when
     AlterTableStatement<Song> alterTableStatement = new AlterTableClause<>(s).addColumn(s.Composer()).get();
     // then
-    check(alterTableStatement, "ALTER TABLE Song\n" //
-        + "ADD Composer Link");
+    check(alterTableStatement, """
+        ALTER TABLE Song
+        ADD Composer Link""", false);
   }
 
   /** Test of {@link AlterTableClause} that adds a single column with auto constraint. */
@@ -41,9 +42,10 @@ public class AlterTableTest extends DbStatementTest {
     // when
     AlterTableStatement<Song> alterTableStatement = new AlterTableClause<>(s).addColumn(s.Composer(), true).get();
     // then
-    check(alterTableStatement, "ALTER TABLE Song\n" //
-        + "ADD Composer Link,\n" //
-        + "ADD CONSTRAINT FK_Song_Composer FOREIGN KEY (Composer) REFERENCES Person(Id)");
+    check(alterTableStatement, """
+        ALTER TABLE Song
+        ADD Composer Link,
+        ADD CONSTRAINT FK_Song_Composer FOREIGN KEY (Composer) REFERENCES Person(Id)""", false);
   }
 
   /** Test of {@link AlterTableClause} that adds a single column with a custom constraint. */
@@ -61,9 +63,12 @@ public class AlterTableTest extends DbStatementTest {
     AlterTableStatement<Song> alterTableStatement = new AlterTableClause<>(s).addColumn(s.Composer())
         .addConstraint(new ForeignKeyConstraint("MY_FK_CONSTRAINT", column, referenceColumn, state)).get();
     // then
-    check(alterTableStatement, "ALTER TABLE Song\n" //
-        + "ADD Composer Link,\n" //
-        + "ADD CONSTRAINT MY_FK_CONSTRAINT FOREIGN KEY (Composer) REFERENCES Person(Id) INITIALLY IMMEDIATE DEFERRABLE RELY");
+    check(alterTableStatement,
+        """
+            ALTER TABLE Song
+            ADD Composer Link,
+            ADD CONSTRAINT MY_FK_CONSTRAINT FOREIGN KEY (Composer) REFERENCES Person(Id) INITIALLY IMMEDIATE DEFERRABLE RELY""",
+        false);
   }
 
 }

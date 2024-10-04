@@ -15,6 +15,33 @@ import io.github.mmm.orm.statement.Song;
  */
 public class CreateTableTest extends DbStatementTest {
 
+  private static final String JQL = """
+      CREATE TABLE Song (
+        Composer Link,
+        Duration Long,
+        Genre String,
+        Id Id,
+        Title String,
+        TrackNo Integer,
+        CONSTRAINT FK_Song_Composer FOREIGN KEY (Composer) REFERENCES Person(Id),
+        CONSTRAINT NN_Song_Title NOT NULL (Title),
+        CONSTRAINT PK_Song PRIMARY KEY (Id)
+      )""";
+
+  private static final String SQL = """
+      CREATE TABLE SONG (
+        COMPOSER Long,
+        DURATION Long,
+        GENRE String,
+        ID Long,
+        REV Long,
+        TITLE String,
+        TRACK_NO Integer,
+        CONSTRAINT FK_SONG_COMPOSER FOREIGN KEY (COMPOSER) REFERENCES PERSON(ID),
+        CONSTRAINT NN_SONG_TITLE NOT NULL (TITLE),
+        CONSTRAINT PK_SONG PRIMARY KEY (ID)
+      )""";
+
   /** Test of {@link CreateTableClause} that automatically creates all columns. */
   @Test
   public void testAuto() {
@@ -26,17 +53,7 @@ public class CreateTableTest extends DbStatementTest {
     // when
     CreateTableStatement<Song> createTableStatement = new CreateTableClause<>(s).columns().get();
     // then
-    check(createTableStatement, "CREATE TABLE Song (\n" //
-        + "  Composer Link,\n" // types (Link, Long, String, etc.) are mapped to proper DB types if dialect is used
-        + "  Duration Long,\n" //
-        + "  Genre String,\n" //
-        + "  Id Id,\n" // will actually be ID and REV columns in regular SQL (if dialect is used)
-        + "  Title String,\n" //
-        + "  TrackNo Integer,\n" //
-        + "  CONSTRAINT FK_Song_Composer FOREIGN KEY (Composer) REFERENCES Person(Id),\n" //
-        + "  CONSTRAINT NN_Song_Title NOT NULL (Title),\n" //
-        + "  CONSTRAINT PK_Song PRIMARY KEY (Id)\n" //
-        + ")");
+    check(createTableStatement, JQL, SQL);
   }
 
 }

@@ -29,12 +29,13 @@ public class SelectTest extends DbStatementTest {
 
     // given
     Person p = Person.of();
-    String sql = "SELECT p FROM Person p WHERE p.Age >= 18 AND (p.Name LIKE 'John%' OR p.Single = TRUE) ORDER BY p.Name ASC";
     // when
     SelectStatement<Person> query = DbStatement.select(p).as("p")
         .where(p.Age().ge(18).and(p.Name().like("John*").or(p.Single().eq(true)))).orderBy(p.Name().asc()).get();
     // then
-    check(query, sql, '"' + sql + '"');
+    check(query,
+        "SELECT p FROM Person p WHERE p.Age >= 18 AND (p.Name LIKE 'John%' OR p.Single = TRUE) ORDER BY p.Name ASC",
+        true);
     AbstractDbDialect<?> dialect = new TestDialect();
     // and when
     BasicDbStatementFormatter sqlFormatter = new BasicDbStatementFormatter(
@@ -65,7 +66,7 @@ public class SelectTest extends DbStatementTest {
     // when
     SelectStatement<Person> query = DbStatement.select(p).as("p").get();
     // then
-    check(query, "SELECT p FROM Person p");
+    check(query, "SELECT p FROM Person p", true);
   }
 
   /** Test creation of {@link SelectStatement} and verifying resulting pseudo-SQL including auto-generated alias. */
@@ -78,7 +79,7 @@ public class SelectTest extends DbStatementTest {
     // when
     SelectStatement<Person> query = DbStatement.select(p).and(p2).where(p.Id().eq(p2.Id())).get();
     // then
-    check(query, "SELECT p FROM Person p, Person pe WHERE p.Id = pe.Id");
+    check(query, "SELECT p FROM Person p, Person pe WHERE p.Id = pe.Id", true);
   }
 
   /** Test creation of {@link SelectStatement} and verifying resulting pseudo-SQL. */
@@ -89,7 +90,6 @@ public class SelectTest extends DbStatementTest {
     Person p = Person.of();
     Song s = Song.of();
     Result r = Result.of();
-    String sql = "SELECT new Result(song.Genre, COUNT(song.Id) Count, AVG(song.Duration) Duration) FROM Song song, Person p WHERE song.Composer = p.Id AND song.Duration <= 10800 GROUP BY song.Genre HAVING COUNT(song.Id) > 1 ORDER BY song.Genre ASC";
     // when
     CriteriaAggregation<Integer> songCount = s.Id().count();
     SelectStatement<Result> query = DbStatement.selectProjection(r).and(s.Genre(), r.Genre()).and(songCount, r.Count())
@@ -98,7 +98,9 @@ public class SelectTest extends DbStatementTest {
         .where(s.Composer().eq(p.Id()).and(s.Duration().le(3 * 60 * 60L))) //
         .groupBy(s.Genre()).having(songCount.gt(1)).orderBy(s.Genre().asc()).get();
     // then
-    check(query, sql, '"' + sql + '"');
+    check(query,
+        "SELECT new Result(song.Genre, COUNT(song.Id) Count, AVG(song.Duration) Duration) FROM Song song, Person p WHERE song.Composer = p.Id AND song.Duration <= 10800 GROUP BY song.Genre HAVING COUNT(song.Id) > 1 ORDER BY song.Genre ASC",
+        true);
   }
 
   /** Test creation of {@link SelectStatement} and verifying resulting pseudo-SQL. */
@@ -113,7 +115,8 @@ public class SelectTest extends DbStatementTest {
         .get();
     // then
     check(query,
-        "SELECT c FROM City c WHERE c.GeoLocation.Latitude = 40.6892534 AND c.GeoLocation.Longitude = -74.0466891");
+        "SELECT c FROM City c WHERE c.GeoLocation.Latitude = 40.6892534 AND c.GeoLocation.Longitude = -74.0466891",
+        true);
   }
 
   /** Test creation of {@link SelectStatement} and verifying resulting pseudo-SQL. */
@@ -122,11 +125,10 @@ public class SelectTest extends DbStatementTest {
 
     // given
     DbName sequenceName = DbName.of("MY_SEQUENCE");
-    String sql = "SELECT NEXTVAL(MY_SEQUENCE)";
     // when
     SelectStatement<Long> query = DbStatement.selectSeqNextVal(sequenceName);
     // then
-    check(query, sql, '"' + sql + '"');
+    check(query, "SELECT NEXTVAL(MY_SEQUENCE)", true);
   }
 
 }

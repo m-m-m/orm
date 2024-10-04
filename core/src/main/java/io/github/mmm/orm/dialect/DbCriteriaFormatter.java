@@ -22,7 +22,19 @@ public class DbCriteriaFormatter extends CriteriaFormatter {
 
   private DbCriteriaFormatter(AbstractDbDialect<?> dialect, AppendableWriter out) {
 
-    super(new CriteriaParametersIndexed(dialect), out);
+    this(dialect, out, new CriteriaParametersIndexed(dialect));
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param dialect the {@link AbstractDbDialect}.
+   * @param out the {@link AppendableWriter}.
+   * @param parameters the {@link CriteriaParameters}.
+   */
+  protected DbCriteriaFormatter(AbstractDbDialect<?> dialect, AppendableWriter out, CriteriaParameters<?> parameters) {
+
+    super(parameters, out);
     this.dialect = dialect;
   }
 

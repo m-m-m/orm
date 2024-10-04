@@ -8,8 +8,10 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
+import io.github.mmm.value.PropertyPath;
 import io.github.mmm.value.ReadablePath;
 import io.github.mmm.value.ReadablePath.PathBuilder;
+import io.github.mmm.value.converter.TypeMapper;
 
 /**
  * Interface to define the naming strategy to map {@link EntityBean}s to a database.
@@ -30,12 +32,51 @@ public interface DbNamingStrategy {
     if (columnName == null) {
       columnName = getColumnName(property.getName());
     }
+    ReadablePath parent = property.parentPath();
+    if (parent != null) {
+      PathBuilder builder = PathBuilder.of();
+      parent.path(builder);
+      builder.add(columnName);
+      return builder.toString();
+    }
     return columnName;
   }
 
   /**
-   * @param rawColumnName the raw column name to map. May be the {@link WritableProperty#getName() property name} or
-   *        {@link io.github.mmm.value.converter.TypeMapper#mapName(String) remapped and decomposed} from it.
+   * @param property the {@link PropertyPath} to derive the column name from.
+   * @param typeMapper the explicit {@link TypeMapper}.
+   * @return the column name for the given {@link ReadableProperty property}.
+   */
+  default String getColumnName(PropertyPath<?> property, TypeMapper<?, ?> typeMapper) {
+
+    String rawColumnName;
+    if (property instanceof ReadableProperty<?> rp) {
+      rawColumnName = getColumnName(rp);
+    } else {
+      rawColumnName = getColumnName(property.getName());
+    }
+    return getColumnName(rawColumnName, typeMapper);
+  }
+
+  /**
+   * @param rawColumnName the raw column name to map.
+   * @param typeMapper the explicit {@link TypeMapper}.
+   * @return the column name for the given {@link ReadableProperty property}.
+   */
+  default String getColumnName(String rawColumnName, TypeMapper<?, ?> typeMapper) {
+
+    if (typeMapper == null) {
+      return rawColumnName;
+    }
+    String suffix = typeMapper.getSuffix();
+    if ((suffix != null) && !suffix.isEmpty()) {
+      suffix = getColumnName(suffix);
+    }
+    return typeMapper.getNameMode().format(rawColumnName, suffix);
+  }
+
+  /**
+   * @param rawColumnName the raw column name to map. E.g. {@link WritableProperty#getName() property name}.
    * @return the final column name.
    */
   default String getColumnName(String rawColumnName) {

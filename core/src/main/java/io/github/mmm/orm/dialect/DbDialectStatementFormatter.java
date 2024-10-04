@@ -54,7 +54,7 @@ public class DbDialectStatementFormatter extends BasicDbStatementFormatter {
   protected void onSelectAll(SelectFrom<?, ?> selectFrom) {
 
     EntityBean entity = selectFrom.getEntity();
-    DbBeanMapper<EntityBean> mapping = this.dialect.getOrm().createBeanMapper(entity, entity.getProperties());
+    DbBeanMapper<EntityBean> mapping = this.dialect.getOrm().createBeanMapper(entity);
     DbResult dbResult = mapping.java2db(entity);
     String s = "";
     for (DbResultValue<?> dbValue : dbResult) {

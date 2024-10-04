@@ -21,7 +21,7 @@ public class DeleteTest extends DbStatementTest {
     // when
     DeleteStatement<Person> deleteStatement = new DeleteClause().from(p).get();
     // then
-    check(deleteStatement, "DELETE FROM Person p");
+    check(deleteStatement, "DELETE FROM Person p", true);
   }
 
   /** Test of {@link DeleteClause} with where clause. */
@@ -31,9 +31,10 @@ public class DeleteTest extends DbStatementTest {
     // given
     Person p = Person.of();
     // when
-    DeleteStatement<Person> deleteStatement = new DeleteClause().from(p).as("p").where(p.Single().eq(Boolean.TRUE)).get();
+    DeleteStatement<Person> deleteStatement = new DeleteClause().from(p).as("p").where(p.Single().eq(Boolean.TRUE))
+        .get();
     // then
-    check(deleteStatement, "DELETE FROM Person p WHERE p.Single = TRUE");
+    check(deleteStatement, "DELETE FROM Person p WHERE p.Single = TRUE", true);
   }
 
 }

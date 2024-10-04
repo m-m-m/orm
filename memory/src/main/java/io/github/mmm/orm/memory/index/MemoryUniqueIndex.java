@@ -61,7 +61,7 @@ public class MemoryUniqueIndex<K, E extends EntityBean> extends MemoryIndex<K, E
 
     if (key != null) {
       Id<E> old = this.map.remove(key);
-      assert ((entity == null) || (old.get() == entity.getId().get()));
+      assert ((entity == null) || (old.getPk() == entity.getId().getPk()));
     }
   }
 

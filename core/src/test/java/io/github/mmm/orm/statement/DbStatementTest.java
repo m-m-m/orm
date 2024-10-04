@@ -7,6 +7,8 @@ import org.assertj.core.api.Assertions;
 import io.github.mmm.marshall.MarshallingConfig;
 import io.github.mmm.marshall.StandardFormat;
 import io.github.mmm.marshall.StructuredTextFormat;
+import io.github.mmm.orm.dialect.AbstractDbDialect;
+import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
 
 /**
  * Abstract base class for tests of {@link DbStatement}s.
@@ -17,34 +19,40 @@ public abstract class DbStatementTest extends Assertions {
    * Formats the given {@link DbStatement} to SQL and compares with the given SQL.
    *
    * @param statement the {@link DbStatement} to check.
-   * @param sql the expected SQL corresponding to the {@link DbStatement}.
+   * @param jql the expected JQL corresponding to the {@link DbStatement}.
+   * @param checkJson {@code true} to also check the JSON of the {@link DbStatement}, {@code false} otherwise.
    */
-  protected void check(DbStatement<?> statement, String sql) {
+  protected void check(DbStatement<?> statement, String jql, boolean checkJson) {
 
-    assertThat(statement).isNotNull().hasToString(sql);
-    DbStatement<?> copy = DbStatementParser.get().parse(sql);
-    assertThat(copy).isNotNull().hasToString(sql);
+    assertThat(statement).isNotNull().hasToString(jql);
+    DbStatement<?> copy = DbStatementParser.get().parse(jql);
+    assertThat(copy).isNotNull().hasToString(jql);
+
+    if (checkJson) {
+      StructuredTextFormat format = StandardFormat.json(MarshallingConfig.NO_INDENTATION);
+      StringBuilder sb = new StringBuilder();
+      statement.writeObject(format.writer(sb), statement);
+      String actualJson = sb.toString();
+      assertThat(actualJson).isEqualTo('"' + jql + '"');
+      DbStatement<?> statement2 = DbStatementMarshalling.get().readObject(format.reader(actualJson));
+      assertThat(statement2).isNotNull().hasToString(jql).isInstanceOf(statement.getClass());
+    }
   }
 
   /**
-   * Formats the given {@link DbStatement} to SQL and compares with the given SQL, then marshals to JSON and compares
-   * with the given JSON, the unmarshals from that JSON back to {@link DbStatement} and checks that this again results
-   * in the same SQL.
+   * Formats the given {@link DbStatement} to SQL and compares with the given SQL.
    *
    * @param statement the {@link DbStatement} to check.
+   * @param jql the expected JQL corresponding to the {@link DbStatement}.
    * @param sql the expected SQL corresponding to the {@link DbStatement}.
-   * @param json the expected JSON corresponding to the {@link DbStatement}.
    */
-  protected void check(DbStatement<?> statement, String sql, String json) {
+  protected void check(DbStatement<?> statement, String jql, String sql) {
 
-    check(statement, sql);
-    StructuredTextFormat format = StandardFormat.json(MarshallingConfig.NO_INDENTATION);
-    StringBuilder sb = new StringBuilder();
-    statement.writeObject(format.writer(sb), statement);
-    String actualJson = sb.toString();
-    assertThat(actualJson).isEqualTo(json);
-    DbStatement<?> statement2 = DbStatementMarshalling.get().readObject(format.reader(json));
-    assertThat(statement2).isNotNull().hasToString(sql).isInstanceOf(statement.getClass());
+    AbstractDbDialect<?> sqlDialect = new SqlDialect();
+    DbDialectStatementFormatter formatter = sqlDialect.createFormatter();
+    formatter.formatStatement(statement);
+    assertThat(formatter.get()).isEqualTo(sql);
+    check(statement, jql, false);
   }
 
 }

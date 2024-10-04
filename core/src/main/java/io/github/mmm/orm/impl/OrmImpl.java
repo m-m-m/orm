@@ -156,9 +156,12 @@ public class OrmImpl implements Orm {
     if (next != null) {
       nextSegment = createSegmentMapper(selection, columnName, next);
     }
-    String newColumnName = typeMapper.mapName(columnName);
+    String suffix = typeMapper.getSuffix();
+    if ((suffix != null) && !suffix.isEmpty()) {
+      suffix = this.namingStrategy.getColumnName(suffix);
+    }
+    String newColumnName = typeMapper.getNameMode().format(columnName, suffix);
     if (typeMapper.hasDeclaration()) {
-      newColumnName = this.namingStrategy.getColumnName(newColumnName);
       DbResultValueObject entry = new DbResultValueObject<>(newColumnName, null, typeMapper.getDeclaration());
       return new DbSegmentMapper<>(typeMapper, entry, nextSegment);
     } else {

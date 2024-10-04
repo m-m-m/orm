@@ -659,7 +659,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
 
   private void parseValues(CharStreamScanner scanner, ValuesClause values, EntityBean entity) {
 
-    // TODO consider mql change: INSERT INTO MyEntity e VALUES (e.Property1=value1, e.Property2=value2)
+    // TODO consider JQL change: INSERT INTO MyEntity e VALUES (e.Property1=value1, e.Property2=value2)
     scanner.requireOne('(');
     List<ReadableProperty<?>> properties = new ArrayList<>();
     boolean todo = true;
@@ -692,19 +692,19 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
       if (property != EntityPathParser.PROPERTY_REVISION) {
         if (property == entity.Id()) {
           Object pk = literal.get();
-          i++;
           Object rev = null;
-          if (i < columnCount) {
-            ReadableProperty<?> ref = properties.get(i);
+          if (scanner.expect("@")) {
+            literal = this.criteriaSelectionParser.parseLiteral(scanner);
+            rev = literal.get();
+          } else if ((i + 1) < columnCount) {
+            ReadableProperty<?> ref = properties.get(i + 1);
             if (ref == EntityPathParser.PROPERTY_REVISION) {
               scanner.requireOne(',');
               scanner.skipWhile(' ');
               literal = this.criteriaSelectionParser.parseLiteral(scanner);
               rev = literal.get();
+              i++;
             }
-          }
-          if (rev == null) {
-            i--; // edge-case
           }
           Id<?> id = PkId.of(entity.getJavaClass(), pk).withRevisionGeneric((Comparable<?>) rev);
           literal = Literal.of(id);
