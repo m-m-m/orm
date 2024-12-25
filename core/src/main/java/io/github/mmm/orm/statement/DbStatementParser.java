@@ -816,7 +816,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
           select = new SelectResultClause();
         }
       }
-      char c;
+      int cp;
       do {
         scanner.skipWhile(NEWLINE_OR_SPACE);
         CriteriaObject<?> selection = this.criteriaSelectionParser.parseSelection(scanner);
@@ -836,22 +836,22 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
           selection = new ProjectionProperty(selection, path);
         }
         select.getSelections().add(selection);
-        c = scanner.next();
-      } while (c == ',');
-      if (c != ')') {
+        cp = scanner.next();
+      } while (cp == ',');
+      if (cp != ')') {
         throw new IllegalArgumentException("Missing ')'.");
       }
     } else if (scanner.expectOne('(')) {
       // multiple selections
       select = new SelectEntityClause("");
-      char c;
+      int cp;
       do {
         scanner.skipWhile(NEWLINE_OR_SPACE);
         CriteriaObject<?> selection = this.criteriaSelectionParser.parseSelection(scanner);
         select.getSelections().add(selection);
-        c = scanner.next();
-      } while (c == ',');
-      if (c != ')') {
+        cp = scanner.next();
+      } while (cp == ',');
+      if (cp != ')') {
         throw new IllegalArgumentException("Missing ')'.");
       }
     } else if (scanner.expect(SequenceNextValue.START, true)) {
