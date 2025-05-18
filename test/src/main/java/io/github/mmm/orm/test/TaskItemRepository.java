@@ -1,4 +1,4 @@
-package io.github.mmm.orm.db.h2.test;
+package io.github.mmm.orm.test;
 
 import java.util.Objects;
 

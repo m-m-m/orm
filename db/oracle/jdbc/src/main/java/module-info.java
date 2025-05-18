@@ -2,6 +2,7 @@
  * Copyright (c) The m-m-m Team, Licensed under the Apache License, Version 2.0
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 /**
  * Provides ORM support for Oracle database via JDBC.
  *
@@ -19,6 +20,6 @@ module io.github.mmm.orm.db.oracle.jdbc {
   requires ojdbc10;
 
   provides io.github.mmm.orm.connection.DbConnectionPoolProvider //
-      with io.github.mmm.orm.db.oracle.connection.OracleConnectionPoolProvider;
+      with io.github.mmm.orm.db.oracle.jdbc.connection.OracleConnectionPoolProvider;
 
 }

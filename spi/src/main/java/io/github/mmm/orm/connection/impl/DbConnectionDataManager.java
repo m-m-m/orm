@@ -81,9 +81,20 @@ public final class DbConnectionDataManager {
           if (provider == null) {
             provider = currentProvider;
           } else {
-            LOG.warn(
-                "Connection pool provider is ambiguous: already found {} but also found {}. Please specify property {} explicitly.",
-                provider.getId(), currentProvider.getId(), source.getPropertyKey(DbSource.KEY_POOL));
+            boolean logWarning = true;
+            if (currentProvider.isPool()) {
+              if (!provider.isPool()) {
+                provider = currentProvider;
+                logWarning = false;
+              }
+            } else if (provider.isPool()) {
+              logWarning = false;
+            }
+            if (logWarning) {
+              LOG.warn(
+                      "Connection pool provider is ambiguous: already found {} but also found {}. Please specify property {} explicitly.",
+                      provider.getId(), currentProvider.getId(), source.getPropertyKey(DbSource.KEY_POOL));
+            }
           }
         }
       }

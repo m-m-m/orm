@@ -3,6 +3,8 @@ package io.github.mmm.orm.connection;
 import io.github.mmm.base.metainfo.MetaInfo;
 import io.github.mmm.orm.connection.impl.DbConnectionDataManager;
 import io.github.mmm.orm.dialect.DbDialect;
+import io.github.mmm.orm.metadata.DbName;
+import io.github.mmm.orm.metadata.DbQualifiedName;
 import io.github.mmm.orm.source.DbSource;
 
 /**
@@ -55,6 +57,38 @@ public interface DbConnectionData {
   default String getKind() {
 
     return getConfig().get(DbSource.KEY_KIND);
+  }
+
+  /**
+   * @return the {@link DbSource#KEY_SCHEMA schema} or {@code null} if not explicitly configured.
+   */
+  default String getSchema() {
+
+    return getConfig().get(DbSource.KEY_SCHEMA);
+  }
+
+  /**
+   * @return the {@link DbSource#KEY_CATALOG schema} or {@code null} if not explicitly configured.
+   */
+  default String getCatalog() {
+
+    return getConfig().get(DbSource.KEY_CATALOG);
+  }
+
+  /**
+   * @return the {@link DbQualifiedName} with {@link #getSchema() schema} and {@link #getCatalog() catalog} to use as
+   *         template.
+   * @see DbQualifiedName#withName(String)
+   * @see DbQualifiedName#withName(DbName)
+   */
+  DbQualifiedName getQualifiedNameTemplate();
+
+  /**
+   * @return the {@link DbSource#KEY_SEQUENCE_INCREMENT sequence increment} value.
+   */
+  default int getSequenceIncrement() {
+
+    return getConfig().getAsInteger(DbSource.KEY_SEQUENCE_INCREMENT, DbSource.VALUE_SEQUENCE_INCREMENT_DEFAULT);
   }
 
   /**

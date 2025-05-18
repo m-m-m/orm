@@ -4,6 +4,8 @@ package io.github.mmm.orm.source;
 
 import java.util.Set;
 
+import io.github.mmm.orm.metadata.DbQualifiedName;
+
 /**
  * A {@link DbSource} identifies a database to connect to as a tenant. It is just a wrapper for a {@link String} used as
  * {@link #getId() identifier}. Most applications only need to talk to a single database and schema. There is always a
@@ -95,11 +97,29 @@ public final class DbSource {
   public static final String VALUE_KIND_JDBC = "jdbc";
 
   /**
+   * {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the explicit {@link DbQualifiedName#getSchema()
+   * schema} to use.
+   */
+  public static final String KEY_SCHEMA = "schema";
+
+  /**
+   * {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the explicit {@link DbQualifiedName#getCatalog()
+   * catalog} to use.
+   */
+  public static final String KEY_CATALOG = "catalog";
+
+  /** {@link io.github.mmm.base.metainfo.MetaInfo#get(String) Key} for the sequence increment. */
+  public static final String KEY_SEQUENCE_INCREMENT = "sequence_increment";
+
+  /** Default value of {@link #KEY_SEQUENCE_INCREMENT sequence_increment}. */
+  public static final int VALUE_SEQUENCE_INCREMENT_DEFAULT = 10;
+
+  /**
    * The standard keys for the database connection. Other keys will be specific for particular implementations (e.g.
    * connection pools).
    */
   public static final Set<String> STANDARD_KEYS = Set.of(KEY_URL, KEY_USER, KEY_PASSWORD, KEY_DIALECT, KEY_TYPE,
-      KEY_POOL, KEY_KIND, KEY_HOST, KEY_PORT, KEY_DATABASE);
+      KEY_POOL, KEY_KIND, KEY_SCHEMA, KEY_HOST, KEY_PORT, KEY_DATABASE, KEY_SEQUENCE_INCREMENT);
 
   private DbSource(String name) {
 

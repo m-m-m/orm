@@ -5,7 +5,6 @@ package io.github.mmm.orm.dialect;
 import io.github.mmm.base.io.AppendableWriter;
 import io.github.mmm.orm.naming.DbNamingStrategy;
 import io.github.mmm.orm.param.CriteriaParametersIndexed;
-import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.criteria.CriteriaExpression;
 import io.github.mmm.property.criteria.CriteriaFormatter;
 import io.github.mmm.property.criteria.CriteriaParameters;
@@ -42,12 +41,7 @@ public class DbCriteriaFormatter extends CriteriaFormatter {
   public void onPropertyPath(PropertyPath<?> property, int i, CriteriaExpression<?> parent) {
 
     DbNamingStrategy namingStrategy = this.dialect.getNamingStrategy();
-    String columnName;
-    if (property instanceof ReadableProperty<?> p) {
-      columnName = namingStrategy.getColumnName(p);
-    } else {
-      columnName = namingStrategy.getColumnName(property.getName());
-    }
+    String columnName = namingStrategy.getColumnName(property);
     write(columnName);
   }
 

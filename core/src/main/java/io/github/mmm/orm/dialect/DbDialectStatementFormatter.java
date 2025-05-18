@@ -11,7 +11,7 @@ import io.github.mmm.orm.result.DbResultValue;
 import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.orm.statement.BasicDbStatementFormatter;
 import io.github.mmm.orm.statement.select.SelectFrom;
-import io.github.mmm.property.criteria.CriteriaFormatter;
+import io.github.mmm.property.criteria.CriteriaFormatterFactory;
 
 /**
  * {@link BasicDbStatementFormatter} for any real {@link DbDialect database dialect}.
@@ -25,21 +25,31 @@ public class DbDialectStatementFormatter extends BasicDbStatementFormatter {
    */
   public DbDialectStatementFormatter(AbstractDbDialect<?> dialect) {
 
-    this(dialect, DbCriteriaFormatter.of(dialect), INDENTATION);
+    this(dialect, () -> DbCriteriaFormatter.of(dialect), INDENTATION);
   }
 
   /**
    * The constructor.
    *
    * @param dialect the owning {@link AbstractDbDialect dialect}.
-   * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to database syntax (e.g.
-   *        SQL).
+   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
+   */
+  public DbDialectStatementFormatter(AbstractDbDialect<?> dialect, CriteriaFormatterFactory criteriaFormatterFactory) {
+
+    this(dialect, criteriaFormatterFactory, INDENTATION);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param dialect the owning {@link AbstractDbDialect dialect}.
+   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public DbDialectStatementFormatter(AbstractDbDialect<?> dialect, CriteriaFormatter criteriaFormatter,
+  public DbDialectStatementFormatter(AbstractDbDialect<?> dialect, CriteriaFormatterFactory criteriaFormatterFactory,
       String indentation) {
 
-    super(dialect, criteriaFormatter, indentation);
+    super(dialect, criteriaFormatterFactory, indentation);
     Objects.requireNonNull(dialect);
   }
 

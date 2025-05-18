@@ -24,7 +24,7 @@ import io.github.mmm.orm.type.DbTypeZonedDateTime;
 import io.github.mmm.orm.typemapping.DbTypeMapping;
 
 /**
- * {@link DbTypeMapping} for SQLite.
+ * {@link DbTypeMapping} for SQLite database.
  *
  * @since 1.0.0
  */

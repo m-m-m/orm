@@ -14,6 +14,8 @@ module io.github.mmm.orm.jdbc {
 
   requires transitive java.sql;
 
+  requires transitive java.naming;
+
   provides io.github.mmm.orm.tx.DbTransactionExecutorProvider //
       with io.github.mmm.orm.jdbc.tx.JdbcTransactionExecutorProvider;
 

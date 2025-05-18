@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.github.m-m-m</groupId>
     <artifactId>mmm</artifactId>
-    <version>23</version>
+    <version>24-SNAPSHOT</version>
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
   <artifactId>mmm-orm-parent</artifactId>
@@ -16,6 +16,7 @@
 
   <properties>
     <mmm.repository>orm</mmm.repository>
+    <argLine>--enable-preview</argLine>
     <r2dbc.version>1.0.0.RELEASE</r2dbc.version>
     <r2dbc.pool.version>1.0.1.RELEASE</r2dbc.pool.version>
     <r2dbc.postgresql.version>1.0.2.RELEASE</r2dbc.postgresql.version>
@@ -28,6 +29,7 @@
   <modules>
     <module>core</module>
     <module>spi</module>
+    <module>test</module>
     <module>memory</module>
     <module>jdbc</module>
     <module>r2dbc</module>
@@ -240,6 +242,31 @@
         <artifactId>mmm-orm-db-sqlserver-jdbc</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>mmm-orm-test</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <!-- Required for ScopedValue with Java21, can be removed after next JDK update -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <enablePreview>true</enablePreview>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalOptions>--enable-preview</additionalOptions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

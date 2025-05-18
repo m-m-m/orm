@@ -9,7 +9,7 @@ import io.github.mmm.orm.repository.operation.DbUpdateOperations;
 import io.github.mmm.orm.statement.select.SelectStatement;
 
 /**
- * {@link EntityRepository} allowing {@link #findByQuery(SelectStatement)}
+ * {@link EntityRepository} with DB operations like {@link #findByQuery(SelectStatement)}
  *
  * @param <E> type of the managed {@link EntityBean}.
  */

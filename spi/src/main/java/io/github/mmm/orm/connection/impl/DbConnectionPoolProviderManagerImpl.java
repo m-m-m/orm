@@ -13,11 +13,15 @@ import io.github.mmm.base.exception.ObjectNotFoundException;
 import io.github.mmm.orm.connection.DbConnection;
 import io.github.mmm.orm.connection.DbConnectionPoolProvider;
 import io.github.mmm.orm.connection.DbConnectionPoolProviderManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link DbConnectionPoolProviderManager}.
  */
 public class DbConnectionPoolProviderManagerImpl implements DbConnectionPoolProviderManager {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DbConnectionPoolProviderManagerImpl.class);
 
   /** The singleton instance. */
   public static final DbConnectionPoolProviderManagerImpl INSTANCE = new DbConnectionPoolProviderManagerImpl();
@@ -35,6 +39,9 @@ public class DbConnectionPoolProviderManagerImpl implements DbConnectionPoolProv
     ServiceLoader<DbConnectionPoolProvider> loader = ServiceLoader.load(DbConnectionPoolProvider.class);
     for (DbConnectionPoolProvider<?> provider : loader) {
       register(provider);
+    }
+    if (this.providers.isEmpty()) {
+      LOG.error("No DbConnectionPoolProvider was found! Please add at least one mmm-orm-jdbc-pool-* dependency to your application.");
     }
   }
 

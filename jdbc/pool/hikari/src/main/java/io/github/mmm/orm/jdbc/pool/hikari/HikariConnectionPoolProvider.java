@@ -13,7 +13,7 @@ import io.github.mmm.orm.jdbc.connection.JdbcConnectionPoolProvider;
 import io.github.mmm.orm.source.DbSource;
 
 /**
- * Implementation of {@link DbDialect} for H2 database.
+ * Implementation of {@link JdbcConnectionPoolProvider} for {@link HikariDataSource hikari}.
  */
 public final class HikariConnectionPoolProvider extends JdbcConnectionPoolProvider {
 
@@ -35,8 +35,7 @@ public final class HikariConnectionPoolProvider extends JdbcConnectionPoolProvid
         config.addDataSourceProperty(key, metaInfo.get(key));
       }
     }
-    HikariDataSource pool = new HikariDataSource(config);
-    return pool;
+    return new HikariDataSource(config);
   }
 
   @Override

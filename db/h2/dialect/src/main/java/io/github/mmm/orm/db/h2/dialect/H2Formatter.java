@@ -4,7 +4,7 @@ package io.github.mmm.orm.db.h2.dialect;
 
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
 import io.github.mmm.orm.statement.select.SelectSequenceNextValueClause;
-import io.github.mmm.property.criteria.CriteriaFormatter;
+import io.github.mmm.property.criteria.CriteriaFormatterFactory;
 
 /**
  * {@link DbDialectStatementFormatter} for H2 Database.
@@ -27,18 +27,18 @@ public class H2Formatter extends DbDialectStatementFormatter {
    * The constructor.
    *
    * @param dialect the {@link H2Dialect}.
-   * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to database syntax (SQL).
+   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public H2Formatter(H2Dialect dialect, CriteriaFormatter criteriaFormatter, String indentation) {
+  public H2Formatter(H2Dialect dialect, CriteriaFormatterFactory criteriaFormatterFactory, String indentation) {
 
-    super(dialect, criteriaFormatter, indentation);
+    super(dialect, criteriaFormatterFactory, indentation);
   }
 
   @Override
   protected void formatSelectSeqNextVal(SelectSequenceNextValueClause seq) {
 
-    write("NEXT VALUE FOR ");
+    write("SELECT NEXT VALUE FOR ");
     formatQualifiedName(seq.getSequenceName());
   }
 

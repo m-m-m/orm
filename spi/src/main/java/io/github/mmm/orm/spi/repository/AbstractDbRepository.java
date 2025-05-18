@@ -7,6 +7,9 @@ import io.github.mmm.entity.id.Id;
 import io.github.mmm.entity.id.generator.IdGenerator;
 import io.github.mmm.entity.id.generator.SequenceIdGenerator;
 import io.github.mmm.entity.id.generator.UuidIdGenerator;
+import io.github.mmm.entity.id.sequence.IdSequence;
+import io.github.mmm.orm.connection.DbConnectionData;
+import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.metadata.DbName;
 import io.github.mmm.orm.metadata.DbQualifiedName;
 import io.github.mmm.orm.repository.AbstractEntityRepository;
@@ -14,6 +17,7 @@ import io.github.mmm.orm.repository.DbRepository;
 import io.github.mmm.orm.source.DbSource;
 import io.github.mmm.orm.spi.access.AbstractDbAccess;
 import io.github.mmm.orm.spi.access.DbAccess;
+import io.github.mmm.orm.spi.sequence.IdSequencePooled;
 import io.github.mmm.orm.statement.create.CreateSequenceClause;
 import io.github.mmm.orm.statement.create.CreateSequenceStatement;
 import io.github.mmm.orm.statement.delete.DeleteStatement;
@@ -33,6 +37,8 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   public static final String DEFAULT_SEQUENCE = "ENTITY_SEQUENCE";
 
   private final AbstractDbAccess dbAccess;
+
+  private final DbConnectionData connectionData;
 
   /** {@link IdGenerator} used to {@link IdGenerator#generate(Id) generate} new unique {@link Id}s. */
   private final IdGenerator idGenerator;
@@ -57,13 +63,26 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   public AbstractDbRepository(E prototype, IdGenerator idGenerator) {
 
     super(prototype);
-    this.dbAccess = (AbstractDbAccess) DbAccess.get(getSource());
+    DbSource source = getSource();
+    this.dbAccess = (AbstractDbAccess) DbAccess.get(source);
+    this.connectionData = DbConnectionData.of(source);
     if (idGenerator == null) {
-      DbQualifiedName sequenceName = getQualifiedSequenceName();
-      if (sequenceName == null) {
-        idGenerator = new UuidIdGenerator();
+      AbstractDbDialect<?> dialect = this.dbAccess.getDialect();
+      if (dialect.isSupportingSequence()) {
+        DbQualifiedName sequenceName = getQualifiedSequenceName();
+        if (sequenceName == null) {
+          idGenerator = new UuidIdGenerator();
+        } else {
+          IdSequence idSequence = this.dbAccess.createIdSequence(sequenceName);
+          int sequenceIncrement = this.connectionData.getSequenceIncrement();
+          if (sequenceIncrement > 1) {
+            idSequence = new IdSequencePooled(idSequence, sequenceIncrement);
+          }
+          idGenerator = new SequenceIdGenerator(idSequence);
+        }
       } else {
-        idGenerator = new SequenceIdGenerator(this.dbAccess.createIdSequence(sequenceName));
+        IdSequence idSequence = this.dbAccess.createIdSequence(new DbQualifiedName(null, null, DbName.of("none")));
+        idGenerator = new SequenceIdGenerator(idSequence);
       }
     }
     this.idGenerator = idGenerator;
@@ -77,6 +96,14 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   public DbSource getSource() {
 
     return DbSource.get();
+  }
+
+  /**
+   * @return the {@link DbConnectionData} for convenient access.
+   */
+  protected DbConnectionData getConnectionData() {
+
+    return this.connectionData;
   }
 
   @Override
@@ -104,7 +131,7 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
     if (sequenceName == null) {
       return null;
     }
-    return new DbQualifiedName(null, null, DbName.of(sequenceName));
+    return this.connectionData.getQualifiedNameTemplate().withName(sequenceName);
   }
 
   @Override
@@ -176,13 +203,19 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
    */
   public void createSequence() {
 
+    AbstractDbDialect<?> dialect = this.dbAccess.getDialect();
+    getSource();
+    if (!dialect.isSupportingSequence()) {
+      return;
+    }
     String sequenceName = getSequenceName();
     // if ((sequenceName == null) || (DEFAULT_SEQUENCE.equals(sequenceName))) {
     if (sequenceName == null) {
       return;
     }
-    CreateSequenceStatement createSequenceStatement = new CreateSequenceClause(sequenceName).incrementBy(10)
-        .startWith(1000000000000L).minValue(1000000000000L).maxValue(9123456789123456789L).nocycle().get();
+    CreateSequenceStatement createSequenceStatement = new CreateSequenceClause(sequenceName)
+        .incrementBy(this.connectionData.getSequenceIncrement()).startWith(1000000000000L).minValue(1000000000000L - 1)
+        .maxValue(9123456789123456789L).nocycle().get();
     this.dbAccess.createSequence(createSequenceStatement);
   }
 

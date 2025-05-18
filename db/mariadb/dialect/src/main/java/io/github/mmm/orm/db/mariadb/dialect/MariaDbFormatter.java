@@ -3,10 +3,10 @@
 package io.github.mmm.orm.db.mariadb.dialect;
 
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
-import io.github.mmm.property.criteria.CriteriaFormatter;
+import io.github.mmm.property.criteria.CriteriaFormatterFactory;
 
 /**
- * {@link DbDialectStatementFormatter} for H2 Database.
+ * {@link DbDialectStatementFormatter} for MariaDB.
  *
  * @since 1.0.0
  */
@@ -26,12 +26,13 @@ public class MariaDbFormatter extends DbDialectStatementFormatter {
    * The constructor.
    *
    * @param dialect the {@link MariaDbDialect}.
-   * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to database syntax (SQL).
+   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public MariaDbFormatter(MariaDbDialect dialect, CriteriaFormatter criteriaFormatter, String indentation) {
+  public MariaDbFormatter(MariaDbDialect dialect, CriteriaFormatterFactory criteriaFormatterFactory,
+      String indentation) {
 
-    super(dialect, criteriaFormatter, indentation);
+    super(dialect, criteriaFormatterFactory, indentation);
   }
 
 }

@@ -33,6 +33,7 @@ import io.github.mmm.orm.result.DbResult;
 import io.github.mmm.orm.spi.access.AbstractDbAccess;
 import io.github.mmm.orm.spi.session.DbEntityHolder;
 import io.github.mmm.orm.spi.session.DbEntitySession;
+import io.github.mmm.orm.statement.DbPlainStatement;
 import io.github.mmm.orm.statement.NonUniqueResultException;
 import io.github.mmm.orm.statement.insert.InsertClause;
 import io.github.mmm.orm.statement.insert.InsertStatement;
@@ -45,7 +46,6 @@ import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.CriteriaPredicate;
 import io.github.mmm.property.criteria.PredicateOperator;
 import io.github.mmm.property.criteria.PropertyAssignment;
-import io.github.mmm.value.PropertyPath;
 import io.github.mmm.value.SimplePath;
 
 /**
@@ -57,8 +57,6 @@ public class JdbcAccess extends AbstractDbAccess {
 
   private static final Logger LOG = LoggerFactory.getLogger(JdbcAccess.class);
 
-  private static final PropertyPath<Object> COLUMN_REVISION = SimplePath.of("REV"); // see PkMapper
-
   @Override
   protected JdbcSession getSession() {
 
@@ -66,7 +64,7 @@ public class JdbcAccess extends AbstractDbAccess {
   }
 
   @Override
-  protected AbstractDbDialect<?> getDialect() {
+  public AbstractDbDialect<?> getDialect() {
 
     return (AbstractDbDialect<?>) JdbcSession.get().getConnectionData().getDialect();
   }
@@ -133,12 +131,13 @@ public class JdbcAccess extends AbstractDbAccess {
     }
     Id<?> newId = ((GenericId<E, ?, ?, ?>) id).updateRevision();
     UpdateClause<EntityBean> updateEntity = new UpdateClause<>(entity);
+    SimplePath rev = new SimplePath(pk.parentPath(), Id.COLUMN_REVISION);
     UpdateSet<EntityBean> set = updateEntity.setAll();
     for (WritableProperty<?> property : entity.getProperties()) {
       if (!property.isTransient()) {
         PropertyAssignment<?> assignment;
         if (property == pk) {
-          assignment = PropertyAssignment.of(COLUMN_REVISION, newId.getRevision());
+          assignment = PropertyAssignment.of(rev, newId.getRevision());
         } else {
           Object managedValue = managed.get(property.getName());
           Object updateValue = property.get();
@@ -155,7 +154,7 @@ public class JdbcAccess extends AbstractDbAccess {
       return;
     }
     UpdateStatement<EntityBean> update = set.where(pk.eq(id))
-        .and(CriteriaPredicate.of(COLUMN_REVISION, PredicateOperator.EQ, id.getRevision())).get();
+        .and(CriteriaPredicate.of(rev, PredicateOperator.EQ, id.getRevision())).get();
     long updateCount = update(update);
     if (updateCount == 0) {
       throw new OptimisicLockException(id, entity.getType().getQualifiedName());
@@ -166,49 +165,58 @@ public class JdbcAccess extends AbstractDbAccess {
   }
 
   @Override
-  protected long executeSql(String sql, AbstractCriteriaParameters parameters, Consumer<DbResult> receiver,
-      boolean unique) {
+  protected long executeSql(DbPlainStatement plainStatement, Consumer<DbResult> receiver, boolean unique) {
 
-    LOG.debug(sql);
+    Objects.requireNonNull(plainStatement);
     Connection connection = getSession().getConnection();
-    try (PreparedStatement statement = connection.prepareStatement(sql)) {
-      parameters.apply(statement, connection);
-      long count;
-      if (receiver == null) {
-        count = statement.executeLargeUpdate();
-      } else {
-        count = 0;
-        boolean dataResult = statement.execute();
-        assert (dataResult);
-        if (dataResult) {
-          JdbcResult jdbcResult = null;
-          do {
-            try (ResultSet resultSet = statement.getResultSet()) {
-              if (jdbcResult == null) {
-                jdbcResult = new JdbcResult(resultSet);
-              } else {
-                jdbcResult.setResultSet(resultSet);
-              }
-              while (resultSet.next()) {
-                receiver.accept(jdbcResult);
-                count++;
-                if (unique) {
-                  resultSet.last();
-                  int size = resultSet.getRow();
-                  throw new NonUniqueResultException(size, sql);
+    DbPlainStatement current = plainStatement;
+    long count = 0;
+    boolean resultReceived = false;
+    while (current != null) {
+      String sql = current.getStatement();
+      LOG.debug(sql);
+      try (PreparedStatement jdbcStatement = connection.prepareStatement(sql)) {
+        AbstractCriteriaParameters parameters = current.getParameters().cast();
+        parameters.apply(jdbcStatement, connection);
+        if (receiver == null) {
+          count += jdbcStatement.executeLargeUpdate();
+        } else {
+          boolean dataResult = jdbcStatement.execute();
+          if (dataResult) {
+            resultReceived = true;
+            JdbcResult jdbcResult = null;
+            do {
+              try (ResultSet resultSet = jdbcStatement.getResultSet()) {
+                if (jdbcResult == null) {
+                  jdbcResult = new JdbcResult(resultSet);
+                } else {
+                  jdbcResult.setResultSet(resultSet);
+                }
+                while (resultSet.next()) {
+                  receiver.accept(jdbcResult);
+                  count++;
+                  if (unique) {
+                    resultSet.last();
+                    int size = resultSet.getRow();
+                    throw new NonUniqueResultException(size, sql);
+                  }
                 }
               }
-            }
-          } while (statement.getMoreResults());
-        } else {
-          count = statement.getUpdateCount();
+            } while (jdbcStatement.getMoreResults());
+          } else {
+            count = jdbcStatement.getUpdateCount();
+          }
         }
+      } catch (SQLException e) {
+        // TODO proper custom runtinme exception class and error message including the SQL
+        throw new IllegalStateException("Failed to execute SQL: " + sql, e);
       }
-      return count;
-    } catch (SQLException e) {
-      // TODO proper custom runtinme exception class and error message including the SQL
-      throw new IllegalStateException("Failed to execute SQL: " + sql, e);
+      current = current.getNext();
     }
+    if (receiver != null) {
+      assert resultReceived : "No result received!";
+    }
+    return count;
   }
 
   @Override

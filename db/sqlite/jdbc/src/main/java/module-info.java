@@ -13,4 +13,7 @@ module io.github.mmm.orm.db.sqlite.jdbc {
 
   requires org.xerial.sqlitejdbc;
 
+  provides io.github.mmm.orm.connection.DbConnectionPoolProvider //
+          with io.github.mmm.orm.db.sqlite.jdbc.connection.SqliteConnectionPoolProvider;
+
 }

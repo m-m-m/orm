@@ -23,7 +23,7 @@ public class UpdateTest extends DbStatementTest {
     // when
     UpdateStatement<Person> updateStatement = new UpdateClause<>(p).as("p").set(p.Single(), Boolean.TRUE).get();
     // then
-    check(updateStatement, "UPDATE Person p SET p.Single=TRUE", true);
+    check(updateStatement, "UPDATE Person p SET p.Single = TRUE", true);
   }
 
   /** Test of {@link UpdateClause} for with {@link UpdateWhere} clause. */
@@ -36,7 +36,7 @@ public class UpdateTest extends DbStatementTest {
     UpdateStatement<Person> updateStatement = new UpdateClause<>(p).as("p").set(p.Single(), Boolean.FALSE)
         .where(p.Id().eq(PkId.of(Person.class, 4711L))).get();
     // then
-    check(updateStatement, "UPDATE Person p SET p.Single=FALSE WHERE p.Id = 4711", true);
+    check(updateStatement, "UPDATE Person p SET p.Single = FALSE WHERE p.Id = 4711", true);
   }
 
   /** Test of {@link UpdateClause} for with data from other entity. */
@@ -50,7 +50,7 @@ public class UpdateTest extends DbStatementTest {
     UpdateStatement<Song> updateStatement = new UpdateClause<>(s).as("s").and(p).as("p").set(s.Title(), p.Name())
         .where(s.Composer().eq(p.Id())).get();
     // then
-    check(updateStatement, "UPDATE Song s, Person p SET s.Title=p.Name WHERE s.Composer = p.Id", true);
+    check(updateStatement, "UPDATE Song s, Person p SET s.Title = p.Name WHERE s.Composer = p.Id", true);
   }
 
 }

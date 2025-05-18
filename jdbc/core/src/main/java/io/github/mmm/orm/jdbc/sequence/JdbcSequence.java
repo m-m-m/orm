@@ -13,6 +13,7 @@ import io.github.mmm.orm.dialect.DbDialect;
 import io.github.mmm.orm.jdbc.session.JdbcSession;
 import io.github.mmm.orm.metadata.DbName;
 import io.github.mmm.orm.metadata.DbQualifiedName;
+import io.github.mmm.orm.statement.DbPlainStatement;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.select.SelectStatement;
 
@@ -22,6 +23,8 @@ import io.github.mmm.orm.statement.select.SelectStatement;
 public class JdbcSequence implements IdSequence {
 
   private final DbQualifiedName sequenceName;
+
+  private final SelectStatement<Long> statement;
 
   /**
    * The constructor.
@@ -42,6 +45,7 @@ public class JdbcSequence implements IdSequence {
 
     super();
     this.sequenceName = sequenceName;
+    this.statement = DbStatement.selectSeqNextVal(this.sequenceName);
   }
 
   @Override
@@ -49,19 +53,31 @@ public class JdbcSequence implements IdSequence {
 
     JdbcSession session = JdbcSession.get();
     DbDialect dialect = session.getConnectionData().getDialect();
-    SelectStatement<Long> statement = DbStatement.selectSeqNextVal(this.sequenceName);
-    try {
-      Connection connection = session.getConnection();
-      String sql = dialect.createFormatter().formatStatement(statement).get();
-      PreparedStatement preparedStatement = connection.prepareStatement(sql);
-      ResultSet rs = preparedStatement.executeQuery();
-      while (rs.next()) {
-        return rs.getLong(1);
+    Connection connection = session.getConnection();
+    DbPlainStatement plainStatement = dialect.createFormatter().formatStatement(this.statement).get();
+    long id = -1;
+    while (plainStatement != null) {
+      String sql = plainStatement.getStatement();
+      try {
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        if (id == -1) {
+          ResultSet rs = preparedStatement.executeQuery();
+          if (rs.next()) {
+            id = rs.getLong(1);
+            assert (id != -1);
+          } else {
+            throw new SQLException("ResultSet empty");
+          }
+        } else {
+          preparedStatement.execute();
+        }
+      } catch (SQLException e) {
+        throw new IllegalStateException("Failed to execute " + sql, e);
       }
-      throw new SQLException("ResultSet empty");
-    } catch (SQLException e) {
-      throw new IllegalStateException("Failed to execute " + statement, e);
+      plainStatement = plainStatement.getNext();
     }
+    assert (id != -1);
+    return id;
   }
 
 }

@@ -90,6 +90,51 @@ public final class DbQualifiedName {
   }
 
   /**
+   * @param newName the new {@link #getName() name}.
+   * @return the new {@link DbQualifiedName} with the given {@link #getName() name}.
+   */
+  public DbQualifiedName withName(String newName) {
+
+    return withName(DbName.of(newName));
+  }
+
+  /**
+   * @param newName the new {@link #getName() name}.
+   * @return the new {@link DbQualifiedName} with the given {@link #getName() name}.
+   */
+  public DbQualifiedName withName(DbName newName) {
+
+    if (Objects.equals(newName, this.name)) {
+      return this;
+    }
+    return new DbQualifiedName(this.catalog, this.schema, newName);
+  }
+
+  /**
+   * @param newSchema the new {@link #getSchema() schema}.
+   * @return the new {@link DbQualifiedName} with the given {@link #getSchema() schema}.
+   */
+  public DbQualifiedName withSchema(DbName newSchema) {
+
+    if (Objects.equals(newSchema, this.schema)) {
+      return this;
+    }
+    return new DbQualifiedName(this.catalog, newSchema, this.name);
+  }
+
+  /**
+   * @param newCatalog the new {@link #getCatalog() catalog}.
+   * @return the new {@link DbQualifiedName} with the given {@link #getCatalog() catalog}.
+   */
+  public DbQualifiedName withCatalog(DbName newCatalog) {
+
+    if (Objects.equals(newCatalog, this.catalog)) {
+      return this;
+    }
+    return new DbQualifiedName(newCatalog, this.schema, this.name);
+  }
+
+  /**
    * @return {@code true} if this {@link DbQualifiedName} has a qualifier ({@link #getCatalog() catalog} or
    *         {@link #getSchema() schema}), {@code false} otherwise (actually unqualified).
    */

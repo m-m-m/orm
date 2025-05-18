@@ -8,7 +8,7 @@ import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
 import io.github.mmm.orm.mapping.Orm;
 
 /**
- * Implementation of {@link DbDialect} for H2 database.
+ * Implementation of {@link DbDialect} for PostGreSQL database.
  */
 public class PostgreSqlDialect extends AbstractDbDialect<PostgreSqlDialect> {
 

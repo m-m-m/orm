@@ -14,4 +14,6 @@ module io.github.mmm.orm.db.sqlite.dialect {
   provides io.github.mmm.orm.dialect.DbDialect //
       with io.github.mmm.orm.db.sqlite.dialect.SqliteDialect;
 
+  exports io.github.mmm.orm.db.sqlite.dialect;
+
 }

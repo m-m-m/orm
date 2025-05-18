@@ -11,7 +11,7 @@ module io.github.mmm.orm.db.derby.dialect {
 
   requires io.github.mmm.orm.spi;
 
-  provides io.github.mmm.orm.dialect.DbDialect //
+    provides io.github.mmm.orm.dialect.DbDialect //
       with io.github.mmm.orm.db.derby.dialect.DerbyDialect;
 
 }

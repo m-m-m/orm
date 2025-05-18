@@ -55,4 +55,12 @@ public interface DbDialect {
    */
   DbStatementFormatter createFormatter();
 
+  /**
+   * @return {@code true} if the underlying database supports sequences, {@code false} otherwise.
+   */
+  default boolean isSupportingSequence() {
+
+    return true;
+  }
+
 }

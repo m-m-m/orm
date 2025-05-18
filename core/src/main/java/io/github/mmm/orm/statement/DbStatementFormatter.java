@@ -32,16 +32,15 @@ public interface DbStatementFormatter {
 
   /**
    * @return the {@link CriteriaFormatter} used to format criteria fragments to database syntax (e.g. SQL).
+   * @deprecated use {@link DbPlainStatement#getParameters()} instead.
    */
+  @Deprecated
   CriteriaFormatter getCriteriaFormatter();
 
   /**
    * @return the {@link #formatStatement(DbStatement, DbContext) formatted statement} as {@link String} (e.g. SQL).
    */
-  default String get() {
-
-    return toString();
-  }
+  DbPlainStatement get();
 
   /**
    * @return the {@link #formatStatement(DbStatement, DbContext) formatted statement} as {@link String} (e.g. SQL).
@@ -49,5 +48,4 @@ public interface DbStatementFormatter {
    */
   @Override
   String toString();
-
 }

@@ -5,10 +5,10 @@ package io.github.mmm.orm.db.mysql.dialect;
 import io.github.mmm.orm.ddl.constraint.DbConstraint;
 import io.github.mmm.orm.ddl.operation.TableOperationType;
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
-import io.github.mmm.property.criteria.CriteriaFormatter;
+import io.github.mmm.property.criteria.CriteriaFormatterFactory;
 
 /**
- * {@link DbDialectStatementFormatter} for H2 Database.
+ * {@link DbDialectStatementFormatter} for MySQL Database.
  *
  * @since 1.0.0
  */
@@ -28,12 +28,12 @@ public class MySqlFormatter extends DbDialectStatementFormatter {
    * The constructor.
    *
    * @param dialect the {@link MySqlDialect}.
-   * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to database syntax (SQL).
+   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public MySqlFormatter(MySqlDialect dialect, CriteriaFormatter criteriaFormatter, String indentation) {
+  public MySqlFormatter(MySqlDialect dialect, CriteriaFormatterFactory criteriaFormatterFactory, String indentation) {
 
-    super(dialect, criteriaFormatter, indentation);
+    super(dialect, criteriaFormatterFactory, indentation);
   }
 
   @Override

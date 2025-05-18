@@ -48,6 +48,7 @@ public class JdbcConnectionPool implements DbConnectionPool<JdbcConnection> {
 
     try {
       Connection connection = this.dataSource.getConnection();
+      connection.setAutoCommit(false);
       return new JdbcConnection(connection, this.source, this.dialect);
     } catch (SQLException e) {
       throw new IllegalStateException("Unable to acquire connection!", e);

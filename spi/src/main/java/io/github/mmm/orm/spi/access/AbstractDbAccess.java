@@ -2,7 +2,6 @@ package io.github.mmm.orm.spi.access;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import io.github.mmm.entity.bean.EntityBean;
@@ -14,12 +13,12 @@ import io.github.mmm.orm.mapping.DbMapper;
 import io.github.mmm.orm.mapping.DbMapper2Java;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.metadata.DbQualifiedName;
-import io.github.mmm.orm.param.AbstractCriteriaParameters;
 import io.github.mmm.orm.result.DbResult;
 import io.github.mmm.orm.spi.access.impl.DbMapperRetrievalAdapter;
 import io.github.mmm.orm.spi.session.DbEntitySession;
 import io.github.mmm.orm.spi.session.DbSession;
 import io.github.mmm.orm.statement.BasicDbStatementFormatter;
+import io.github.mmm.orm.statement.DbPlainStatement;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.create.CreateIndexStatement;
 import io.github.mmm.orm.statement.create.CreateSequenceStatement;
@@ -48,7 +47,7 @@ public abstract class AbstractDbAccess implements DbAccess {
   /**
    * @return the {@link DbDialect}.
    */
-  protected AbstractDbDialect<?> getDialect() {
+  public AbstractDbDialect<?> getDialect() {
 
     return (AbstractDbDialect<?>) getSession().getConnectionData().getDialect();
   }
@@ -77,27 +76,19 @@ public abstract class AbstractDbAccess implements DbAccess {
    *        received.
    * @return the number of rows that have been updated or selected.
    * @see #executeStatement(DbStatement)
-   * @see #executeSql(String, AbstractCriteriaParameters, Consumer, boolean)
+   * @see #executeSql(DbPlainStatement, Consumer, boolean)
    */
   protected long executeStatement(DbStatement<?> statement, Consumer<DbResult> receiver, boolean unique) {
 
     BasicDbStatementFormatter formatter = getDialect().createFormatter();
-    String sql = formatter.formatStatement(statement).toString();
-    AbstractCriteriaParameters parameters = (AbstractCriteriaParameters) formatter.getCriteriaFormatter()
-        .getParameters();
-    if (statement.getType().isQuery()) {
-      Objects.requireNonNull(receiver);
-    }
-    return executeSql(sql, parameters, receiver, unique);
+    DbPlainStatement plainStatement = formatter.formatStatement(statement).get();
+    return executeSql(plainStatement, receiver, unique);
   }
 
   /**
    * Low-level and DB/orm specific method method to execute a query.
    *
-   * @param sql the DB statement as {@link String}. Typically SQL but may be any statement syntax also for NO-SQL
-   *        solutions.
-   * @param parameters the {@link AbstractCriteriaParameters dynamic parameters} to bind to the given DB statement
-   *        ({@code sql}).
+   * @param statement the {@link DbPlainStatement}.
    * @param receiver the {@link Consumer} of a potential {@link DbResult} (e.g. for SELECT) or {@code null} if no result
    *        is expected (e.g. for INSERT or DELETE).
    * @param unique {@code true} if a unique {@link DbResult} is expected and an
@@ -105,8 +96,7 @@ public abstract class AbstractDbAccess implements DbAccess {
    *        received.
    * @return the number of rows that have been updated or selected.
    */
-  protected abstract long executeSql(String sql, AbstractCriteriaParameters parameters, Consumer<DbResult> receiver,
-      boolean unique);
+  protected abstract long executeSql(DbPlainStatement statement, Consumer<DbResult> receiver, boolean unique);
 
   @Override
   public void createTable(CreateTableStatement<?> statement) {

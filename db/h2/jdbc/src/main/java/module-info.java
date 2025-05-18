@@ -13,4 +13,7 @@ module io.github.mmm.orm.db.h2.jdbc {
 
   requires com.h2database;
 
+  provides io.github.mmm.orm.connection.DbConnectionPoolProvider //
+          with io.github.mmm.orm.db.h2.jdbc.connection.H2ConnectionPoolProvider;
+
 }

@@ -50,7 +50,7 @@ public abstract class AbstractDbStatement<E> implements DbStatement<E> {
     String indendation = writer.getFormat().getConfig().get(MarshallingConfig.VAR_INDENTATION);
     BasicDbStatementFormatter formatter = new BasicDbStatementFormatter(indendation);
     formatter.formatStatement(this, DbContextNone.INSTANCE);
-    writer.writeValueAsString(formatter.get());
+    writer.writeValueAsString(formatter.toString());
   }
 
   @Override

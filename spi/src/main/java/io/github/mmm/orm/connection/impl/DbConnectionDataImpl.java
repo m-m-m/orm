@@ -6,6 +6,8 @@ import io.github.mmm.base.metainfo.MetaInfo;
 import io.github.mmm.orm.connection.DbConnectionData;
 import io.github.mmm.orm.connection.DbConnectionPool;
 import io.github.mmm.orm.dialect.DbDialect;
+import io.github.mmm.orm.metadata.DbName;
+import io.github.mmm.orm.metadata.DbQualifiedName;
 import io.github.mmm.orm.source.DbSource;
 
 /**
@@ -13,13 +15,15 @@ import io.github.mmm.orm.source.DbSource;
  */
 public class DbConnectionDataImpl implements DbConnectionData {
 
-  private DbSource source;
+  private final DbSource source;
 
-  private DbDialect dialect;
+  private final DbDialect dialect;
 
-  private MetaInfo config;
+  private final MetaInfo config;
 
-  private DbConnectionPool<?> pool;
+  private final DbConnectionPool<?> pool;
+
+  private final DbQualifiedName qualifiedNameTemplate;
 
   /**
    * The constructor.
@@ -36,6 +40,8 @@ public class DbConnectionDataImpl implements DbConnectionData {
     this.dialect = dialect;
     this.config = config;
     this.pool = pool;
+    this.qualifiedNameTemplate = new DbQualifiedName(DbName.of(getCatalog()), DbName.of(getSchema()),
+        DbName.of("template"));
   }
 
   @Override
@@ -60,6 +66,12 @@ public class DbConnectionDataImpl implements DbConnectionData {
   public DbConnectionPool<?> getPool() {
 
     return this.pool;
+  }
+
+  @Override
+  public DbQualifiedName getQualifiedNameTemplate() {
+
+    return this.qualifiedNameTemplate;
   }
 
   @Override

@@ -35,6 +35,14 @@ public interface DbConnectionPoolProvider<C extends DbConnection> {
   }
 
   /**
+   * @return {@code true} if a real connection pool is provided, {@code false} otherwise.
+   */
+  default boolean isPool() {
+
+    return true;
+  }
+
+  /**
    * @param source the {@link DbSource}.
    * @param config the {@link MetaInfo} with the database configuration.
    * @param dialect the {@link DbDialect} to use.

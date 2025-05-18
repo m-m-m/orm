@@ -9,6 +9,11 @@ module io.github.mmm.orm.db.postgresql.jdbc {
 
   requires io.github.mmm.orm.db.postgresql.dialect;
 
+  requires io.github.mmm.orm.jdbc;
+
   requires org.postgresql.jdbc;
+
+  provides io.github.mmm.orm.connection.DbConnectionPoolProvider //
+          with io.github.mmm.orm.db.postgresql.jdbc.connection.PostgreSqlConnectionPoolProvider;
 
 }

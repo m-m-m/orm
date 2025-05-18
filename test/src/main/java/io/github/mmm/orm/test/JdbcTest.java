@@ -1,4 +1,4 @@
-package io.github.mmm.orm.db.h2.test;
+package io.github.mmm.orm.test;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -14,7 +14,7 @@ import io.github.mmm.orm.tx.DbTransactionExecutor;
 /**
  * Test of H2 database support.
  */
-public class H2JdbcTest extends Assertions {
+public abstract class JdbcTest extends Assertions {
 
   /** Test that H2 integration works. */
   @Test

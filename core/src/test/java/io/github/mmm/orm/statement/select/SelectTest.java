@@ -8,7 +8,9 @@ import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.metadata.DbName;
 import io.github.mmm.orm.param.CriteriaParametersNamed;
 import io.github.mmm.orm.statement.BasicDbStatementFormatter;
+import io.github.mmm.orm.statement.BasicDbStatementFormatterUseAsBeforeAlias;
 import io.github.mmm.orm.statement.City;
+import io.github.mmm.orm.statement.DbPlainStatement;
 import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.DbStatementTest;
 import io.github.mmm.orm.statement.Person;
@@ -38,20 +40,14 @@ public class SelectTest extends DbStatementTest {
         true);
     AbstractDbDialect<?> dialect = new TestDialect();
     // and when
-    BasicDbStatementFormatter sqlFormatter = new BasicDbStatementFormatter(
-        CriteriaFormatter.of(new CriteriaParametersNamed(dialect, true))) {
+    BasicDbStatementFormatter sqlFormatter = new BasicDbStatementFormatterUseAsBeforeAlias(
+        () -> CriteriaFormatter.of(new CriteriaParametersNamed(dialect, true)));
 
-      @Override
-      public boolean isUseAsBeforeAlias() {
-
-        return true;
-      }
-    };
-
-    assertThat(sqlFormatter.formatStatement(query).get()).isEqualTo(
+    DbPlainStatement plainStatement = sqlFormatter.formatStatement(query).get();
+    assertThat(plainStatement.getStatement()).isEqualTo(
         "SELECT p FROM Person AS p WHERE p.Age >= :Age AND (p.Name LIKE :Name OR p.Single = :Single) ORDER BY p.Name ASC");
 
-    CriteriaParametersNamed parameters = sqlFormatter.getCriteriaFormatter().getParameters().cast();
+    CriteriaParametersNamed parameters = plainStatement.getParameters().cast();
 
     assertThat(parameters.getParameters()).containsEntry("Age", 18).containsEntry("Name", "John%")
         .containsEntry("Single", Boolean.TRUE).hasSize(3);

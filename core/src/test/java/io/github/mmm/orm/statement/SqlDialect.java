@@ -49,7 +49,7 @@ public class SqlDialect extends AbstractDbDialect<SqlDialect> {
   @Override
   public DbDialectStatementFormatter createFormatter() {
 
-    return new DbDialectStatementFormatter(this, new SqlCriteriaFormatter(this), "  ");
+    return new DbDialectStatementFormatter(this, () -> new SqlCriteriaFormatter(this));
   }
 
   @Override

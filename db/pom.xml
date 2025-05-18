@@ -11,9 +11,6 @@
   <packaging>pom</packaging>
   <name>${project.artifactId}</name>
   <description>ORM support for all kind of databases (dialects, driver dependencies).</description>
-  <properties>
-    <argLine>--enable-preview</argLine>
-  </properties>
   <modules>
     <module>derby</module>
     <module>h2</module>
@@ -25,4 +22,12 @@
     <module>sqlite</module>
     <module>sqlserver</module>
   </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mmm-orm-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

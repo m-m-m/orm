@@ -29,6 +29,29 @@ public interface DbNamingStrategy {
   default String getColumnName(ReadableProperty<?> property) {
 
     String columnName = property.getMetadata().getMetaInfo().get(EntityBean.META_KEY_COLUMN);
+    return getColumnName(columnName, property);
+  }
+
+  /**
+   * @param property the {@link PropertyPath} to derive the column name from.
+   * @return the column name for the given {@link PropertyPath property}.
+   */
+  default String getColumnName(PropertyPath<?> property) {
+
+    if (property instanceof ReadableProperty<?> rp) {
+      return getColumnName(rp);
+    } else {
+      return getColumnName(null, property);
+    }
+  }
+
+  /**
+   * @param columnName the raw column name that has already be resolved.
+   * @param property the {@link ReadableProperty} to derive the column name from.
+   * @return the column name for the given {@link ReadableProperty property}.
+   */
+  default String getColumnName(String columnName, PropertyPath<?> property) {
+
     if (columnName == null) {
       columnName = getColumnName(property.getName());
     }
@@ -49,13 +72,7 @@ public interface DbNamingStrategy {
    */
   default String getColumnName(PropertyPath<?> property, TypeMapper<?, ?> typeMapper) {
 
-    String rawColumnName;
-    if (property instanceof ReadableProperty<?> rp) {
-      rawColumnName = getColumnName(rp);
-    } else {
-      rawColumnName = getColumnName(property.getName());
-    }
-    return getColumnName(rawColumnName, typeMapper);
+    return getColumnName(getColumnName(property), typeMapper);
   }
 
   /**

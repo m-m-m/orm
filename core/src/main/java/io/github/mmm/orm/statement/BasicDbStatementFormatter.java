@@ -63,6 +63,7 @@ import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.criteria.BooleanLiteral;
 import io.github.mmm.property.criteria.CriteriaExpression;
 import io.github.mmm.property.criteria.CriteriaFormatter;
+import io.github.mmm.property.criteria.CriteriaFormatterFactory;
 import io.github.mmm.property.criteria.CriteriaOperator;
 import io.github.mmm.property.criteria.CriteriaOrdering;
 import io.github.mmm.property.criteria.CriteriaPredicate;
@@ -92,7 +93,11 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
   /** The {@link AbstractDbDialect} or {@code null} for generic formatter. */
   protected final AbstractDbDialect<?> dialect;
 
-  private final CriteriaFormatter criteriaFormatter;
+  private final CriteriaFormatterFactory criteriaFormatterFactory;
+
+  private CriteriaFormatter criteriaFormatter;
+
+  private DbPlainStatement sql;
 
   private final String indentation;
 
@@ -102,37 +107,38 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
 
   BasicDbStatementFormatter() {
 
-    this(new CriteriaJqlFormatterInline());
+    this(CriteriaJqlFormatterInline.FACTORY);
   }
 
   BasicDbStatementFormatter(String indentation) {
 
-    this(null, new CriteriaJqlFormatterInline(), indentation);
+    this(null, CriteriaJqlFormatterInline.FACTORY, indentation);
   }
 
   /**
    * The constructor.
    *
-   * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to SQL.
+   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
    */
-  public BasicDbStatementFormatter(CriteriaFormatter criteriaFormatter) {
+  public BasicDbStatementFormatter(CriteriaFormatterFactory criteriaFormatterFactory) {
 
-    this(null, criteriaFormatter, INDENTATION);
+    this(null, criteriaFormatterFactory, INDENTATION);
   }
 
   /**
    * The constructor.
    *
    * @param dialect the owning {@link AbstractDbDialect}.
-   * @param criteriaFormatter the {@link CriteriaFormatter} used to format criteria fragments to SQL.
+   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public BasicDbStatementFormatter(AbstractDbDialect<?> dialect, CriteriaFormatter criteriaFormatter,
+  public BasicDbStatementFormatter(AbstractDbDialect<?> dialect, CriteriaFormatterFactory criteriaFormatterFactory,
       String indentation) {
 
     super();
     this.dialect = dialect;
-    this.criteriaFormatter = criteriaFormatter;
+    this.criteriaFormatterFactory = criteriaFormatterFactory;
+    this.criteriaFormatter = criteriaFormatterFactory.create();
     this.indentation = indentation;
   }
 
@@ -155,9 +161,6 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     return this.dialect.getOrm();
   }
 
-  /**
-   * @return the {@link CriteriaFormatter} used to format criteria fragments to database syntax (e.g. SQL).
-   */
   @Override
   public CriteriaFormatter getCriteriaFormatter() {
 
@@ -170,6 +173,17 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
   protected void write(String text) {
 
     this.criteriaFormatter.out().append(text);
+  }
+
+  /**
+   * Starts a new {@link DbPlainStatement} in case multiple statements are needed.<br>
+   * <b>ATTENTION:</b> When producing multiple plain statements, they have to be created in reverse order due to the
+   * nature of {@link DbPlainStatement#getNext()}.
+   */
+  protected void newStatement() {
+
+    this.sql = new DbPlainStatement(out().toString(), this.criteriaFormatter.getParameters(), this.sql);
+    this.criteriaFormatter = this.criteriaFormatterFactory.create();
   }
 
   /**
@@ -327,7 +341,10 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     }
   }
 
-  private void writeIndent() {
+  /**
+   * Writes an indentation as needed.
+   */
+  protected void writeIndent() {
 
     if (this.indentation == null) {
       return;
@@ -360,18 +377,18 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
    */
   public void formatSelectClause(SelectClause<?> select, DbContext context) {
 
-    writeIndent();
-    write("SELECT ");
     if (select instanceof SelectSequenceNextValueClause seq) {
       formatSelectSeqNextVal(seq);
-    } else {
-      SelectStatement<?> statement = select.getStatement();
-      SelectFrom<?, ?> selectFrom = null;
-      if (statement != null) {
-        selectFrom = statement.getFrom();
-      }
-      formatSelections(select, selectFrom);
+      return;
     }
+    writeIndent();
+    write("SELECT ");
+    SelectStatement<?> statement = select.getStatement();
+    SelectFrom<?, ?> selectFrom = null;
+    if (statement != null) {
+      selectFrom = statement.getFrom();
+    }
+    formatSelections(select, selectFrom);
   }
 
   /**
@@ -379,6 +396,8 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
    */
   protected void formatSelectSeqNextVal(SelectSequenceNextValueClause seq) {
 
+    writeIndent();
+    write("SELECT ");
     write(SequenceNextValue.NEXT_VALUE);
     write("(");
     formatQualifiedName(seq.getSequenceName());
@@ -786,7 +805,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     }
     if (assign) {
       this.criteriaFormatter.onPropertyPath(property, index, null);
-      write("=");
+      write(" = ");
       assert (args == null);
     }
     if (args == null) {
@@ -1229,9 +1248,15 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
   }
 
   @Override
+  public DbPlainStatement get() {
+
+    return new DbPlainStatement(out().toString(), this.criteriaFormatter.getParameters(), this.sql);
+  }
+
+  @Override
   public String toString() {
 
-    return out().toString();
+    return get().toString();
   }
 
 }

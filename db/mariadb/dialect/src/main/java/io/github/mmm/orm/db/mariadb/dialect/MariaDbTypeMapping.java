@@ -23,7 +23,7 @@ import io.github.mmm.orm.type.DbTypeZonedDateTime;
 import io.github.mmm.orm.typemapping.DbTypeMapping;
 
 /**
- * {@link DbTypeMapping} for <a href="http://www.h2database.com/html/datatypes.html">H2 database</a>.
+ * {@link DbTypeMapping} for MariaDB.
  *
  * @since 1.0.0
  */

@@ -51,7 +51,7 @@ public abstract class DbStatementTest extends Assertions {
     AbstractDbDialect<?> sqlDialect = new SqlDialect();
     DbDialectStatementFormatter formatter = sqlDialect.createFormatter();
     formatter.formatStatement(statement);
-    assertThat(formatter.get()).isEqualTo(sql);
+    assertThat(formatter).hasToString(sql);
     check(statement, jql, false);
   }
 
