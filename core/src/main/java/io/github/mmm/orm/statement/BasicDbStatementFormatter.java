@@ -172,9 +172,13 @@ public class BasicDbStatementFormatter extends CriteriaFormatter implements DbSt
   @Override
   public void onPropertyPath(PropertyPath<?> property, int i, CriteriaExpression<?> parent) {
 
-    DbNamingStrategy namingStrategy = this.dialect.getNamingStrategy();
-    String columnName = namingStrategy.getColumnName(property);
-    write(columnName);
+    if (this.dialect == null) {
+      super.onPropertyPath(property, i, parent);
+    } else {
+      DbNamingStrategy namingStrategy = this.dialect.getNamingStrategy();
+      String columnName = namingStrategy.getColumnName(property);
+      write(columnName);
+    }
   }
 
   /**
