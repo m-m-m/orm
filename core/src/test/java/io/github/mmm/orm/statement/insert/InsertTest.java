@@ -38,7 +38,7 @@ public class InsertTest extends DbStatementTest {
     InsertStatement<Person> insertStatement = new InsertClause().into(p).valuesAll().get();
     // then
     check(insertStatement, "INSERT INTO Person(Id, Name, Single) VALUES (4711@1, 'John Doe', TRUE)",
-        "INSERT INTO PERSON(ID, REV, NAME, SINGLE) VALUES (4711, 1, 'John Doe', TRUE)");
+        "INSERT INTO PERSON(ID, REV, NAME, SINGLE) VALUES (?, ?, ?, ?)");
   }
 
 }

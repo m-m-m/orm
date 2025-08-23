@@ -4,6 +4,7 @@ package io.github.mmm.orm.test;
 
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.mapping.Orm;
+import io.github.mmm.orm.naming.DbNamingStrategy;
 
 /**
  * {@link AbstractDbDialect} implementation for testing.
@@ -33,6 +34,12 @@ public class TestDialect extends AbstractDbDialect<TestDialect> {
   protected TestDialect withOrm(Orm newOrm) {
 
     return new TestDialect(newOrm);
+  }
+
+  @Override
+  protected DbNamingStrategy getDefaultNamingStrategy() {
+
+    return DbNamingStrategy.of();
   }
 
 }
