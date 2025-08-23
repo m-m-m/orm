@@ -24,9 +24,22 @@ import io.github.mmm.value.PropertyPath;
  */
 public class CriteriaParametersNamed extends AbstractCriteriaParameters {
 
+  /** {@link CriteriaParametersFactory} for this implementation. */
+  public static final CriteriaParametersFactory FACTORY = CriteriaParametersNamed::new;
+
   private final Map<String, Object> parameters;
 
   private final boolean merge;
+
+  /**
+   * The constructor.
+   *
+   * @param dialect the {@link AbstractDbDialect}.
+   */
+  public CriteriaParametersNamed(AbstractDbDialect<?> dialect) {
+
+    this(dialect, true);
+  }
 
   /**
    * The constructor.

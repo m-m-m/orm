@@ -4,9 +4,12 @@ package io.github.mmm.orm.db.sqlite.dialect;
 
 import io.github.mmm.orm.dialect.DbContext;
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
+import io.github.mmm.orm.param.CriteriaParametersFactory;
+import io.github.mmm.orm.statement.AbstractEntityClause;
+import io.github.mmm.orm.statement.SetClause;
 import io.github.mmm.orm.statement.create.CreateSequenceClause;
 import io.github.mmm.orm.statement.select.SelectSequenceNextValueClause;
-import io.github.mmm.property.criteria.CriteriaFormatterFactory;
+import io.github.mmm.orm.statement.update.UpdateClause;
 
 /**
  * {@link DbDialectStatementFormatter} for SQLite Database.
@@ -29,18 +32,35 @@ public class SqliteFormatter extends DbDialectStatementFormatter {
    * The constructor.
    *
    * @param dialect the {@link SqliteDialect}.
-   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
+   * @param parametersFactory the {@link CriteriaParametersFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public SqliteFormatter(SqliteDialect dialect, CriteriaFormatterFactory criteriaFormatterFactory, String indentation) {
+  public SqliteFormatter(SqliteDialect dialect, CriteriaParametersFactory parametersFactory, String indentation) {
 
-    super(dialect, criteriaFormatterFactory, indentation);
+    super(dialect, parametersFactory, indentation);
   }
 
   @Override
   public boolean isUseAsBeforeAlias() {
 
     return true;
+  }
+
+  @Override
+  protected void formatEntity(AbstractEntityClause<?, ?, ?> entity) {
+
+    if (entity instanceof UpdateClause<?>) {
+      formatEntity(entity, false);
+    } else {
+      super.formatEntity(entity);
+    }
+  }
+
+  @Override
+  public void formatSetClause(SetClause<?, ?> set, DbContext context) {
+
+    // TODO Auto-generated method stub
+    super.formatSetClause(set, context);
   }
 
   @Override

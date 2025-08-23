@@ -2,9 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.statement;
 
-import io.github.mmm.base.io.AppendableWriter;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
-import io.github.mmm.orm.dialect.DbCriteriaFormatter;
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.type.DbTypeBigDecimal;
@@ -49,7 +47,7 @@ public class SqlDialect extends AbstractDbDialect<SqlDialect> {
   @Override
   public DbDialectStatementFormatter createFormatter() {
 
-    return new DbDialectStatementFormatter(this, () -> new SqlCriteriaFormatter(this));
+    return new DbDialectStatementFormatter(this);
   }
 
   @Override
@@ -82,14 +80,5 @@ public class SqlDialect extends AbstractDbDialect<SqlDialect> {
       add(new DbTypeLocalDateTime2Timestamp("LocalDateTime"));
       addString("String", "String(%s)", "String(%s)");
     }
-  }
-
-  private static final class SqlCriteriaFormatter extends DbCriteriaFormatter {
-
-    private SqlCriteriaFormatter(SqlDialect dialect) {
-
-      super(dialect, new AppendableWriter(), null);
-    }
-
   }
 }

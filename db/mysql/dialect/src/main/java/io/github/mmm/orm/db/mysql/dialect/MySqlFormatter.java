@@ -5,7 +5,7 @@ package io.github.mmm.orm.db.mysql.dialect;
 import io.github.mmm.orm.ddl.constraint.DbConstraint;
 import io.github.mmm.orm.ddl.operation.TableOperationType;
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
-import io.github.mmm.property.criteria.CriteriaFormatterFactory;
+import io.github.mmm.orm.param.CriteriaParametersFactory;
 
 /**
  * {@link DbDialectStatementFormatter} for MySQL Database.
@@ -28,12 +28,12 @@ public class MySqlFormatter extends DbDialectStatementFormatter {
    * The constructor.
    *
    * @param dialect the {@link MySqlDialect}.
-   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
+   * @param parametersFactory the {@link CriteriaParametersFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public MySqlFormatter(MySqlDialect dialect, CriteriaFormatterFactory criteriaFormatterFactory, String indentation) {
+  public MySqlFormatter(MySqlDialect dialect, CriteriaParametersFactory parametersFactory, String indentation) {
 
-    super(dialect, criteriaFormatterFactory, indentation);
+    super(dialect, parametersFactory, indentation);
   }
 
   @Override

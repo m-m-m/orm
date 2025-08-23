@@ -93,7 +93,7 @@ public class JdbcSession extends AbstractDbSession implements DbTransaction {
     try {
       jdbcConnection = connectionPool.acquire();
       JdbcSession session = new JdbcSession(jdbcConnection, connectionData);
-      R result = ScopedValue.where(SESSION_HOLDER, session).call(task);
+      R result = ScopedValue.where(SESSION_HOLDER, session).call(() -> task.call());
       connection = session.getConnection();
       connection.commit();
       return result;

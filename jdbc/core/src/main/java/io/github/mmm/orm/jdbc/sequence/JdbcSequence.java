@@ -54,7 +54,7 @@ public class JdbcSequence implements IdSequence {
     JdbcSession session = JdbcSession.get();
     DbDialect dialect = session.getConnectionData().getDialect();
     Connection connection = session.getConnection();
-    DbPlainStatement plainStatement = dialect.createFormatter().formatStatement(this.statement).get();
+    DbPlainStatement plainStatement = dialect.createFormatter().formatStatement(this.statement);
     long id = -1;
     while (plainStatement != null) {
       String sql = plainStatement.getStatement();

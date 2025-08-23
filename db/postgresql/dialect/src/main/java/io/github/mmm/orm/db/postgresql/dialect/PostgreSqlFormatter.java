@@ -3,7 +3,7 @@
 package io.github.mmm.orm.db.postgresql.dialect;
 
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
-import io.github.mmm.property.criteria.CriteriaFormatterFactory;
+import io.github.mmm.orm.param.CriteriaParametersFactory;
 
 /**
  * {@link DbDialectStatementFormatter} for PostgreSQL Database.
@@ -26,13 +26,13 @@ public class PostgreSqlFormatter extends DbDialectStatementFormatter {
    * The constructor.
    *
    * @param dialect the {@link PostgreSqlDialect}.
-   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
+   * @param parametersFactory the {@link CriteriaParametersFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public PostgreSqlFormatter(PostgreSqlDialect dialect, CriteriaFormatterFactory criteriaFormatterFactory,
+  public PostgreSqlFormatter(PostgreSqlDialect dialect, CriteriaParametersFactory parametersFactory,
       String indentation) {
 
-    super(dialect, criteriaFormatterFactory, indentation);
+    super(dialect, parametersFactory, indentation);
   }
 
 }

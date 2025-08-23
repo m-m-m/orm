@@ -82,7 +82,6 @@ public abstract class AbstractCriteriaParameters implements CriteriaParameters<C
       }
     }
     out.append("null");
-
   }
 
   /**

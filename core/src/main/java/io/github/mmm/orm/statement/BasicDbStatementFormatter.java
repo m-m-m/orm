@@ -35,6 +35,8 @@ import io.github.mmm.orm.mapping.DbBeanMapper;
 import io.github.mmm.orm.mapping.Orm;
 import io.github.mmm.orm.metadata.DbName;
 import io.github.mmm.orm.metadata.DbQualifiedName;
+import io.github.mmm.orm.naming.DbNamingStrategy;
+import io.github.mmm.orm.param.CriteriaParametersFactory;
 import io.github.mmm.orm.result.DbResult;
 import io.github.mmm.orm.result.DbResultValue;
 import io.github.mmm.orm.statement.alter.AlterTableClause;
@@ -46,7 +48,7 @@ import io.github.mmm.orm.statement.create.CreateSequenceClause;
 import io.github.mmm.orm.statement.create.CreateTableClause;
 import io.github.mmm.orm.statement.create.CreateTableContentsClause;
 import io.github.mmm.orm.statement.delete.DeleteClause;
-import io.github.mmm.orm.statement.impl.CriteriaJqlFormatterInline;
+import io.github.mmm.orm.statement.impl.CriteriaJqlParametersInline;
 import io.github.mmm.orm.statement.insert.InsertClause;
 import io.github.mmm.orm.statement.insert.InsertValues;
 import io.github.mmm.orm.statement.merge.MergeClause;
@@ -63,7 +65,6 @@ import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.criteria.BooleanLiteral;
 import io.github.mmm.property.criteria.CriteriaExpression;
 import io.github.mmm.property.criteria.CriteriaFormatter;
-import io.github.mmm.property.criteria.CriteriaFormatterFactory;
 import io.github.mmm.property.criteria.CriteriaOperator;
 import io.github.mmm.property.criteria.CriteriaOrdering;
 import io.github.mmm.property.criteria.CriteriaPredicate;
@@ -81,7 +82,7 @@ import io.github.mmm.value.converter.TypeMapper;
  *
  * @since 1.0.0
  */
-public class BasicDbStatementFormatter implements DbStatementFormatter {
+public class BasicDbStatementFormatter extends CriteriaFormatter implements DbStatementFormatter {
 
   /** Default value for {@link #getIndentation() indentation}. */
   protected static final String INDENTATION = "  ";
@@ -93,11 +94,11 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
   /** The {@link AbstractDbDialect} or {@code null} for generic formatter. */
   protected final AbstractDbDialect<?> dialect;
 
-  private final CriteriaFormatterFactory criteriaFormatterFactory;
+  private final StringBuilder sb;
 
-  private CriteriaFormatter criteriaFormatter;
+  private CriteriaParametersFactory parametersFactory;
 
-  private DbPlainStatement sql;
+  private DbPlainStatement plainStatement;
 
   private final String indentation;
 
@@ -107,38 +108,45 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
 
   BasicDbStatementFormatter() {
 
-    this(CriteriaJqlFormatterInline.FACTORY);
+    this(INDENTATION);
   }
 
   BasicDbStatementFormatter(String indentation) {
 
-    this(null, CriteriaJqlFormatterInline.FACTORY, indentation);
-  }
-
-  /**
-   * The constructor.
-   *
-   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
-   */
-  public BasicDbStatementFormatter(CriteriaFormatterFactory criteriaFormatterFactory) {
-
-    this(null, criteriaFormatterFactory, INDENTATION);
+    this(null, CriteriaJqlParametersInline.FACTORY, indentation);
   }
 
   /**
    * The constructor.
    *
    * @param dialect the owning {@link AbstractDbDialect}.
-   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
+   * @param parametersFactory the {@link CriteriaParametersFactory}.
+   */
+  public BasicDbStatementFormatter(AbstractDbDialect<?> dialect, CriteriaParametersFactory parametersFactory) {
+
+    this(dialect, parametersFactory, INDENTATION);
+  }
+
+  /**
+   * The constructor.
+   *
+   * @param dialect the owning {@link AbstractDbDialect}.
+   * @param parametersFactory the {@link CriteriaParametersFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public BasicDbStatementFormatter(AbstractDbDialect<?> dialect, CriteriaFormatterFactory criteriaFormatterFactory,
+  public BasicDbStatementFormatter(AbstractDbDialect<?> dialect, CriteriaParametersFactory parametersFactory,
       String indentation) {
 
-    super();
+    this(dialect, parametersFactory, indentation, new StringBuilder(32));
+  }
+
+  private BasicDbStatementFormatter(AbstractDbDialect<?> dialect, CriteriaParametersFactory parametersFactory,
+      String indentation, StringBuilder sb) {
+
+    super(parametersFactory.create(dialect), new AppendableWriter(sb));
     this.dialect = dialect;
-    this.criteriaFormatterFactory = criteriaFormatterFactory;
-    this.criteriaFormatter = criteriaFormatterFactory.create();
+    this.sb = sb;
+    this.parametersFactory = parametersFactory;
     this.indentation = indentation;
   }
 
@@ -162,17 +170,11 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
   }
 
   @Override
-  public CriteriaFormatter getCriteriaFormatter() {
+  public void onPropertyPath(PropertyPath<?> property, int i, CriteriaExpression<?> parent) {
 
-    return this.criteriaFormatter;
-  }
-
-  /**
-   * @param text the database syntax to append.
-   */
-  protected void write(String text) {
-
-    this.criteriaFormatter.out().append(text);
+    DbNamingStrategy namingStrategy = this.dialect.getNamingStrategy();
+    String columnName = namingStrategy.getColumnName(property);
+    write(columnName);
   }
 
   /**
@@ -182,8 +184,9 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
    */
   protected void newStatement() {
 
-    this.sql = new DbPlainStatement(out().toString(), this.criteriaFormatter.getParameters(), this.sql);
-    this.criteriaFormatter = this.criteriaFormatterFactory.create();
+    this.plainStatement = new DbPlainStatement(this.out.toString(), this.parameters, this.plainStatement);
+    this.parameters = this.parametersFactory.create(this.dialect);
+    this.sb.setLength(0);
   }
 
   /**
@@ -236,21 +239,13 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     formatName(name);
   }
 
-  /**
-   * @return the {@link AppendableWriter} wrapping the {@link Appendable} to write to.
-   */
-  protected AppendableWriter out() {
-
-    return this.criteriaFormatter.out();
-  }
-
   @Override
-  public BasicDbStatementFormatter formatStatement(DbStatement<?> statement, DbContext context) {
+  public DbPlainStatement formatStatement(DbStatement<?> statement, DbContext context) {
 
     for (DbClause clause : statement.getClauses()) {
       formatClause(clause, context);
     }
-    return this;
+    return get();
   }
 
   /**
@@ -432,7 +427,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
 
     writeIndent();
     write("UPDATE ");
-    onEntities(update);
+    formatEntities(update);
   }
 
   /**
@@ -515,7 +510,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
       if (!select.isSelectEntity()) {
         LOG.info("Formatting invalid select statement.");
       }
-      onSelectAll(selectFrom);
+      formatSelectAll(selectFrom);
     } else {
       String s;
       if (select.isSelectResult()) {
@@ -528,7 +523,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
       int i = 0;
       for (CriteriaObject<?> selection : selectionCriterias) {
         write(s);
-        this.criteriaFormatter.onArg(selection, i++, null);
+        onArg(selection, i++, null);
         s = ", ";
       }
       write(") ");
@@ -558,7 +553,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
   /**
    * @param selectFrom the {@link SelectFrom} giving access to the {@link SelectFrom#getAlias() alias}.
    */
-  protected void onSelectAll(SelectFrom<?, ?> selectFrom) {
+  protected void formatSelectAll(SelectFrom<?, ?> selectFrom) {
 
     if (isSelectAllByAlias()) {
       write(selectFrom.getAlias());
@@ -578,14 +573,14 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     if ((from.getEntityName() == null) && (from.getEntity() == null)) {
       assert (from.get() instanceof SelectStatement);
     } else {
-      onEntities(from);
+      formatEntities(from);
     }
   }
 
   /**
    * @param entities the {@link AbstractEntitiesClause} to format.
    */
-  protected void onEntities(AbstractEntitiesClause<?, ?, ?> entities) {
+  protected void formatEntities(AbstractEntitiesClause<?, ?, ?> entities) {
 
     formatEntity(entities);
     for (EntitySubClause<?, ?> entity : entities.getAdditionalEntities()) {
@@ -662,7 +657,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     String s = "";
     for (CriteriaPredicate predicate : clause.getPredicates()) {
       write(s);
-      this.criteriaFormatter.onExpression(predicate, PARENT_AND);
+      onExpression(predicate, PARENT_AND);
       s = " AND ";
     }
   }
@@ -677,7 +672,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     String s = "";
     for (CriteriaOrdering ordering : orderBy.getOrderings()) {
       write(s);
-      this.criteriaFormatter.onOrdering(ordering);
+      onOrdering(ordering);
       s = ", ";
     }
   }
@@ -692,7 +687,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     String s = "";
     for (PropertyPath<?> property : groupBy.getProperties()) {
       write(s);
-      this.criteriaFormatter.onPropertyPath(property, 0, null);
+      onPropertyPath(property, 0, null);
       s = ", ";
     }
   }
@@ -707,7 +702,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     String s = "";
     for (CriteriaPredicate predicate : having.getPredicates()) {
       write(s);
-      this.criteriaFormatter.onExpression(predicate);
+      onExpression(predicate);
       s = ", ";
     }
   }
@@ -740,7 +735,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     String s = "";
     int i = 0;
     for (PropertyAssignment<?> assignment : assignments) {
-      i = onAssignment(assignment.getProperty(), assignment.getValue(), i, false, args);
+      i = formatAssignmentRecursive(assignment.getProperty(), assignment.getValue(), i, false, args, values);
     }
     write(")");
     if (args != null) { // isInto
@@ -749,7 +744,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
       ;
       for (int argIndex = 0; argIndex < i; argIndex++) {
         write(s);
-        this.criteriaFormatter.onArg(args.get(argIndex), argIndex, null);
+        onArg(args.get(argIndex), argIndex, null);
         s = ", ";
       }
       write(")");
@@ -785,36 +780,52 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
   }
 
   @SuppressWarnings("rawtypes")
-  private int onAssignment(PropertyPath<?> property, CriteriaObject<?> value, int index, boolean assign,
-      List<CriteriaObject<?>> args) {
+  private int formatAssignmentRecursive(PropertyPath<?> property, CriteriaObject<?> value, int index, boolean assign,
+      List<CriteriaObject<?>> args, DbClause clause) {
 
     if ((this.dialect != null) && (property instanceof ReadableProperty<?> p)) {
       TypeMapper typeMapper = p.getTypeMapper();
       if (typeMapper != null) {
         do {
           String name = this.dialect.getNamingStrategy().getColumnName(property, typeMapper);
-          index = onAssignment(new SimplePath(property.parentPath(), name), mapValue(value, typeMapper), index, assign,
-              args);
+          index = formatAssignmentRecursive(new SimplePath(property.parentPath(), name), mapValue(value, typeMapper),
+              index, assign, args, clause);
           typeMapper = typeMapper.next();
         } while (typeMapper != null);
         return index;
       }
     }
+    formatAssignment(property, value, index, assign, args, clause);
+    return index + 1;
+  }
+
+  /**
+   *
+   * @param property the {@link PropertyAssignment#getProperty() property to assign}.
+   * @param value the {@link PropertyAssignment#getValue() value to assign}.
+   * @param index the index of the assignment in the potential list of assignments (0 for first).
+   * @param assign - {@code true} for a regular assignment, {@code false} to only format the {@code value} and ignore
+   *        the {@code property}.
+   * @param args the optional {@link List} where to {@link List#add(Object) add} the {@code value} or {@code null}.
+   * @param clause the owning {@link DbClause}.
+   */
+  protected void formatAssignment(PropertyPath<?> property, CriteriaObject<?> value, int index, boolean assign,
+      List<CriteriaObject<?>> args, DbClause clause) {
+
     if (index > 0) {
       write(", ");
     }
     if (assign) {
-      this.criteriaFormatter.onPropertyPath(property, index, null);
+      onPropertyPath(property, index, null);
       write(" = ");
       assert (args == null);
     }
     if (args == null) {
-      this.criteriaFormatter.onArg(value, index, null);
+      onArg(value, index, null);
     } else {
-      this.criteriaFormatter.onPropertyPath(property, index, null);
+      onPropertyPath(property, index, null);
       args.add(value);
     }
-    return index + 1;
   }
 
   /**
@@ -826,7 +837,7 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     write(" SET ");
     int i = 0;
     for (PropertyAssignment<?> assignment : set.getAssignments()) {
-      i = onAssignment(assignment.getProperty(), assignment.getValue(), i, true, null);
+      i = formatAssignmentRecursive(assignment.getProperty(), assignment.getValue(), i, true, null, set);
     }
   }
 
@@ -1247,10 +1258,12 @@ public class BasicDbStatementFormatter implements DbStatementFormatter {
     }
   }
 
-  @Override
+  /**
+   * @return the {@link #formatStatement(DbStatement, DbContext) formatted statement} as {@link String} (e.g. SQL).
+   */
   public DbPlainStatement get() {
 
-    return new DbPlainStatement(out().toString(), this.criteriaFormatter.getParameters(), this.sql);
+    return new DbPlainStatement(this.out.toString(), this.parameters, this.plainStatement);
   }
 
   @Override

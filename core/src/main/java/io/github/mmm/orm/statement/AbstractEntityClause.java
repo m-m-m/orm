@@ -118,6 +118,10 @@ public abstract class AbstractEntityClause<R, E extends EntityBean, SELF extends
   }
 
   /**
+   * <b>ATTENTION:</b> Only define an explicit alias when explicitly required for uniqueness (e.g. joining the same
+   * table). E.g. sqlite database does not support aliases in UPDATE statements. Your statement may therefore not be
+   * portable if you add pointless aliases in such situations.
+   *
    * @param entityAlias the alias (variable name) for the {@link EntityBean} to query.
    * @return this {@link DbClause} itself for fluent API calls.
    * @see #getAlias()

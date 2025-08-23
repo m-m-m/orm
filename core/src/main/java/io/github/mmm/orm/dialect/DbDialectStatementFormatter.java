@@ -6,6 +6,8 @@ import java.util.Objects;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.mapping.DbBeanMapper;
+import io.github.mmm.orm.param.CriteriaParametersFactory;
+import io.github.mmm.orm.param.CriteriaParametersIndexed;
 import io.github.mmm.orm.result.DbResult;
 import io.github.mmm.orm.result.DbResultValue;
 import io.github.mmm.orm.statement.AbstractEntityClause;
@@ -25,31 +27,31 @@ public class DbDialectStatementFormatter extends BasicDbStatementFormatter {
    */
   public DbDialectStatementFormatter(AbstractDbDialect<?> dialect) {
 
-    this(dialect, () -> DbCriteriaFormatter.of(dialect), INDENTATION);
+    this(dialect, CriteriaParametersIndexed.FACTORY);
   }
 
   /**
    * The constructor.
    *
    * @param dialect the owning {@link AbstractDbDialect dialect}.
-   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
+   * @param parametersFactory the {@link CriteriaFormatterFactory}.
    */
-  public DbDialectStatementFormatter(AbstractDbDialect<?> dialect, CriteriaFormatterFactory criteriaFormatterFactory) {
+  public DbDialectStatementFormatter(AbstractDbDialect<?> dialect, CriteriaParametersFactory parametersFactory) {
 
-    this(dialect, criteriaFormatterFactory, INDENTATION);
+    this(dialect, parametersFactory, INDENTATION);
   }
 
   /**
    * The constructor.
    *
    * @param dialect the owning {@link AbstractDbDialect dialect}.
-   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
+   * @param parametersFactory the {@link CriteriaFormatterFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public DbDialectStatementFormatter(AbstractDbDialect<?> dialect, CriteriaFormatterFactory criteriaFormatterFactory,
+  public DbDialectStatementFormatter(AbstractDbDialect<?> dialect, CriteriaParametersFactory parametersFactory,
       String indentation) {
 
-    super(dialect, criteriaFormatterFactory, indentation);
+    super(dialect, parametersFactory, indentation);
     Objects.requireNonNull(dialect);
   }
 
@@ -61,7 +63,7 @@ public class DbDialectStatementFormatter extends BasicDbStatementFormatter {
   }
 
   @Override
-  protected void onSelectAll(SelectFrom<?, ?> selectFrom) {
+  protected void formatSelectAll(SelectFrom<?, ?> selectFrom) {
 
     EntityBean entity = selectFrom.getEntity();
     DbBeanMapper<EntityBean> mapping = this.dialect.getOrm().createBeanMapper(entity);

@@ -17,6 +17,9 @@ import io.github.mmm.property.criteria.Literal;
  */
 public class CriteriaParametersIndexed extends AbstractCriteriaParameters {
 
+  /** {@link CriteriaParametersFactory} for this implementation. */
+  public static final CriteriaParametersFactory FACTORY = CriteriaParametersIndexed::new;
+
   /**
    * The constructor.
    *

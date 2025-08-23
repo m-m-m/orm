@@ -1,5 +1,7 @@
 package io.github.mmm.orm.statement;
 
+import io.github.mmm.orm.dialect.AbstractDbDialect;
+import io.github.mmm.orm.param.CriteriaParametersFactory;
 import io.github.mmm.property.criteria.CriteriaFormatterFactory;
 
 /**
@@ -18,11 +20,13 @@ public class BasicDbStatementFormatterUseAsBeforeAlias extends BasicDbStatementF
   /**
    * The constructor.
    *
-   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
+   * @param dialect the {@link AbstractDbDialect}.
+   * @param parametersFactory the {@link CriteriaFormatterFactory}.
    */
-  public BasicDbStatementFormatterUseAsBeforeAlias(CriteriaFormatterFactory criteriaFormatterFactory) {
+  public BasicDbStatementFormatterUseAsBeforeAlias(AbstractDbDialect<?> dialect,
+      CriteriaParametersFactory parametersFactory) {
 
-    super(criteriaFormatterFactory);
+    super(dialect, parametersFactory, INDENTATION);
   }
 
   @Override

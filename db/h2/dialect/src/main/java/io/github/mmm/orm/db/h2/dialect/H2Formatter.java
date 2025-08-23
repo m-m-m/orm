@@ -3,8 +3,8 @@
 package io.github.mmm.orm.db.h2.dialect;
 
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
+import io.github.mmm.orm.param.CriteriaParametersFactory;
 import io.github.mmm.orm.statement.select.SelectSequenceNextValueClause;
-import io.github.mmm.property.criteria.CriteriaFormatterFactory;
 
 /**
  * {@link DbDialectStatementFormatter} for H2 Database.
@@ -27,12 +27,12 @@ public class H2Formatter extends DbDialectStatementFormatter {
    * The constructor.
    *
    * @param dialect the {@link H2Dialect}.
-   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
+   * @param parametersFactory the {@link CriteriaParametersFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public H2Formatter(H2Dialect dialect, CriteriaFormatterFactory criteriaFormatterFactory, String indentation) {
+  public H2Formatter(H2Dialect dialect, CriteriaParametersFactory parametersFactory, String indentation) {
 
-    super(dialect, criteriaFormatterFactory, indentation);
+    super(dialect, parametersFactory, indentation);
   }
 
   @Override

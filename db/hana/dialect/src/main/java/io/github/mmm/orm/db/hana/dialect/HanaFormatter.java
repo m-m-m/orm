@@ -3,7 +3,7 @@
 package io.github.mmm.orm.db.hana.dialect;
 
 import io.github.mmm.orm.dialect.DbDialectStatementFormatter;
-import io.github.mmm.property.criteria.CriteriaFormatterFactory;
+import io.github.mmm.orm.param.CriteriaParametersFactory;
 
 /**
  * {@link DbDialectStatementFormatter} for SAP Hana Database.
@@ -26,12 +26,12 @@ public class HanaFormatter extends DbDialectStatementFormatter {
    * The constructor.
    *
    * @param dialect the {@link HanaDialect}.
-   * @param criteriaFormatterFactory the {@link CriteriaFormatterFactory}.
+   * @param parametersFactory the {@link CriteriaParametersFactory}.
    * @param indentation the {@link #getIndentation() indentation}.
    */
-  public HanaFormatter(HanaDialect dialect, CriteriaFormatterFactory criteriaFormatterFactory, String indentation) {
+  public HanaFormatter(HanaDialect dialect, CriteriaParametersFactory parametersFactory, String indentation) {
 
-    super(dialect, criteriaFormatterFactory, indentation);
+    super(dialect, parametersFactory, indentation);
   }
 
 }

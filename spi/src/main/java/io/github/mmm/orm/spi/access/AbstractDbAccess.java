@@ -81,7 +81,7 @@ public abstract class AbstractDbAccess implements DbAccess {
   protected long executeStatement(DbStatement<?> statement, Consumer<DbResult> receiver, boolean unique) {
 
     BasicDbStatementFormatter formatter = getDialect().createFormatter();
-    DbPlainStatement plainStatement = formatter.formatStatement(statement).get();
+    DbPlainStatement plainStatement = formatter.formatStatement(statement);
     return executeSql(plainStatement, receiver, unique);
   }
 

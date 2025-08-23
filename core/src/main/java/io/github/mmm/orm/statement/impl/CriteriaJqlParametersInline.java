@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import io.github.mmm.base.io.AppendableWriter;
 import io.github.mmm.entity.id.Id;
+import io.github.mmm.orm.param.CriteriaParametersFactory;
 import io.github.mmm.property.criteria.CriteriaExpression;
 import io.github.mmm.property.criteria.CriteriaParameter;
 import io.github.mmm.property.criteria.CriteriaParameters;
@@ -19,6 +20,9 @@ import io.github.mmm.property.criteria.Literal;
 public class CriteriaJqlParametersInline implements CriteriaParameters<CriteriaParameter<?>> {
 
   private static final CriteriaJqlParametersInline INSTANCE = new CriteriaJqlParametersInline();
+
+  /** {@link CriteriaParametersFactory} for this implementation. */
+  public static final CriteriaParametersFactory FACTORY = _ -> INSTANCE;
 
   @Override
   public void onLiteral(Literal<?> literal, AppendableWriter out, CriteriaExpression<?> parent) {

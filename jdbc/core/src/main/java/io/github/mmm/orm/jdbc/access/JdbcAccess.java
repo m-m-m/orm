@@ -34,6 +34,7 @@ import io.github.mmm.orm.spi.access.AbstractDbAccess;
 import io.github.mmm.orm.spi.session.DbEntityHolder;
 import io.github.mmm.orm.spi.session.DbEntitySession;
 import io.github.mmm.orm.statement.DbPlainStatement;
+import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.NonUniqueResultException;
 import io.github.mmm.orm.statement.insert.InsertClause;
 import io.github.mmm.orm.statement.insert.InsertStatement;
@@ -130,8 +131,13 @@ public class JdbcAccess extends AbstractDbAccess {
       throw new OptimisicLockException(id, entity.getType().getQualifiedName());
     }
     Id<?> newId = ((GenericId<E, ?, ?, ?>) id).updateRevision();
-    UpdateClause<EntityBean> updateEntity = new UpdateClause<>(entity);
+    UpdateClause<EntityBean> updateEntity = DbStatement.update(entity);
     SimplePath rev = new SimplePath(pk.parentPath(), Id.COLUMN_REVISION);
+    // setAll sets all assignments given as varargs
+    // we provide no arguments just to get access to the SET clause (UpdateSet)
+    // this allows us to build the clause dynamically
+    // otherwise we would need to add the first assignment to UpdateClause
+    // and then all following assignments to the returned UpdateSet.
     UpdateSet<EntityBean> set = updateEntity.setAll();
     for (WritableProperty<?> property : entity.getProperties()) {
       if (!property.isTransient()) {

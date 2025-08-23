@@ -4,10 +4,9 @@ package io.github.mmm.orm.statement;
 
 import io.github.mmm.orm.dialect.DbContext;
 import io.github.mmm.orm.impl.DbContextNone;
-import io.github.mmm.property.criteria.CriteriaFormatter;
 
 /**
- * Interface for
+ * Interface of a formatter for {@link DbStatement}s.
  *
  * @see BasicDbStatementFormatter
  */
@@ -18,7 +17,7 @@ public interface DbStatementFormatter {
    * @param context the {@link DbContext}.
    * @return this {@link DbStatementFormatter} for fluent API calls.
    */
-  default DbStatementFormatter formatStatement(DbStatement<?> statement) {
+  default DbPlainStatement formatStatement(DbStatement<?> statement) {
 
     return formatStatement(statement, DbContextNone.INSTANCE);
   }
@@ -28,23 +27,10 @@ public interface DbStatementFormatter {
    * @param context the {@link DbContext}.
    * @return this {@link DbStatementFormatter} for fluent API calls.
    */
-  DbStatementFormatter formatStatement(DbStatement<?> statement, DbContext context);
-
-  /**
-   * @return the {@link CriteriaFormatter} used to format criteria fragments to database syntax (e.g. SQL).
-   * @deprecated use {@link DbPlainStatement#getParameters()} instead.
-   */
-  @Deprecated
-  CriteriaFormatter getCriteriaFormatter();
+  DbPlainStatement formatStatement(DbStatement<?> statement, DbContext context);
 
   /**
    * @return the {@link #formatStatement(DbStatement, DbContext) formatted statement} as {@link String} (e.g. SQL).
-   */
-  DbPlainStatement get();
-
-  /**
-   * @return the {@link #formatStatement(DbStatement, DbContext) formatted statement} as {@link String} (e.g. SQL).
-   * @see #get()
    */
   @Override
   String toString();
