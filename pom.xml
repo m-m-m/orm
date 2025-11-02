@@ -16,6 +16,7 @@
 
   <properties>
     <mmm.repository>orm</mmm.repository>
+    <java.version>25</java.version>
     <r2dbc.version>1.0.0.RELEASE</r2dbc.version>
     <r2dbc.pool.version>1.0.1.RELEASE</r2dbc.pool.version>
     <r2dbc.postgresql.version>1.0.2.RELEASE</r2dbc.postgresql.version>
