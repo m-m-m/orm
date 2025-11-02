@@ -22,7 +22,7 @@ public class CriteriaJqlParametersInline implements CriteriaParameters<CriteriaP
   private static final CriteriaJqlParametersInline INSTANCE = new CriteriaJqlParametersInline();
 
   /** {@link CriteriaParametersFactory} for this implementation. */
-  public static final CriteriaParametersFactory FACTORY = _ -> INSTANCE;
+  public static final CriteriaParametersFactory FACTORY = x -> INSTANCE;
 
   @Override
   public void onLiteral(Literal<?> literal, AppendableWriter out, CriteriaExpression<?> parent) {
