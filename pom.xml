@@ -16,7 +16,6 @@
 
   <properties>
     <mmm.repository>orm</mmm.repository>
-    <argLine>--enable-preview</argLine>
     <r2dbc.version>1.0.0.RELEASE</r2dbc.version>
     <r2dbc.pool.version>1.0.1.RELEASE</r2dbc.pool.version>
     <r2dbc.postgresql.version>1.0.2.RELEASE</r2dbc.postgresql.version>
@@ -249,24 +248,4 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <!-- Required for ScopedValue with Java21, can be removed after next JDK update -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <enablePreview>true</enablePreview>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <additionalOptions>--enable-preview</additionalOptions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
