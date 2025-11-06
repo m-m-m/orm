@@ -11,15 +11,15 @@ import io.github.mmm.orm.statement.MainDbClause;
 import io.github.mmm.orm.statement.StartClause;
 
 /**
- * A {@link DropTable}-{@link DbClause} of an SQL {@link DropTableStatement}.
+ * A {@link DropTableClause}-{@link DbClause} of an SQL {@link DropTableStatement}.
  *
  * @param <E> type of the {@link #getEntity() entity}.
  * @since 1.0.0
  */
-public class DropTable<E extends EntityBean> extends AbstractEntityClause<E, E, DropTable<E>>
+public class DropTableClause<E extends EntityBean> extends AbstractEntityClause<E, E, DropTableClause<E>>
     implements StartClause, MainDbClause<E> {
 
-  /** Name of {@link DropTable} for marshaling. */
+  /** Name of {@link DropTableClause} for marshaling. */
   public static final String NAME_DROP_TABLE = "DROP TABLE";
 
   private final DropTableStatement<E> statement;
@@ -29,7 +29,7 @@ public class DropTable<E extends EntityBean> extends AbstractEntityClause<E, E, 
    *
    * @param entity the {@link #getEntity() entity} to operate on.
    */
-  public DropTable(E entity) {
+  public DropTableClause(E entity) {
 
     this(entity, null);
   }
@@ -40,7 +40,7 @@ public class DropTable<E extends EntityBean> extends AbstractEntityClause<E, E, 
    * @param entity the {@link #getEntity() entity} to operate on.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public DropTable(E entity, String entityName) {
+  public DropTableClause(E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new DropTableStatement<>(this);

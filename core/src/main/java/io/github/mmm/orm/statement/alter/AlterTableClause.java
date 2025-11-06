@@ -8,7 +8,7 @@ import io.github.mmm.orm.ddl.constraint.DbConstraint;
 import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.orm.statement.AliasMap;
 import io.github.mmm.orm.statement.DbClause;
-import io.github.mmm.orm.statement.StartClause;
+import io.github.mmm.orm.statement.IncompleteStartClause;
 
 /**
  * A {@link AlterTableClause}-{@link DbClause} of an SQL {@link AlterTableStatement}.
@@ -17,7 +17,7 @@ import io.github.mmm.orm.statement.StartClause;
  * @since 1.0.0
  */
 public class AlterTableClause<E extends EntityBean> extends AbstractEntityClause<E, E, AlterTableClause<E>>
-    implements StartClause, AlterTableFragment<E> {
+    implements IncompleteStartClause, AlterTableFragment<E> {
 
   /** Name of {@link AlterTableClause} for marshaling. */
   public static final String NAME_ALTER_TABLE = "ALTER TABLE";
@@ -112,6 +112,12 @@ public class AlterTableClause<E extends EntityBean> extends AbstractEntityClause
   protected AliasMap getAliasMap() {
 
     return super.getAliasMap();
+  }
+
+  @Override
+  public AlterTableStatement<E> getStatement() {
+
+    return this.statement;
   }
 
 }

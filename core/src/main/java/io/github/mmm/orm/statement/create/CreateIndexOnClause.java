@@ -72,4 +72,9 @@ public class CreateIndexOnClause<E extends EntityBean> extends AbstractEntityCla
     return super.getAliasMap();
   }
 
+  CreateIndexStatement<E> get() {
+
+    return this.statement;
+  }
+
 }

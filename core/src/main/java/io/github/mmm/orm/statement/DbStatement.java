@@ -9,16 +9,18 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.marshall.MarshallingObject;
 import io.github.mmm.orm.metadata.DbName;
 import io.github.mmm.orm.metadata.DbQualifiedName;
+import io.github.mmm.orm.statement.create.CreateIndexClause;
 import io.github.mmm.orm.statement.create.CreateTableClause;
+import io.github.mmm.orm.statement.create.CreateUniqueIndexClause;
 import io.github.mmm.orm.statement.delete.DeleteClause;
-import io.github.mmm.orm.statement.delete.DeleteFrom;
-import io.github.mmm.orm.statement.drop.DropTable;
+import io.github.mmm.orm.statement.delete.DeleteFromClause;
+import io.github.mmm.orm.statement.drop.DropTableClause;
 import io.github.mmm.orm.statement.insert.InsertClause;
-import io.github.mmm.orm.statement.insert.InsertInto;
+import io.github.mmm.orm.statement.insert.InsertIntoClause;
 import io.github.mmm.orm.statement.merge.MergeClause;
-import io.github.mmm.orm.statement.merge.MergeInto;
+import io.github.mmm.orm.statement.merge.MergeIntoClause;
 import io.github.mmm.orm.statement.select.SelectEntityClause;
-import io.github.mmm.orm.statement.select.SelectFrom;
+import io.github.mmm.orm.statement.select.SelectFromClause;
 import io.github.mmm.orm.statement.select.SelectProjectionClause;
 import io.github.mmm.orm.statement.select.SelectSequenceNextValueClause;
 import io.github.mmm.orm.statement.select.SelectSingleClause;
@@ -60,7 +62,7 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    * @param entity the {@link EntityBean} to select.
    * @return the {@link SelectEntityClause} clause.
    */
-  public static <E extends EntityBean> SelectFrom<E, E> select(E entity) {
+  public static <E extends EntityBean> SelectFromClause<E, E> select(E entity) {
 
     return new SelectEntityClause<>(entity).from();
   }
@@ -112,9 +114,9 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    *
    * @param <E> type of the {@link EntityBean} to delete.
    * @param entity the {@link EntityBean} to delete.
-   * @return the {@link DeleteFrom} clause.
+   * @return the {@link DeleteFromClause} clause.
    */
-  public static <E extends EntityBean> DeleteFrom<E> delete(E entity) {
+  public static <E extends EntityBean> DeleteFromClause<E> delete(E entity) {
 
     return new DeleteClause().from(entity);
   }
@@ -124,9 +126,9 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    *
    * @param <E> type of the {@link EntityBean} to insert.
    * @param entity the {@link EntityBean} to insert.
-   * @return the {@link InsertInto} clause.
+   * @return the {@link InsertIntoClause} clause.
    */
-  public static <E extends EntityBean> InsertInto<E> insert(E entity) {
+  public static <E extends EntityBean> InsertIntoClause<E> insert(E entity) {
 
     return new InsertClause().into(entity);
   }
@@ -162,7 +164,7 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    * @param entity the {@link EntityBean} to update.
    * @return the {@link UpsertInto} clause.
    */
-  public static <E extends EntityBean> MergeInto<E> merge(E entity) {
+  public static <E extends EntityBean> MergeIntoClause<E> merge(E entity) {
 
     return new MergeClause().into(entity);
   }
@@ -184,10 +186,58 @@ public abstract interface DbStatement<E> extends MarshallingObject {
    *
    * @param <E> type of the {@link EntityBean} to drop the table.
    * @param entity the {@link EntityBean} to create drop the table.
-   * @return the {@link DropTable} clause.
+   * @return the {@link DropTableClause} clause.
    */
-  public static <E extends EntityBean> DropTable<E> dropTable(E entity) {
+  public static <E extends EntityBean> DropTableClause<E> dropTable(E entity) {
 
-    return new DropTable<>(entity);
+    return new DropTableClause<>(entity);
+  }
+
+  /**
+   * Alternative for <code>new {@link CreateIndexClause}()</code>.
+   *
+   * @return the {@link CreateIndexClause}.
+   * @see CreateIndexClause#on(EntityBean)
+   * @see #createIndex(String)
+   */
+  public static CreateIndexClause createIndex() {
+
+    return new CreateIndexClause();
+  }
+
+  /**
+   * Alternative for <code>new {@link CreateIndexClause}(indexName)</code>.
+   *
+   * @param indexName the {@link CreateIndexClause#getName() the name of the index}.
+   * @return the {@link CreateIndexClause}.
+   * @see CreateIndexClause#on(EntityBean)
+   */
+  public static CreateIndexClause createIndex(String indexName) {
+
+    return new CreateIndexClause(indexName);
+  }
+
+  /**
+   * Alternative for <code>new {@link CreateUniqueIndexClause}()</code>.
+   *
+   * @return the {@link CreateUniqueIndexClause}.
+   * @see CreateIndexClause#on(EntityBean)
+   * @see #createUniqueIndex(String)
+   */
+  public static CreateUniqueIndexClause createUniqueIndex() {
+
+    return new CreateUniqueIndexClause();
+  }
+
+  /**
+   * Alternative for <code>new {@link CreateUniqueIndexClause}(indexName)</code>.
+   *
+   * @param indexName the {@link CreateUniqueIndexClause#getName() the name of the index}.
+   * @return the {@link CreateUniqueIndexClause}.
+   * @see CreateUniqueIndexClause#on(EntityBean)
+   */
+  public static CreateUniqueIndexClause createUniqueIndex(String indexName) {
+
+    return new CreateUniqueIndexClause(indexName);
   }
 }

@@ -25,7 +25,7 @@ public class DeleteStatement<E extends EntityBean> extends AbstractDbStatement<E
 
   private final DeleteClause delete;
 
-  private final DeleteFrom<E> from;
+  private final DeleteFromClause<E> from;
 
   private final DeleteWhere<E> where;
 
@@ -35,7 +35,7 @@ public class DeleteStatement<E extends EntityBean> extends AbstractDbStatement<E
    * @param delete the {@link #getDelete() delete}.
    * @param from the #getFrom
    */
-  public DeleteStatement(DeleteClause delete, DeleteFrom<E> from) {
+  public DeleteStatement(DeleteClause delete, DeleteFromClause<E> from) {
 
     super();
     this.delete = delete;
@@ -62,9 +62,9 @@ public class DeleteStatement<E extends EntityBean> extends AbstractDbStatement<E
   }
 
   /**
-   * @return the {@link DeleteFrom From}-{@link DbClause}.
+   * @return the {@link DeleteFromClause From}-{@link DbClause}.
    */
-  public DeleteFrom<E> getFrom() {
+  public DeleteFromClause<E> getFrom() {
 
     return this.from;
   }

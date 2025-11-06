@@ -5,12 +5,12 @@ package io.github.mmm.orm.statement.update;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.WhereClause;
-import io.github.mmm.orm.statement.select.SelectFrom;
+import io.github.mmm.orm.statement.select.SelectFromClause;
 
 /**
  * A {@link WhereClause}-{@link DbClause} of an SQL {@link UpdateStatement}.
  *
- * @param <E> type of the {@link SelectFrom#getEntity() entity}.
+ * @param <E> type of the {@link SelectFromClause#getEntity() entity}.
  * @since 1.0.0
  */
 public class UpdateWhere<E extends EntityBean> extends WhereClause<E, UpdateWhere<E>> {

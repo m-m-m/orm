@@ -22,7 +22,7 @@ public class SelectStatement<R> extends AbstractDbStatement<R> {
 
   private final SelectClause<R> select;
 
-  private final SelectFrom<R, ?> from;
+  private final SelectFromClause<R, ?> from;
 
   private final SelectWhere<R> where;
 
@@ -38,10 +38,9 @@ public class SelectStatement<R> extends AbstractDbStatement<R> {
    * @param select the {@link #getStart() starting} {@link SelectClause SELECT}.
    * @param from the {@link #getFrom() FROM}.
    */
-  protected SelectStatement(SelectClause<R> select, SelectFrom<R, ?> from) {
+  protected SelectStatement(SelectClause<R> select, SelectFromClause<R, ?> from) {
 
     super();
-    select.setStatement(this);
     this.select = select;
     this.from = from;
     this.where = new SelectWhere<>(this);
@@ -69,9 +68,9 @@ public class SelectStatement<R> extends AbstractDbStatement<R> {
   }
 
   /**
-   * @return the {@link SelectFrom FROM} {@link DbClause}.
+   * @return the {@link SelectFromClause FROM} {@link DbClause}.
    */
-  public SelectFrom<R, ?> getFrom() {
+  public SelectFromClause<R, ?> getFrom() {
 
     return this.from;
   }

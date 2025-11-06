@@ -25,9 +25,9 @@ public class MergeStatement<E extends EntityBean> extends IntoValuesStatement<E>
 
   private final MergeClause merge;
 
-  private final MergeInto<E> into;
+  private final MergeIntoClause<E> into;
 
-  private final MergeValues<E> values;
+  private final MergeValuesClause<E> values;
 
   /**
    * The constructor.
@@ -35,12 +35,12 @@ public class MergeStatement<E extends EntityBean> extends IntoValuesStatement<E>
    * @param merge the {@link #getMerge() MERGE}.
    * @param into the {@link #getInto() INTO}.
    */
-  public MergeStatement(MergeClause merge, MergeInto<E> into) {
+  public MergeStatement(MergeClause merge, MergeIntoClause<E> into) {
 
     super();
     this.merge = merge;
     this.into = into;
-    this.values = new MergeValues<>(this);
+    this.values = new MergeValuesClause<>(this);
   }
 
   /**
@@ -62,10 +62,10 @@ public class MergeStatement<E extends EntityBean> extends IntoValuesStatement<E>
   }
 
   /**
-   * @return the {@link MergeInto INTO}-{@link DbClause clause}.
+   * @return the {@link MergeIntoClause INTO}-{@link DbClause clause}.
    */
   @Override
-  public MergeInto<E> getInto() {
+  public MergeIntoClause<E> getInto() {
 
     return this.into;
   }
@@ -74,7 +74,7 @@ public class MergeStatement<E extends EntityBean> extends IntoValuesStatement<E>
    * @return the {@link UpsertValues VALUES}-{@link DbClause clause} or {@code null} if none was added.
    */
   @Override
-  public MergeValues<E> getValues() {
+  public MergeValuesClause<E> getValues() {
 
     return this.values;
   }

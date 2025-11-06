@@ -2,10 +2,14 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.naming;
 
+import java.util.List;
+
 import io.github.mmm.base.text.CaseSyntax;
 import io.github.mmm.bean.BeanType;
 import io.github.mmm.entity.bean.EntityBean;
+import io.github.mmm.orm.ddl.DbColumnSpec;
 import io.github.mmm.orm.statement.AbstractEntityClause;
+import io.github.mmm.orm.statement.create.CreateIndexStatement;
 import io.github.mmm.property.ReadableProperty;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.value.PropertyPath;
@@ -21,6 +25,29 @@ import io.github.mmm.value.converter.TypeMapper;
  * @since 1.0.0
  */
 public interface DbNamingStrategy {
+
+  /**
+   * @return the maximum length for names of DDL elements (tables, columns, constraints, indexes, etc.) supported by the
+   *         underlying database. To avoid trouble you should name your entities and properties short but precise.
+   *         However, if you somehow exceed the limit, your names will be truncated automatically.
+   */
+  default int getMaximumNameLength() {
+
+    return 128;
+  }
+
+  /**
+   * @param name the suggested name of a DDL element.
+   * @return the given {@code name} clipped to ensure {@link #getMaximumNameLength()} is not exceeded.
+   */
+  default String clipName(String name) {
+
+    int max = getMaximumNameLength();
+    if (name.length() > max) {
+      return name.substring(0, max);
+    }
+    return name;
+  }
 
   /**
    * @param property the {@link ReadableProperty} to derive the column name from.
@@ -62,7 +89,7 @@ public interface DbNamingStrategy {
       builder.add(columnName);
       return builder.toString();
     }
-    return columnName;
+    return clipName(columnName);
   }
 
   /**
@@ -89,7 +116,8 @@ public interface DbNamingStrategy {
     if ((suffix != null) && !suffix.isEmpty()) {
       suffix = getColumnName(suffix);
     }
-    return typeMapper.getNameMode().format(rawColumnName, suffix);
+    String columnName = typeMapper.getNameMode().format(rawColumnName, suffix);
+    return clipName(columnName);
   }
 
   /**
@@ -98,21 +126,21 @@ public interface DbNamingStrategy {
    */
   default String getColumnName(String rawColumnName) {
 
-    return rawColumnName;
+    return clipName(rawColumnName);
   }
 
   /**
-   * @param bean the {@link EntityBean} to map to a database table.
+   * @param entity the {@link EntityBean} to map to a database table.
    * @return the physical table name.
    */
-  default String getTableName(EntityBean bean) {
+  default String getTableName(EntityBean entity) {
 
-    BeanType type = bean.getType();
+    BeanType type = entity.getType();
     String tableName = type.getMetaInfo().get(EntityBean.META_KEY_TABLE);
     if (tableName == null) {
       tableName = getTableName(type.getSimpleName());
     }
-    return tableName;
+    return clipName(tableName);
   }
 
   /**
@@ -135,7 +163,61 @@ public interface DbNamingStrategy {
    */
   default String getTableName(String rawTableName) {
 
-    return rawTableName;
+    return clipName(rawTableName);
+  }
+
+  /**
+   * @param createIndex the {@link CreateIndexStatement}.
+   * @return the static prefix for an {@link #getIndexName(CreateIndexStatement) index name}.
+   */
+  default String getIndexNamePrefix(CreateIndexStatement<?> createIndex) {
+
+    if (createIndex.getCreateIndex().isUnique()) {
+      return "UX";
+    } else {
+      return "IX";
+    }
+  }
+
+  /**
+   * @return the static infix for an {@link #getIndexName(CreateIndexStatement) index name} used to separate the
+   *         columns.
+   */
+  default String getIndexNameInfix() {
+
+    return "_";
+  }
+
+  /**
+   * @param createIndex the {@link CreateIndexStatement}.
+   * @return the auto-generated index name.
+   */
+  default String getIndexName(CreateIndexStatement<?> createIndex) {
+
+    EntityBean entity = createIndex.getOn().getEntity();
+    List<DbColumnSpec> columns = createIndex.getColumn().getColumns();
+    String tableName = getTableName(entity);
+    int capacity = 3 + tableName.length() + (columns.size() * 5);
+    int max = getMaximumNameLength();
+    if (capacity > max) {
+      capacity = max;
+    }
+    StringBuilder sb = new StringBuilder(capacity);
+    String infix = getIndexNameInfix();
+    sb.append(getIndexNamePrefix(createIndex));
+    sb.append(infix);
+    sb.append(tableName);
+    for (DbColumnSpec column : columns) {
+      column.getName();
+      String columnName = getColumnName(column.getProperty());
+      sb.append(infix);
+      sb.append(columnName);
+      if (sb.length() > max) {
+        break;
+      }
+    }
+    String indexName = sb.toString();
+    return clipName(indexName);
   }
 
   /**
