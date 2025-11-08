@@ -180,7 +180,7 @@ public class JdbcAccess extends AbstractDbAccess {
     boolean resultReceived = false;
     while (current != null) {
       String sql = current.getStatement();
-      LOG.debug(sql);
+      LOG.debug("Executing SQL:\n{}", sql);
       try (PreparedStatement jdbcStatement = connection.prepareStatement(sql)) {
         AbstractCriteriaParameters parameters = current.getParameters().cast();
         parameters.apply(jdbcStatement, connection);
