@@ -8,10 +8,10 @@ import io.github.mmm.orm.statement.ValuesClause;
 /**
  * {@link ValuesClause} of an {@link MergeStatement}.
  *
- * @param <E> type of the {@link MergeInto#getEntity() entity}.
+ * @param <E> type of the {@link MergeIntoClause#getEntity() entity}.
  * @since 1.0.0
  */
-public class MergeValues<E extends EntityBean> extends ValuesClause<E, MergeValues<E>> {
+public class MergeValuesClause<E extends EntityBean> extends ValuesClause<E, MergeValuesClause<E>> {
 
   private final MergeStatement<E> statement;
 
@@ -20,7 +20,7 @@ public class MergeValues<E extends EntityBean> extends ValuesClause<E, MergeValu
    *
    * @param statement the owning {@link MergeStatement}.
    */
-  public MergeValues(MergeStatement<E> statement) {
+  public MergeValuesClause(MergeStatement<E> statement) {
 
     super();
     this.statement = statement;

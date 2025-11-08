@@ -5,21 +5,30 @@ package io.github.mmm.orm.statement.create;
 import io.github.mmm.orm.statement.StartClause;
 
 /**
- * A {@link CreateUniqueIndex}-{@link StartClause} of an SQL {@link CreateIndexStatement}.
+ * A {@link CreateUniqueIndexClause}-{@link StartClause} of an SQL {@link CreateIndexStatement}.
  *
  * @since 1.0.0
+ * @see io.github.mmm.orm.statement.DbStatement#createUniqueIndex()
  */
-public class CreateUniqueIndex extends CreateIndexClause {
+public class CreateUniqueIndexClause extends CreateIndexClause {
 
-  /** Name of {@link CreateUniqueIndex} for marshaling. */
+  /** Name of {@link CreateUniqueIndexClause} for marshaling. */
   public static final String NAME_CREATE_UNIQUE_INDEX = "CREATE UNIQUE INDEX";
+
+  /**
+   * The constructor to use an auto-generated {@link #getName() name}.
+   */
+  public CreateUniqueIndexClause() {
+
+    super();
+  }
 
   /**
    * The constructor.
    *
    * @param name the {@link #getName() name of the index}.
    */
-  public CreateUniqueIndex(String name) {
+  public CreateUniqueIndexClause(String name) {
 
     super(name);
   }

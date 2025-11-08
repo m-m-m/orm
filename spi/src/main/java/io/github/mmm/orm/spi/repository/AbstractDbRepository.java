@@ -8,6 +8,8 @@ import io.github.mmm.entity.id.generator.IdGenerator;
 import io.github.mmm.entity.id.generator.SequenceIdGenerator;
 import io.github.mmm.entity.id.generator.UuidIdGenerator;
 import io.github.mmm.entity.id.sequence.IdSequence;
+import io.github.mmm.entity.property.id.FkProperty;
+import io.github.mmm.entity.property.link.LinkProperty;
 import io.github.mmm.orm.connection.DbConnectionData;
 import io.github.mmm.orm.dialect.AbstractDbDialect;
 import io.github.mmm.orm.metadata.DbName;
@@ -18,11 +20,14 @@ import io.github.mmm.orm.source.DbSource;
 import io.github.mmm.orm.spi.access.AbstractDbAccess;
 import io.github.mmm.orm.spi.access.DbAccess;
 import io.github.mmm.orm.spi.sequence.IdSequencePooled;
+import io.github.mmm.orm.statement.DbStatement;
+import io.github.mmm.orm.statement.create.CreateIndexStatement;
 import io.github.mmm.orm.statement.create.CreateSequenceClause;
 import io.github.mmm.orm.statement.create.CreateSequenceStatement;
 import io.github.mmm.orm.statement.delete.DeleteStatement;
 import io.github.mmm.orm.statement.select.SelectStatement;
 import io.github.mmm.orm.statement.update.UpdateStatement;
+import io.github.mmm.property.WritableProperty;
 
 /**
  * Abstract base implementation of {@link DbRepository}.
@@ -196,6 +201,40 @@ public abstract class AbstractDbRepository<E extends EntityBean> extends Abstrac
   public void createTable() {
 
     this.dbAccess.createTable(this.prototype);
+    createIndexes();
+  }
+
+  /**
+   * This method is called from {@link #createTable()} in order to create the indexes for the table. By default, for
+   * each foreign key an index will be created. You can override this entire method or XXX in order to replace, extend
+   * or adapt the default behaviour.
+   */
+  protected void createIndexes() {
+
+    for (WritableProperty<?> property : this.prototype.getProperties()) {
+      CreateIndexStatement<E> createIndexStatement = createIndex(property);
+      if (createIndexStatement != null) {
+        this.dbAccess.createIndex(createIndexStatement);
+      }
+    }
+  }
+
+  /**
+   * @param property the {@link WritableProperty} to potentially generate an automatic index for.
+   * @return the {@link CreateIndexStatement} or {@code null} for no index.
+   */
+  protected CreateIndexStatement<E> createIndex(WritableProperty<?> property) {
+
+    Class<?> targetEntity = null;
+    if (property instanceof FkProperty<?> fkProperty) {
+      targetEntity = fkProperty.get().getEntityClass();
+    } else if (property instanceof LinkProperty<?> linkProperty) {
+      targetEntity = linkProperty.getEntityClass();
+    }
+    if (targetEntity != null) {
+      return DbStatement.createIndex().on(this.prototype).column(property).get();
+    }
+    return null;
   }
 
   /**

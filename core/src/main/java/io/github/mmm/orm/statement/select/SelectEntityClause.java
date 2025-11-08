@@ -6,7 +6,7 @@ import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.DbStatement;
 
 /**
- * {@link SelectClause} to query the {@link SelectFrom#getEntity() primary entity}.
+ * {@link SelectClause} to query the {@link SelectFromClause#getEntity() primary entity}.
  *
  * @param <R> type of the result of the selection.
  * @see DbStatement#select(EntityBean)
@@ -41,11 +41,13 @@ public class SelectEntityClause<R extends EntityBean> extends SelectClause<R> {
   }
 
   /**
-   * @return the {@link SelectFrom} for fluent API calls.
+   * @return the {@link SelectFromClause} for fluent API calls.
    */
-  public SelectFrom<R, R> from() {
+  public SelectFromClause<R, R> from() {
 
-    return new SelectFrom<>(this, getResultBean());
+    SelectFromClause<R, R> fromClause = new SelectFromClause<>(this, getResultBean());
+    this.statement = fromClause.get();
+    return fromClause;
   }
 
   @Override

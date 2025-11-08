@@ -26,7 +26,7 @@ public class SelectSequenceNextValueClause extends SelectClause<Long> {
     this.selection = new SequenceNextValue(sequenceName);
     setResultName(VALUE_RESULT_SEQ_NEXT_VAL);
     add(this.selection);
-    setStatement(new SelectStatement<>(this, null));
+    this.statement = new SelectStatement<>(this, null);
   }
 
   /**
@@ -46,7 +46,7 @@ public class SelectSequenceNextValueClause extends SelectClause<Long> {
   }
 
   @Override
-  public <E extends EntityBean> SelectFrom<Long, E> from(E entity) {
+  public <E extends EntityBean> SelectFromClause<Long, E> from(E entity) {
 
     assert (entity == null);
     return super.from(entity);

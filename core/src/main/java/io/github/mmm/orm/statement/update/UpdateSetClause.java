@@ -7,17 +7,17 @@ import io.github.mmm.orm.statement.DbClause;
 import io.github.mmm.orm.statement.MainDbClause;
 import io.github.mmm.orm.statement.SetClause;
 import io.github.mmm.orm.statement.ValuesClause;
-import io.github.mmm.orm.statement.insert.InsertInto;
+import io.github.mmm.orm.statement.insert.InsertIntoClause;
 import io.github.mmm.orm.statement.insert.InsertStatement;
 import io.github.mmm.property.criteria.CriteriaPredicate;
 
 /**
  * {@link ValuesClause}-{@link DbClause} of an {@link InsertStatement}.
  *
- * @param <E> type of the {@link InsertInto#getEntity() entity}.
+ * @param <E> type of the {@link InsertIntoClause#getEntity() entity}.
  * @since 1.0.0
  */
-public class UpdateSet<E extends EntityBean> extends SetClause<E, UpdateSet<E>> implements MainDbClause<E> {
+public class UpdateSetClause<E extends EntityBean> extends SetClause<E, UpdateSetClause<E>> implements MainDbClause<E> {
 
   private final UpdateStatement<E> statement;
 
@@ -26,7 +26,7 @@ public class UpdateSet<E extends EntityBean> extends SetClause<E, UpdateSet<E>> 
    *
    * @param statement the owning {@link UpdateStatement}.
    */
-  public UpdateSet(UpdateStatement<E> statement) {
+  public UpdateSetClause(UpdateStatement<E> statement) {
 
     super();
     this.statement = statement;

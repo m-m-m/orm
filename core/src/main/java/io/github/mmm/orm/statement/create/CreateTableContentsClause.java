@@ -18,8 +18,8 @@ import io.github.mmm.orm.statement.MainDbClause;
  * @param <E> type of the {@link io.github.mmm.orm.statement.AbstractEntityClause#getEntity() entity}.
  * @since 1.0.0
  */
-public class CreateTableContentsClause<E extends EntityBean> extends AbstractTypedClause<E, CreateTableContentsClause<E>>
-    implements MainDbClause<E>, CreateTableFragment<E> {
+public class CreateTableContentsClause<E extends EntityBean>
+    extends AbstractTypedClause<E, CreateTableContentsClause<E>> implements MainDbClause<E>, CreateTableFragment<E> {
 
   private final CreateTableStatement<E> statement;
 

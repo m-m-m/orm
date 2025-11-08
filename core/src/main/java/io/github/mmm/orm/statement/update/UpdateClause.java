@@ -18,7 +18,7 @@ import io.github.mmm.property.criteria.PropertyAssignment;
  * @since 1.0.0
  */
 public final class UpdateClause<E extends EntityBean> extends AbstractEntitiesClause<E, E, UpdateClause<E>>
-    implements StartClause, MainDbClause<E>, SetFragment<E, UpdateSet<E>> {
+    implements StartClause, MainDbClause<E>, SetFragment<E, UpdateSetClause<E>> {
 
   /** Name of {@link UpdateClause} for marshaling. */
   public static final String NAME_UPDATE = "UPDATE";
@@ -50,11 +50,11 @@ public final class UpdateClause<E extends EntityBean> extends AbstractEntitiesCl
   /**
    * Sets all properties of the {@link #getEntity() entity} to their current values.
    *
-   * @return the {@link UpdateSet} for fluent API.
+   * @return the {@link UpdateSetClause} for fluent API.
    */
-  public UpdateSet<E> set() {
+  public UpdateSetClause<E> set() {
 
-    UpdateSet<E> set = this.statement.getSet();
+    UpdateSetClause<E> set = this.statement.getSet();
     for (WritableProperty<?> property : this.entity.getProperties()) {
       set.set(PropertyAssignment.ofValue(property));
     }
@@ -62,13 +62,13 @@ public final class UpdateClause<E extends EntityBean> extends AbstractEntitiesCl
   }
 
   @Override
-  public UpdateSet<E> set(PropertyAssignment<?> assignment) {
+  public UpdateSetClause<E> set(PropertyAssignment<?> assignment) {
 
     return this.statement.getSet().set(assignment);
   }
 
   @Override
-  public UpdateSet<E> setAll(PropertyAssignment<?>... assignments) {
+  public UpdateSetClause<E> setAll(PropertyAssignment<?>... assignments) {
 
     return this.statement.getSet().setAll(assignments);
   }

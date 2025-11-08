@@ -9,10 +9,10 @@ import io.github.mmm.orm.statement.ValuesClause;
 /**
  * {@link ValuesClause}-{@link DbClause} of an {@link InsertStatement}.
  *
- * @param <E> type of the {@link InsertInto#getEntity() entity}.
+ * @param <E> type of the {@link InsertIntoClause#getEntity() entity}.
  * @since 1.0.0
  */
-public class InsertValues<E extends EntityBean> extends ValuesClause<E, InsertValues<E>> {
+public class InsertValuesClause<E extends EntityBean> extends ValuesClause<E, InsertValuesClause<E>> {
 
   private final InsertStatement<E> statement;
 
@@ -21,7 +21,7 @@ public class InsertValues<E extends EntityBean> extends ValuesClause<E, InsertVa
    *
    * @param statement the owning {@link InsertStatement}.
    */
-  public InsertValues(InsertStatement<E> statement) {
+  public InsertValuesClause(InsertStatement<E> statement) {
 
     super();
     this.statement = statement;

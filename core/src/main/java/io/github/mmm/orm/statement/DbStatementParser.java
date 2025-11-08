@@ -47,23 +47,23 @@ import io.github.mmm.orm.statement.create.CreateSequenceStatement;
 import io.github.mmm.orm.statement.create.CreateTableClause;
 import io.github.mmm.orm.statement.create.CreateTableContentsClause;
 import io.github.mmm.orm.statement.create.CreateTableStatement;
-import io.github.mmm.orm.statement.create.CreateUniqueIndex;
+import io.github.mmm.orm.statement.create.CreateUniqueIndexClause;
 import io.github.mmm.orm.statement.delete.DeleteClause;
-import io.github.mmm.orm.statement.delete.DeleteFrom;
+import io.github.mmm.orm.statement.delete.DeleteFromClause;
 import io.github.mmm.orm.statement.delete.DeleteStatement;
 import io.github.mmm.orm.statement.insert.InsertClause;
-import io.github.mmm.orm.statement.insert.InsertInto;
+import io.github.mmm.orm.statement.insert.InsertIntoClause;
 import io.github.mmm.orm.statement.insert.InsertStatement;
-import io.github.mmm.orm.statement.insert.InsertValues;
+import io.github.mmm.orm.statement.insert.InsertValuesClause;
 import io.github.mmm.orm.statement.merge.MergeClause;
-import io.github.mmm.orm.statement.merge.MergeInto;
+import io.github.mmm.orm.statement.merge.MergeIntoClause;
 import io.github.mmm.orm.statement.merge.MergeStatement;
 import io.github.mmm.orm.statement.select.GroupByClause;
 import io.github.mmm.orm.statement.select.HavingClause;
 import io.github.mmm.orm.statement.select.OrderByClause;
 import io.github.mmm.orm.statement.select.SelectClause;
 import io.github.mmm.orm.statement.select.SelectEntityClause;
-import io.github.mmm.orm.statement.select.SelectFrom;
+import io.github.mmm.orm.statement.select.SelectFromClause;
 import io.github.mmm.orm.statement.select.SelectProjectionClause;
 import io.github.mmm.orm.statement.select.SelectResultClause;
 import io.github.mmm.orm.statement.select.SelectSequenceNextValueClause;
@@ -203,7 +203,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
     String name = parseSegment(scanner);
     scanner.requireOneOrMore(NEWLINE_OR_SPACE);
     if (unique) {
-      return new CreateUniqueIndex(name);
+      return new CreateUniqueIndexClause(name);
     } else {
       return new CreateIndexClause(name);
     }
@@ -553,7 +553,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
 
   private MergeStatement<?> parseMergeStatement(CharStreamScanner scanner) {
 
-    MergeStatement statement = new MergeInto<>(new MergeClause(), null).values(PropertyAssignment.EMPTY_ARRAY).get();
+    MergeStatement statement = new MergeIntoClause<>(new MergeClause(), null).values(PropertyAssignment.EMPTY_ARRAY).get();
     // TODO Auto-generated method stub
     return statement;
   }
@@ -568,7 +568,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
 
   private DeleteStatement<?> parseDeleteStatement(CharStreamScanner scanner) {
 
-    DeleteFrom<EntityBean> from = new DeleteFrom<>(new DeleteClause(), null);
+    DeleteFromClause<EntityBean> from = new DeleteFromClause<>(new DeleteClause(), null);
     parseFrom(scanner, from);
     DeleteStatement<EntityBean> statement = from.get();
     parseWhere(scanner, statement.getWhere());
@@ -578,10 +578,10 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
 
   private InsertStatement<?> parseInsertStatement(CharStreamScanner scanner) {
 
-    InsertInto<?> into = new InsertInto<>(new InsertClause(), null);
+    InsertIntoClause<?> into = new InsertIntoClause<>(new InsertClause(), null);
     parseInto(scanner, into);
     scanner.skipWhile(' ');
-    InsertValues<?> values = into.values(PropertyAssignment.EMPTY_ARRAY);
+    InsertValuesClause<?> values = into.values(PropertyAssignment.EMPTY_ARRAY);
     parseValues(scanner, values, into.getEntity());
     InsertStatement statement = values.get();
     // TODO Auto-generated method stub
@@ -627,7 +627,7 @@ public class DbStatementParser implements CharScannerParser<DbStatement<?>> {
     if (select instanceof SelectSequenceNextValueClause) {
       return select.getStatement();
     }
-    SelectFrom from = new SelectFrom<>(select, null);
+    SelectFromClause from = new SelectFromClause<>(select, null);
     parseFrom(scanner, from);
     if (select instanceof SelectEntityClause) {
       String aliasFrom = from.getAlias();

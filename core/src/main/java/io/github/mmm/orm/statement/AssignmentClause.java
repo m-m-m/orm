@@ -10,7 +10,7 @@ import io.github.mmm.property.criteria.PropertyAssignment;
 
 /**
  * {@link DbClause} containing {@link #getAssignments() assignments} like a
- * {@link io.github.mmm.orm.statement.insert.InsertValues}-clause.
+ * {@link io.github.mmm.orm.statement.insert.InsertValuesClause}-clause.
  *
  * @param <E> type of the {@link EntityBean} to query.
  * @param <SELF> type of this class itself.

@@ -16,21 +16,21 @@ import io.github.mmm.orm.statement.StartClause;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 
 /**
- * {@link DbStatement} to {@link DropTable drop a table}.
+ * {@link DbStatement} to {@link DropTableClause drop a table}.
  *
  * @param <E> type of the {@link AbstractEntityClause#getEntity() entity}.
  * @since 1.0.0
  */
 public class DropTableStatement<E extends EntityBean> extends AbstractDbStatement<E> {
 
-  private final DropTable<E> dropTable;
+  private final DropTableClause<E> dropTable;
 
   /**
    * The constructor.
    *
    * @param dropTable the {@link #getDropTable() drop table}.
    */
-  public DropTableStatement(DropTable<E> dropTable) {
+  public DropTableStatement(DropTableClause<E> dropTable) {
 
     super();
     this.dropTable = dropTable;
@@ -47,9 +47,9 @@ public class DropTableStatement<E extends EntityBean> extends AbstractDbStatemen
   }
 
   /**
-   * @return the opening {@link DropTable}-{@link DbClause}.
+   * @return the opening {@link DropTableClause}-{@link DbClause}.
    */
-  public DropTable<E> getDropTable() {
+  public DropTableClause<E> getDropTable() {
 
     return this.dropTable;
   }

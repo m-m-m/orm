@@ -50,7 +50,7 @@ public class SelectSingleClause<R> extends SelectClause<R> {
   }
 
   @Override
-  public <E extends EntityBean> SelectFrom<R, E> from(E entity) {
+  public <E extends EntityBean> SelectFromClause<R, E> from(E entity) {
 
     return super.from(entity);
   }

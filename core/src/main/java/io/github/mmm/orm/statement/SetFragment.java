@@ -4,7 +4,7 @@ package io.github.mmm.orm.statement;
 
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.orm.statement.alter.AlterTableClause;
-import io.github.mmm.orm.statement.update.UpdateSet;
+import io.github.mmm.orm.statement.update.UpdateSetClause;
 import io.github.mmm.property.criteria.PropertyAssignment;
 import io.github.mmm.value.PropertyPath;
 
@@ -57,7 +57,7 @@ public interface SetFragment<E extends EntityBean, C extends DbClause> {
    * @param <V> type of the {@link PropertyPath#get() value}.
    * @param property the {@link PropertyPath property} to set.
    * @param valueProperty the {@link PropertyPath property} from where to read the value to set.
-   * @return the {@link UpdateSet} for fluent API.
+   * @return the {@link UpdateSetClause} for fluent API.
    */
   default <V> C set(PropertyPath<V> property, PropertyPath<V> valueProperty) {
 
