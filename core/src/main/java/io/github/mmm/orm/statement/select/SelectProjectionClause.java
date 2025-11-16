@@ -145,7 +145,7 @@ public final class SelectProjectionClause<R extends WritableBean> extends Select
   }
 
   @Override
-  public <E extends EntityBean> SelectFrom<R, E> from(E entity) {
+  public <E extends EntityBean> SelectFromClause<R, E> from(E entity) {
 
     if (getSelections().isEmpty()) {
       throw new IllegalStateException("Selections must not be empty! Call 'and' method at least once!");

@@ -14,7 +14,7 @@ import io.github.mmm.property.criteria.PropertyAssignment;
  * @param <E> type of the {@link #getEntity() entity}.
  * @since 1.0.0
  */
-public class InsertInto<E extends EntityBean> extends IntoClause<E, InsertValues<E>, InsertInto<E>> {
+public class InsertIntoClause<E extends EntityBean> extends IntoClause<E, InsertValuesClause<E>, InsertIntoClause<E>> {
 
   private final InsertStatement<E> statement;
 
@@ -24,7 +24,7 @@ public class InsertInto<E extends EntityBean> extends IntoClause<E, InsertValues
    * @param insert the opening {@link InsertClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    */
-  public InsertInto(InsertClause insert, E entity) {
+  public InsertIntoClause(InsertClause insert, E entity) {
 
     this(insert, entity, null);
   }
@@ -36,20 +36,20 @@ public class InsertInto<E extends EntityBean> extends IntoClause<E, InsertValues
    * @param entity the {@link #getEntity() entity} to operate on.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public InsertInto(InsertClause insert, E entity, String entityName) {
+  public InsertIntoClause(InsertClause insert, E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new InsertStatement<>(insert, this);
   }
 
   @Override
-  public InsertValues<E> value(PropertyAssignment<?> assignment) {
+  public InsertValuesClause<E> value(PropertyAssignment<?> assignment) {
 
     return this.statement.getValues().value(assignment);
   }
 
   @Override
-  public InsertValues<E> values(PropertyAssignment<?>... assignments) {
+  public InsertValuesClause<E> values(PropertyAssignment<?>... assignments) {
 
     return this.statement.getValues().values(assignments);
   }
@@ -65,7 +65,7 @@ public class InsertInto<E extends EntityBean> extends IntoClause<E, InsertValues
    */
   @Override
   @Deprecated
-  public InsertInto<E> as(String entityAlias) {
+  public InsertIntoClause<E> as(String entityAlias) {
 
     throw new UnsupportedOperationException();
   }
@@ -75,6 +75,11 @@ public class InsertInto<E extends EntityBean> extends IntoClause<E, InsertValues
   protected AliasMap getAliasMap() {
 
     return super.getAliasMap();
+  }
+
+  InsertStatement<E> getStatement() {
+
+    return this.statement;
   }
 
 }

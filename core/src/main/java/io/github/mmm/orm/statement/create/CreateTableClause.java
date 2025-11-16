@@ -7,7 +7,7 @@ import io.github.mmm.orm.ddl.DbColumnSpec;
 import io.github.mmm.orm.ddl.constraint.DbConstraint;
 import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.orm.statement.AliasMap;
-import io.github.mmm.orm.statement.StartClause;
+import io.github.mmm.orm.statement.IncompleteStartClause;
 import io.github.mmm.property.ReadableProperty;
 
 /**
@@ -17,7 +17,7 @@ import io.github.mmm.property.ReadableProperty;
  * @since 1.0.0
  */
 public class CreateTableClause<E extends EntityBean> extends AbstractEntityClause<E, E, CreateTableClause<E>>
-    implements StartClause, CreateTableFragment<E> {
+    implements IncompleteStartClause, CreateTableFragment<E> {
 
   /** Name of {@link CreateTableClause} for marshaling. */
   public static final String NAME_CREATE_TABLE = "CREATE TABLE";
@@ -91,6 +91,12 @@ public class CreateTableClause<E extends EntityBean> extends AbstractEntityClaus
   protected AliasMap getAliasMap() {
 
     return super.getAliasMap();
+  }
+
+  @Override
+  public CreateTableStatement<E> getStatement() {
+
+    return this.statement;
   }
 
 }

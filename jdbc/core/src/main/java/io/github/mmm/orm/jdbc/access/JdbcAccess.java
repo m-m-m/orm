@@ -41,7 +41,7 @@ import io.github.mmm.orm.statement.insert.InsertStatement;
 import io.github.mmm.orm.statement.select.SelectEntityClause;
 import io.github.mmm.orm.statement.select.SelectStatement;
 import io.github.mmm.orm.statement.update.UpdateClause;
-import io.github.mmm.orm.statement.update.UpdateSet;
+import io.github.mmm.orm.statement.update.UpdateSetClause;
 import io.github.mmm.orm.statement.update.UpdateStatement;
 import io.github.mmm.property.WritableProperty;
 import io.github.mmm.property.criteria.CriteriaPredicate;
@@ -138,7 +138,7 @@ public class JdbcAccess extends AbstractDbAccess {
     // this allows us to build the clause dynamically
     // otherwise we would need to add the first assignment to UpdateClause
     // and then all following assignments to the returned UpdateSet.
-    UpdateSet<EntityBean> set = updateEntity.setAll();
+    UpdateSetClause<EntityBean> set = updateEntity.setAll();
     for (WritableProperty<?> property : entity.getProperties()) {
       if (!property.isTransient()) {
         PropertyAssignment<?> assignment;
@@ -180,7 +180,7 @@ public class JdbcAccess extends AbstractDbAccess {
     boolean resultReceived = false;
     while (current != null) {
       String sql = current.getStatement();
-      LOG.debug(sql);
+      LOG.debug("Executing SQL:\n{}", sql);
       try (PreparedStatement jdbcStatement = connection.prepareStatement(sql)) {
         AbstractCriteriaParameters parameters = current.getParameters().cast();
         parameters.apply(jdbcStatement, connection);

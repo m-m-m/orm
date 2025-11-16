@@ -2,6 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.r2dbc.session;
 
+import java.lang.ScopedValue.CallableOp;
 import java.util.concurrent.Callable;
 
 import io.github.mmm.orm.connection.DbConnectionData;
@@ -83,7 +84,7 @@ public class R2dbcSession extends AbstractDbSession implements DbTransaction {
    * @return the result of {@link Callable#call()}.
    * @see R2dbcTransactionExecutor#doInTx(Callable)
    */
-  public static <R> R doInTx(DbConnectionData connectionData, Callable<R> task) {
+  public static <R> R doInTx(DbConnectionData connectionData, CallableOp<R, Exception> task) {
 
     R2dbcConnection jdbcConnection = null;
     R2dbcConnectionPool connectionPool = (R2dbcConnectionPool) connectionData.getPool();

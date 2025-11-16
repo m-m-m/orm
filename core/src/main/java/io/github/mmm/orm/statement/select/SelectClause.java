@@ -9,6 +9,7 @@ import io.github.mmm.bean.WritableBean;
 import io.github.mmm.entity.bean.EntityBean;
 import io.github.mmm.marshall.StructuredReader;
 import io.github.mmm.orm.statement.AbstractDbClause;
+import io.github.mmm.orm.statement.IncompleteStartClause;
 import io.github.mmm.orm.statement.StartClause;
 import io.github.mmm.property.criteria.CriteriaExpression;
 import io.github.mmm.value.CriteriaObject;
@@ -33,7 +34,7 @@ import io.github.mmm.value.PropertyPath;
  * @param <R> type of the result of the selection.
  * @since 1.0.0
  */
-public abstract class SelectClause<R> extends AbstractDbClause implements StartClause {
+public abstract class SelectClause<R> extends AbstractDbClause implements IncompleteStartClause {
 
   /** Name of {@link SelectClause} for marshaling. */
   public static final String NAME_SELECT = "SELECT";
@@ -53,7 +54,7 @@ public abstract class SelectClause<R> extends AbstractDbClause implements StartC
   /** {@link #getResultName() Result name} for {@link SelectResultClause}. */
   public static final String VALUE_RESULT_RESULT = "result";
 
-  private SelectStatement<R> statement;
+  SelectStatement<R> statement;
 
   private final List<? extends CriteriaObject<?>> selections;
 
@@ -91,18 +92,10 @@ public abstract class SelectClause<R> extends AbstractDbClause implements StartC
     return this.selections;
   }
 
-  /**
-   * @return the owning {@link SelectStatement} or {@code null} if not initialized (until {@code from} method is
-   *         called).
-   */
+  @Override
   public SelectStatement<R> getStatement() {
 
     return this.statement;
-  }
-
-  void setStatement(SelectStatement<R> statement) {
-
-    this.statement = statement;
   }
 
   /**
@@ -146,7 +139,8 @@ public abstract class SelectClause<R> extends AbstractDbClause implements StartC
   }
 
   /**
-   * @return {@code true} if the {@link SelectFrom#getEntity() primary entity} is selected, {@code false} otherwise.
+   * @return {@code true} if the {@link SelectFromClause#getEntity() primary entity} is selected, {@code false}
+   *         otherwise.
    * @see SelectEntityClause
    */
   public boolean isSelectEntity() {
@@ -166,7 +160,7 @@ public abstract class SelectClause<R> extends AbstractDbClause implements StartC
   }
 
   /**
-   * @return {@code true} if only if the {@link SelectFrom#getEntity() main entity} is selected, {@code false}
+   * @return {@code true} if only if the {@link SelectFromClause#getEntity() main entity} is selected, {@code false}
    *         otherwise.
    * @see SelectEntityClause
    */
@@ -239,11 +233,11 @@ public abstract class SelectClause<R> extends AbstractDbClause implements StartC
   /**
    * @param <E> type of the {@link EntityBean}.
    * @param entity the {@link EntityBean entity} to select from.
-   * @return the {@link SelectFrom} for fluent API calls.
+   * @return the {@link SelectFromClause} for fluent API calls.
    */
-  protected <E extends EntityBean> SelectFrom<R, E> from(E entity) {
+  protected <E extends EntityBean> SelectFromClause<R, E> from(E entity) {
 
-    return new SelectFrom<>(this, entity);
+    return new SelectFromClause<>(this, entity);
   }
 
   /**

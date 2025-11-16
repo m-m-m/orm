@@ -21,7 +21,7 @@ public class SelectResultClause extends SelectClause<DbResult> {
   }
 
   @Override
-  protected <E extends EntityBean> SelectFrom<DbResult, E> from(E entity) {
+  protected <E extends EntityBean> SelectFromClause<DbResult, E> from(E entity) {
 
     return super.from(entity);
   }

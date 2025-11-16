@@ -14,7 +14,7 @@ import io.github.mmm.property.criteria.CriteriaPredicate;
  * @param <E> type of the {@link #getEntity() entity}.
  * @since 1.0.0
  */
-public class SelectFrom<R, E extends EntityBean> extends FromClause<R, E, SelectFrom<R, E>>
+public class SelectFromClause<R, E extends EntityBean> extends FromClause<R, E, SelectFromClause<R, E>>
     implements ClauseWithGroupBy<R>, ClauseWithOrderBy<R> {
 
   private final SelectStatement<R> statement;
@@ -25,7 +25,7 @@ public class SelectFrom<R, E extends EntityBean> extends FromClause<R, E, Select
    * @param select the {@link SelectClause}.
    * @param entity the {@link #getEntity() entity}.
    */
-  public SelectFrom(SelectClause<R> select, E entity) {
+  public SelectFromClause(SelectClause<R> select, E entity) {
 
     this(select, entity, null);
   }
@@ -37,10 +37,11 @@ public class SelectFrom<R, E extends EntityBean> extends FromClause<R, E, Select
    * @param entity the {@link #getEntity() entity}.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public SelectFrom(SelectClause<R> select, E entity, String entityName) {
+  public SelectFromClause(SelectClause<R> select, E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new SelectStatement<>(select, this);
+    select.statement = this.statement;
   }
 
   @Override

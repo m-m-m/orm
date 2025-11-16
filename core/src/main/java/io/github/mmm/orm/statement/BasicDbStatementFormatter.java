@@ -50,13 +50,13 @@ import io.github.mmm.orm.statement.create.CreateTableContentsClause;
 import io.github.mmm.orm.statement.delete.DeleteClause;
 import io.github.mmm.orm.statement.impl.CriteriaJqlParametersInline;
 import io.github.mmm.orm.statement.insert.InsertClause;
-import io.github.mmm.orm.statement.insert.InsertValues;
+import io.github.mmm.orm.statement.insert.InsertValuesClause;
 import io.github.mmm.orm.statement.merge.MergeClause;
 import io.github.mmm.orm.statement.select.GroupByClause;
 import io.github.mmm.orm.statement.select.HavingClause;
 import io.github.mmm.orm.statement.select.OrderByClause;
 import io.github.mmm.orm.statement.select.SelectClause;
-import io.github.mmm.orm.statement.select.SelectFrom;
+import io.github.mmm.orm.statement.select.SelectFromClause;
 import io.github.mmm.orm.statement.select.SelectSequenceNextValueClause;
 import io.github.mmm.orm.statement.select.SelectStatement;
 import io.github.mmm.orm.statement.update.UpdateClause;
@@ -383,7 +383,7 @@ public class BasicDbStatementFormatter extends CriteriaFormatter implements DbSt
     writeIndent();
     write("SELECT ");
     SelectStatement<?> statement = select.getStatement();
-    SelectFrom<?, ?> selectFrom = null;
+    SelectFromClause<?, ?> selectFrom = null;
     if (statement != null) {
       selectFrom = statement.getFrom();
     }
@@ -505,9 +505,9 @@ public class BasicDbStatementFormatter extends CriteriaFormatter implements DbSt
 
   /**
    * @param select the {@link SelectClause} with the {@link SelectClause#getSelections() selections}.
-   * @param selectFrom the {@link SelectFrom}.
+   * @param selectFrom the {@link SelectFromClause}.
    */
-  protected void formatSelections(SelectClause<?> select, SelectFrom<?, ?> selectFrom) {
+  protected void formatSelections(SelectClause<?> select, SelectFromClause<?, ?> selectFrom) {
 
     List<? extends CriteriaObject<?>> selectionCriterias = select.getSelections();
     if (selectionCriterias.isEmpty()) {
@@ -535,10 +535,10 @@ public class BasicDbStatementFormatter extends CriteriaFormatter implements DbSt
   }
 
   /**
-   * @return {@code true} if a {@link SelectClause} of all properties should happen via {@link SelectFrom#getAlias()
-   *         alias}, {@code false} otherwise (to simply use {@code *}). The default is {@code false}. Override to
-   *         change. E.g. in JPQL you would write "SELECT a FROM Entity a ..." whereas in plain SQL you would write
-   *         "SELECT * FROM Entity ..."
+   * @return {@code true} if a {@link SelectClause} of all properties should happen via
+   *         {@link SelectFromClause#getAlias() alias}, {@code false} otherwise (to simply use {@code *}). The default
+   *         is {@code false}. Override to change. E.g. in JPQL you would write "SELECT a FROM Entity a ..." whereas in
+   *         plain SQL you would write "SELECT * FROM Entity ..."
    */
   public boolean isSelectAllByAlias() {
 
@@ -546,8 +546,8 @@ public class BasicDbStatementFormatter extends CriteriaFormatter implements DbSt
   }
 
   /**
-   * @return {@code true} to use the {@code AS} keyword before an {@link SelectFrom#getAlias() alias} (e.g. "FROM Entity
-   *         <b>AS</b> e"), {@code false} otherwise.
+   * @return {@code true} to use the {@code AS} keyword before an {@link SelectFromClause#getAlias() alias} (e.g. "FROM
+   *         Entity <b>AS</b> e"), {@code false} otherwise.
    */
   public boolean isUseAsBeforeAlias() {
 
@@ -555,15 +555,19 @@ public class BasicDbStatementFormatter extends CriteriaFormatter implements DbSt
   }
 
   /**
-   * @param selectFrom the {@link SelectFrom} giving access to the {@link SelectFrom#getAlias() alias}.
+   * @param selectFrom the {@link SelectFromClause} giving access to the {@link SelectFromClause#getAlias() alias}.
    */
-  protected void formatSelectAll(SelectFrom<?, ?> selectFrom) {
+  protected void formatSelectAll(SelectFromClause<?, ?> selectFrom) {
 
-    if (isSelectAllByAlias()) {
-      write(selectFrom.getAlias());
-      write(" ");
+    if (selectFrom == null) {
+      write("?"); // robustness to avoid toString fails in debugger while object is created.
     } else {
-      write("* ");
+      if (isSelectAllByAlias()) {
+        write(selectFrom.getAlias());
+        write(" ");
+      } else {
+        write("* ");
+      }
     }
   }
 
@@ -727,7 +731,7 @@ public class BasicDbStatementFormatter extends CriteriaFormatter implements DbSt
    */
   public void formatValuesClause(ValuesClause<?, ?> values, DbContext context) {
 
-    boolean isInto = values instanceof InsertValues;
+    boolean isInto = values instanceof InsertValuesClause;
     List<PropertyAssignment<?>> assignments = values.getAssignments();
     List<CriteriaObject<?>> args = null;
     if (isInto) {
@@ -1118,7 +1122,11 @@ public class BasicDbStatementFormatter extends CriteriaFormatter implements DbSt
       write("UNIQUE ");
     }
     write("INDEX ");
-    formatName(createIndex.getName());
+    String name = createIndex.getName();
+    if ((name == null) || name.isEmpty()) {
+      name = getOrm().getNamingStrategy().getIndexName(createIndex.getStatement());
+    }
+    formatName(name);
   }
 
   /**

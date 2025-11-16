@@ -16,7 +16,7 @@ import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 /**
  * {@link DbStatement} to {@link InsertClause insert} data into the database.
  *
- * @param <E> type of the {@link InsertInto#getEntity() entity}.
+ * @param <E> type of the {@link InsertIntoClause#getEntity() entity}.
  * @since 1.0.0
  */
 // TODO: support sub-query as alternative to values
@@ -29,9 +29,9 @@ public class InsertStatement<E extends EntityBean> extends IntoValuesStatement<E
 
   private final InsertClause insert;
 
-  private final InsertInto<E> into;
+  private final InsertIntoClause<E> into;
 
-  private final InsertValues<E> values;
+  private final InsertValuesClause<E> values;
 
   /**
    * The constructor.
@@ -39,12 +39,12 @@ public class InsertStatement<E extends EntityBean> extends IntoValuesStatement<E
    * @param insert the {@link #getInsert() insert}.
    * @param into the #getInto
    */
-  public InsertStatement(InsertClause insert, InsertInto<E> into) {
+  public InsertStatement(InsertClause insert, InsertIntoClause<E> into) {
 
     super();
     this.insert = insert;
     this.into = into;
-    this.values = new InsertValues<>(this);
+    this.values = new InsertValuesClause<>(this);
   }
 
   /**
@@ -66,19 +66,19 @@ public class InsertStatement<E extends EntityBean> extends IntoValuesStatement<E
   }
 
   /**
-   * @return the {@link InsertInto Into}-{@link DbClause}.
+   * @return the {@link InsertIntoClause Into}-{@link DbClause}.
    */
   @Override
-  public InsertInto<E> getInto() {
+  public InsertIntoClause<E> getInto() {
 
     return this.into;
   }
 
   /**
-   * @return the {@link InsertValues Values}-{@link DbClause} or {@code null} if none was added.
+   * @return the {@link InsertValuesClause Values}-{@link DbClause} or {@code null} if none was added.
    */
   @Override
-  public InsertValues<E> getValues() {
+  public InsertValuesClause<E> getValues() {
 
     return this.values;
   }

@@ -9,7 +9,7 @@ import io.github.mmm.orm.statement.WhereClause;
 /**
  * A {@link WhereClause}-{@link DbClause} of an SQL {@link DeleteStatement}.
  *
- * @param <E> type of the {@link DeleteFrom#getEntity() entity}.
+ * @param <E> type of the {@link DeleteFromClause#getEntity() entity}.
  * @since 1.0.0
  */
 public class DeleteWhere<E extends EntityBean> extends WhereClause<E, DeleteWhere<E>> {

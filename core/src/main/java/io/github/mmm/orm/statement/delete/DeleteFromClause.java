@@ -14,7 +14,7 @@ import io.github.mmm.property.criteria.CriteriaPredicate;
  * @param <E> type of the {@link #getEntity() entity}.
  * @since 1.0.0
  */
-public class DeleteFrom<E extends EntityBean> extends FromClause<E, E, DeleteFrom<E>> {
+public class DeleteFromClause<E extends EntityBean> extends FromClause<E, E, DeleteFromClause<E>> {
 
   private final DeleteStatement<E> statement;
 
@@ -24,7 +24,7 @@ public class DeleteFrom<E extends EntityBean> extends FromClause<E, E, DeleteFro
    * @param delete the opening {@link DeleteClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    */
-  public DeleteFrom(DeleteClause delete, E entity) {
+  public DeleteFromClause(DeleteClause delete, E entity) {
 
     this(delete, entity, null);
   }
@@ -36,7 +36,7 @@ public class DeleteFrom<E extends EntityBean> extends FromClause<E, E, DeleteFro
    * @param entity the {@link #getEntity() entity} to operate on.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public DeleteFrom(DeleteClause delete, E entity, String entityName) {
+  public DeleteFromClause(DeleteClause delete, E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new DeleteStatement<>(delete, this);

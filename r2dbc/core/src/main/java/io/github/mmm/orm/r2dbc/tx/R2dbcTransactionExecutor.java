@@ -30,7 +30,7 @@ public class R2dbcTransactionExecutor implements DbTransactionExecutor {
   @Override
   public <R> R doInTx(Callable<R> task) {
 
-    return R2dbcSession.doInTx(this.connectionData, task);
+    return R2dbcSession.doInTx(this.connectionData, () -> task.call());
   }
 
   @Override

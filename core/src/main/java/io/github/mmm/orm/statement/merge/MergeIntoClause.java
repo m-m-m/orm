@@ -13,7 +13,7 @@ import io.github.mmm.property.criteria.PropertyAssignment;
  * @param <E> type of the {@link #getEntity() entity}.
  * @since 1.0.0
  */
-public class MergeInto<E extends EntityBean> extends IntoClause<E, MergeValues<E>, MergeInto<E>> {
+public class MergeIntoClause<E extends EntityBean> extends IntoClause<E, MergeValuesClause<E>, MergeIntoClause<E>> {
 
   private final MergeStatement<E> statement;
 
@@ -23,7 +23,7 @@ public class MergeInto<E extends EntityBean> extends IntoClause<E, MergeValues<E
    * @param merge the opening {@link MergeClause}.
    * @param entity the {@link #getEntity() entity} to operate on.
    */
-  public MergeInto(MergeClause merge, E entity) {
+  public MergeIntoClause(MergeClause merge, E entity) {
 
     this(merge, entity, null);
   }
@@ -35,20 +35,20 @@ public class MergeInto<E extends EntityBean> extends IntoClause<E, MergeValues<E
    * @param entity the {@link #getEntity() entity} to operate on.
    * @param entityName the {@link #getEntityName() entity name}.
    */
-  public MergeInto(MergeClause merge, E entity, String entityName) {
+  public MergeIntoClause(MergeClause merge, E entity, String entityName) {
 
     super(new AliasMap(), entity, entityName);
     this.statement = new MergeStatement<>(merge, this);
   }
 
   @Override
-  public MergeValues<E> value(PropertyAssignment<?> assignment) {
+  public MergeValuesClause<E> value(PropertyAssignment<?> assignment) {
 
     return this.statement.getValues().value(assignment);
   }
 
   @Override
-  public MergeValues<E> values(PropertyAssignment<?>... assignments) {
+  public MergeValuesClause<E> values(PropertyAssignment<?>... assignments) {
 
     return this.statement.getValues().values(assignments);
   }
@@ -58,6 +58,11 @@ public class MergeInto<E extends EntityBean> extends IntoClause<E, MergeValues<E
   protected AliasMap getAliasMap() {
 
     return super.getAliasMap();
+  }
+
+  MergeStatement<E> getStatement() {
+
+    return this.statement;
   }
 
 }

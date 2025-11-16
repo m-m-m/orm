@@ -13,19 +13,19 @@ import io.github.mmm.orm.statement.DbStatement;
 import io.github.mmm.orm.statement.DbStatementType;
 import io.github.mmm.orm.statement.impl.DbStatementTypeImpl;
 import io.github.mmm.orm.statement.insert.InsertClause;
-import io.github.mmm.orm.statement.insert.InsertInto;
+import io.github.mmm.orm.statement.insert.InsertIntoClause;
 
 /**
  * {@link DbStatement} to {@link InsertClause insert} data into the database.
  *
- * @param <E> type of the {@link InsertInto#getEntity() entity}.
+ * @param <E> type of the {@link InsertIntoClause#getEntity() entity}.
  * @since 1.0.0
  */
 public class UpdateStatement<E extends EntityBean> extends AbstractDbStatement<E> {
 
   private final UpdateClause<E> update;
 
-  private final UpdateSet<E> set;
+  private final UpdateSetClause<E> set;
 
   private final UpdateWhere<E> where;
 
@@ -38,7 +38,7 @@ public class UpdateStatement<E extends EntityBean> extends AbstractDbStatement<E
 
     super();
     this.update = update;
-    this.set = new UpdateSet<>(this);
+    this.set = new UpdateSetClause<>(this);
     this.where = new UpdateWhere<>(this);
   }
 
@@ -61,9 +61,9 @@ public class UpdateStatement<E extends EntityBean> extends AbstractDbStatement<E
   }
 
   /**
-   * @return the {@link UpdateSet Set}-{@link DbClause}.
+   * @return the {@link UpdateSetClause Set}-{@link DbClause}.
    */
-  public UpdateSet<E> getSet() {
+  public UpdateSetClause<E> getSet() {
 
     return this.set;
   }

@@ -12,7 +12,7 @@ import io.github.mmm.orm.result.DbResult;
 import io.github.mmm.orm.result.DbResultValue;
 import io.github.mmm.orm.statement.AbstractEntityClause;
 import io.github.mmm.orm.statement.BasicDbStatementFormatter;
-import io.github.mmm.orm.statement.select.SelectFrom;
+import io.github.mmm.orm.statement.select.SelectFromClause;
 import io.github.mmm.property.criteria.CriteriaFormatterFactory;
 
 /**
@@ -63,7 +63,7 @@ public class DbDialectStatementFormatter extends BasicDbStatementFormatter {
   }
 
   @Override
-  protected void formatSelectAll(SelectFrom<?, ?> selectFrom) {
+  protected void formatSelectAll(SelectFromClause<?, ?> selectFrom) {
 
     EntityBean entity = selectFrom.getEntity();
     DbBeanMapper<EntityBean> mapping = this.dialect.getOrm().createBeanMapper(entity);
