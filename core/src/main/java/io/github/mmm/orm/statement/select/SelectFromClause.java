@@ -41,6 +41,7 @@ public class SelectFromClause<R, E extends EntityBean> extends FromClause<R, E, 
 
     super(new AliasMap(), entity, entityName);
     this.statement = new SelectStatement<>(select, this);
+    select.statement = this.statement;
   }
 
   @Override

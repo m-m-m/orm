@@ -45,9 +45,7 @@ public class SelectEntityClause<R extends EntityBean> extends SelectClause<R> {
    */
   public SelectFromClause<R, R> from() {
 
-    SelectFromClause<R, R> fromClause = new SelectFromClause<>(this, getResultBean());
-    this.statement = fromClause.get();
-    return fromClause;
+    return new SelectFromClause<>(this, getResultBean());
   }
 
   @Override

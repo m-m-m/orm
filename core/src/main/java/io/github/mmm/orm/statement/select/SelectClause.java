@@ -237,9 +237,7 @@ public abstract class SelectClause<R> extends AbstractDbClause implements Incomp
    */
   protected <E extends EntityBean> SelectFromClause<R, E> from(E entity) {
 
-    SelectFromClause<R, E> selectFrom = new SelectFromClause<>(this, entity);
-    this.statement = selectFrom.get();
-    return selectFrom;
+    return new SelectFromClause<>(this, entity);
   }
 
   /**

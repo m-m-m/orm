@@ -559,11 +559,15 @@ public class BasicDbStatementFormatter extends CriteriaFormatter implements DbSt
    */
   protected void formatSelectAll(SelectFromClause<?, ?> selectFrom) {
 
-    if (isSelectAllByAlias()) {
-      write(selectFrom.getAlias());
-      write(" ");
+    if (selectFrom == null) {
+      write("?"); // robustness to avoid toString fails in debugger while object is created.
     } else {
-      write("* ");
+      if (isSelectAllByAlias()) {
+        write(selectFrom.getAlias());
+        write(" ");
+      } else {
+        write("* ");
+      }
     }
   }
 
