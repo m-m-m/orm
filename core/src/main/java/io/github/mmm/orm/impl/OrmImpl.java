@@ -165,8 +165,13 @@ public class OrmImpl implements Orm {
       DbResultValueObject entry = new DbResultValueObject<>(newColumnName, null, typeMapper.getDeclaration());
       return new DbSegmentMapper<>(typeMapper, entry, nextSegment);
     } else {
-      DbSegmentMapper child = createSegmentMapper(selection, newColumnName, typeMapper.getTargetType(), null);
-      return new DbSegmentMapper<>(typeMapper, child, nextSegment);
+      try {
+        DbSegmentMapper child = createSegmentMapper(selection, newColumnName, typeMapper.getTargetType(), null);
+        return new DbSegmentMapper<>(typeMapper, child, nextSegment);
+      } catch (RuntimeException e) {
+        throw new IllegalStateException(
+            "Failed to create segment mapper for column '" + columnName + "' using mapper: " + typeMapper, e);
+      }
     }
   }
 
