@@ -47,7 +47,7 @@ public interface EntityDeleteOperations<E extends EntityBean> {
       return false;
     }
     if (link.isResolved()) {
-      return delete(link.getTarget());
+      return delete(link.getEntity());
     } else {
       return deleteById(link.getId());
     }

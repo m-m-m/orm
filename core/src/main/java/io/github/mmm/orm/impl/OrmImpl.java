@@ -2,6 +2,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0 */
 package io.github.mmm.orm.impl;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -10,6 +11,9 @@ import io.github.mmm.bean.WritableBean;
 import io.github.mmm.entity.bean.typemapping.TypeMapping;
 import io.github.mmm.entity.id.FkMapper;
 import io.github.mmm.entity.id.Id;
+import io.github.mmm.entity.link.Link;
+import io.github.mmm.entity.property.id.IdProperty;
+import io.github.mmm.entity.property.link.LinkProperty;
 import io.github.mmm.orm.mapping.DbBeanMapper;
 import io.github.mmm.orm.mapping.DbMapper;
 import io.github.mmm.orm.mapping.Orm;
@@ -135,7 +139,17 @@ public class OrmImpl implements Orm {
     }
     if (typeMapper == null) {
       if (Id.class.equals(valueClass)) {
-        typeMapper = (TypeMapper) FkMapper.get();
+        System.out.println(property + " : " + valueClass + " : " + columnName + " : " + selection);
+        Id<?> id = null;
+        if (selection instanceof LinkProperty<?> linkProperty) {
+          Link<?> link = linkProperty.get();
+          if (link != null) {
+            id = link.getId();
+          }
+        } else if (selection instanceof IdProperty<?> fkProperty) {
+          id = fkProperty.get();
+        }
+        typeMapper = (TypeMapper) FkMapper.of(id);
       } else if (Collection.class.isAssignableFrom(valueClass)) {
         return null; // ignore
       } else if (Map.class.isAssignableFrom(valueClass)) {
@@ -165,14 +179,24 @@ public class OrmImpl implements Orm {
       DbResultValueObject entry = new DbResultValueObject<>(newColumnName, null, typeMapper.getDeclaration());
       return new DbSegmentMapper<>(typeMapper, entry, nextSegment);
     } else {
+      Class<?> targetType = typeMapper.getTargetType();
+      if (isTooGeneric(targetType)) {
+        throw new IllegalStateException(
+            "Illegal TypeMapper " + typeMapper + " mapping to generic type " + targetType.getName());
+      }
       try {
-        DbSegmentMapper child = createSegmentMapper(selection, newColumnName, typeMapper.getTargetType(), null);
+        DbSegmentMapper child = createSegmentMapper(selection, newColumnName, targetType, null);
         return new DbSegmentMapper<>(typeMapper, child, nextSegment);
       } catch (RuntimeException e) {
         throw new IllegalStateException(
             "Failed to create segment mapper for column '" + columnName + "' using mapper: " + typeMapper, e);
       }
     }
+  }
+
+  private static boolean isTooGeneric(Class<?> type) {
+
+    return (type == Object.class) || (type == Comparable.class) || (type == Serializable.class);
   }
 
   /**
