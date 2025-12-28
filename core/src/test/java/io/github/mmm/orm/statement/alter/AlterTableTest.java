@@ -23,11 +23,11 @@ public class AlterTableTest extends DbStatementTest {
   @Test
   public void testAddColumn() {
 
-    // given
+    // arrange
     Song s = Song.of();
-    // when
+    // act
     AlterTableStatement<Song> alterTableStatement = new AlterTableClause<>(s).addColumn(s.Composer()).get();
-    // then
+    // assert
     check(alterTableStatement, """
         ALTER TABLE Song
         ADD Composer Link""", false);
@@ -37,11 +37,11 @@ public class AlterTableTest extends DbStatementTest {
   @Test
   public void testAddColumnAutoConstraint() {
 
-    // given
+    // arrange
     Song s = Song.of();
-    // when
+    // act
     AlterTableStatement<Song> alterTableStatement = new AlterTableClause<>(s).addColumn(s.Composer(), true).get();
-    // then
+    // assert
     check(alterTableStatement, """
         ALTER TABLE Song
         ADD Composer Link,
@@ -52,17 +52,17 @@ public class AlterTableTest extends DbStatementTest {
   @Test
   public void testAddColumnCustomConstraint() {
 
-    // given
+    // arrange
     Song s = Song.of();
     Person p = Person.of();
     DbColumnSpec column = new DbColumnSpec(s.Composer());
     DbColumnSpec referenceColumn = new DbColumnSpec(p.Id());
     DbConstraintState state = DbConstraintState.of(DbConstraintDeferrable.DEFERRABLE,
         DbConstraintInitially.INITIALLY_IMMEDIATE, DbConstraintRely.RELY);
-    // when
+    // act
     AlterTableStatement<Song> alterTableStatement = new AlterTableClause<>(s).addColumn(s.Composer())
         .addConstraint(new ForeignKeyConstraint("MY_FK_CONSTRAINT", column, referenceColumn, state)).get();
-    // then
+    // assert
     check(alterTableStatement,
         """
             ALTER TABLE Song

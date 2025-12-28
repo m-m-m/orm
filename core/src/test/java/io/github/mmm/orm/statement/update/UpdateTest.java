@@ -18,11 +18,11 @@ public class UpdateTest extends DbStatementTest {
   @Test
   public void testUpdateAll() {
 
-    // given
+    // arrange
     Person p = Person.of();
-    // when
+    // act
     UpdateStatement<Person> updateStatement = new UpdateClause<>(p).as("p").set(p.Single(), Boolean.TRUE).get();
-    // then
+    // assert
     check(updateStatement, "UPDATE Person p SET p.Single = TRUE", true);
   }
 
@@ -30,12 +30,12 @@ public class UpdateTest extends DbStatementTest {
   @Test
   public void testUpdateWhere() {
 
-    // given
+    // arrange
     Person p = Person.of();
-    // when
+    // act
     UpdateStatement<Person> updateStatement = new UpdateClause<>(p).as("p").set(p.Single(), Boolean.FALSE)
         .where(p.Id().eq(PkId.of(Person.class, 4711L))).get();
-    // then
+    // assert
     check(updateStatement, "UPDATE Person p SET p.Single = FALSE WHERE p.Id = 4711", true);
   }
 
@@ -43,13 +43,13 @@ public class UpdateTest extends DbStatementTest {
   @Test
   public void testUpdateFromJoinTable() {
 
-    // given
+    // arrange
     Song s = Song.of();
     Person p = Person.of();
-    // when
+    // act
     UpdateStatement<Song> updateStatement = new UpdateClause<>(s).as("s").and(p).as("p").set(s.Title(), p.Name())
         .where(s.Composer().eq(p.Id())).get();
-    // then
+    // assert
     check(updateStatement, "UPDATE Song s, Person p SET s.Title = p.Name WHERE s.Composer = p.Id", true);
   }
 

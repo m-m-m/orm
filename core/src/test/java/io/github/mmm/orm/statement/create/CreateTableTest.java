@@ -43,11 +43,11 @@ public class CreateTableTest extends DbStatementTest {
   @Test
   public void testAuto() {
 
-    // given
+    // arrange
     Song s = Song.of();
-    // when
+    // act
     CreateTableStatement<Song> createTableStatement = new CreateTableClause<>(s).columns().get();
-    // then
+    // assert
     check(createTableStatement, JQL, SQL);
   }
 

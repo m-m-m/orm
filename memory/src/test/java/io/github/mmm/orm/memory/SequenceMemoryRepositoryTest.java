@@ -14,12 +14,12 @@ import io.github.mmm.orm.memory.example.PersonMemoryRepository;
  * Test of {@link SequenceMemoryRepository} with all its features using {@link PersonMemoryRepository} as example
  * implementation.
  */
-public class SequenceMemoryRepositoryTest extends Assertions {
+class SequenceMemoryRepositoryTest extends Assertions {
 
   private PersonMemoryRepository repo;
 
   @Test
-  public void testAll() {
+  void testAll() {
 
     this.repo = new PersonMemoryRepository();
     this.repo.read(Path.of("src/test/resources/persons.json"));

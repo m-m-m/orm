@@ -16,11 +16,11 @@ public class CreateIndexTest extends DbStatementTest {
   @Test
   public void testSingleColumn() {
 
-    // given
+    // arrange
     Song s = Song.of();
-    // when
+    // act
     CreateIndexStatement<Song> createIndexStatement = new CreateIndexClause("IDX_GENRE").on(s).column(s.Genre()).get();
-    // then
+    // assert
     check(createIndexStatement, "CREATE INDEX IDX_GENRE ON Song (Genre)", true);
   }
 
@@ -28,12 +28,12 @@ public class CreateIndexTest extends DbStatementTest {
   @Test
   public void testMultipleColumns() {
 
-    // given
+    // arrange
     Song s = Song.of();
-    // when
+    // act
     CreateIndexStatement<Song> createIndexStatement = new CreateIndexClause("IDX_GENRE").on(s).as("S")
         .columns(s.Title(), s.Genre()).get();
-    // then
+    // assert
     check(createIndexStatement, "CREATE INDEX IDX_GENRE ON Song S (S.Title,S.Genre)", true);
   }
 

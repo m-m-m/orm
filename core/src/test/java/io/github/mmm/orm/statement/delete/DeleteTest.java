@@ -16,11 +16,11 @@ public class DeleteTest extends DbStatementTest {
   @Test
   public void testDeleteAll() {
 
-    // given
+    // arrange
     Person p = Person.of();
-    // when
+    // act
     DeleteStatement<Person> deleteStatement = new DeleteClause().from(p).get();
-    // then
+    // assert
     check(deleteStatement, "DELETE FROM Person p", true);
   }
 
@@ -28,12 +28,12 @@ public class DeleteTest extends DbStatementTest {
   @Test
   public void testDeleteWhere() {
 
-    // given
+    // arrange
     Person p = Person.of();
-    // when
+    // act
     DeleteStatement<Person> deleteStatement = new DeleteClause().from(p).as("p").where(p.Single().eq(Boolean.TRUE))
         .get();
-    // then
+    // assert
     check(deleteStatement, "DELETE FROM Person p WHERE p.Single = TRUE", true);
   }
 
