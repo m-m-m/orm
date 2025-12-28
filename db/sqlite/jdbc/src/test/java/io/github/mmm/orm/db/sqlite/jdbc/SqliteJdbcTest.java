@@ -12,7 +12,7 @@ import io.github.mmm.orm.test.JdbcTest;
 /**
  * Test of Sqlite database support.
  */
-public class SqliteJdbcTest extends JdbcTest {
+class SqliteJdbcTest extends JdbcTest {
 
   @BeforeAll
   static void setup() {

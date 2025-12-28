@@ -29,7 +29,7 @@ public abstract class AbstractDbResultTest extends Assertions {
    * Test the basic functionality of {@link DbResult}.
    */
   @Test
-  public void testBasics() {
+  void testBasics() {
 
     // arrange
     // act

@@ -18,7 +18,7 @@ public abstract class JdbcTest extends Assertions {
 
   /** Test that H2 integration works. */
   @Test
-  public void testInsertAndUpdatePerson() {
+  void testInsertAndUpdatePerson() {
 
     try {
       DbTransactionExecutor executor = DbTransactionExecutor.get();
@@ -59,7 +59,7 @@ public abstract class JdbcTest extends Assertions {
 
   /** Test that entity with relation can be persisted (inserted). */
   @Test
-  public void testInsertEntityWithRelation() {
+  void testInsertEntityWithRelation() {
 
     try {
       DbTransactionExecutor executor = DbTransactionExecutor.get();

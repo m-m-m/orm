@@ -17,11 +17,11 @@ import io.github.mmm.orm.statement.Song;
 /**
  * Test of {@link AlterTableClause} and {@link AlterTableStatement}.
  */
-public class AlterTableTest extends DbStatementTest {
+class AlterTableTest extends DbStatementTest {
 
   /** Test of {@link AlterTableClause} that adds a single column. */
   @Test
-  public void testAddColumn() {
+  void testAddColumn() {
 
     // arrange
     Song s = Song.of();
@@ -35,7 +35,7 @@ public class AlterTableTest extends DbStatementTest {
 
   /** Test of {@link AlterTableClause} that adds a single column with auto constraint. */
   @Test
-  public void testAddColumnAutoConstraint() {
+  void testAddColumnAutoConstraint() {
 
     // arrange
     Song s = Song.of();
@@ -50,7 +50,7 @@ public class AlterTableTest extends DbStatementTest {
 
   /** Test of {@link AlterTableClause} that adds a single column with a custom constraint. */
   @Test
-  public void testAddColumnCustomConstraint() {
+  void testAddColumnCustomConstraint() {
 
     // arrange
     Song s = Song.of();

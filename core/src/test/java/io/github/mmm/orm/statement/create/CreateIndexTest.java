@@ -10,11 +10,11 @@ import io.github.mmm.orm.statement.Song;
 /**
  * Test of {@link CreateIndexClause} and {@link CreateIndexStatement}.
  */
-public class CreateIndexTest extends DbStatementTest {
+class CreateIndexTest extends DbStatementTest {
 
   /** Test of {@link CreateIndexClause} on a single column. */
   @Test
-  public void testSingleColumn() {
+  void testSingleColumn() {
 
     // arrange
     Song s = Song.of();
@@ -26,7 +26,7 @@ public class CreateIndexTest extends DbStatementTest {
 
   /** Test of {@link CreateIndexClause} on multiple columns. */
   @Test
-  public void testMultipleColumns() {
+  void testMultipleColumns() {
 
     // arrange
     Song s = Song.of();

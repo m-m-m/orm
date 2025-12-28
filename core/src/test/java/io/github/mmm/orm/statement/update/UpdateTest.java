@@ -12,11 +12,11 @@ import io.github.mmm.orm.statement.Song;
 /**
  * Test of {@link UpdateClause} and {@link UpdateStatement}.
  */
-public class UpdateTest extends DbStatementTest {
+class UpdateTest extends DbStatementTest {
 
   /** Test of {@link UpdateClause} for entire table. */
   @Test
-  public void testUpdateAll() {
+  void testUpdateAll() {
 
     // arrange
     Person p = Person.of();
@@ -28,7 +28,7 @@ public class UpdateTest extends DbStatementTest {
 
   /** Test of {@link UpdateClause} for with {@link UpdateWhere} clause. */
   @Test
-  public void testUpdateWhere() {
+  void testUpdateWhere() {
 
     // arrange
     Person p = Person.of();
@@ -41,7 +41,7 @@ public class UpdateTest extends DbStatementTest {
 
   /** Test of {@link UpdateClause} for with data from other entity. */
   @Test
-  public void testUpdateFromJoinTable() {
+  void testUpdateFromJoinTable() {
 
     // arrange
     Song s = Song.of();

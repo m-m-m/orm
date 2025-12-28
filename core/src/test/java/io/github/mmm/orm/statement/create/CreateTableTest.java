@@ -10,7 +10,7 @@ import io.github.mmm.orm.statement.Song;
 /**
  * Test of {@link CreateTableClause} and {@link CreateTableStatement}.
  */
-public class CreateTableTest extends DbStatementTest {
+class CreateTableTest extends DbStatementTest {
 
   private static final String JQL = """
       CREATE TABLE Song (
@@ -41,7 +41,7 @@ public class CreateTableTest extends DbStatementTest {
 
   /** Test of {@link CreateTableClause} that automatically creates all columns. */
   @Test
-  public void testAuto() {
+  void testAuto() {
 
     // arrange
     Song s = Song.of();

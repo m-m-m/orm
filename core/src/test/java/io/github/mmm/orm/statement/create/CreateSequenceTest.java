@@ -11,11 +11,11 @@ import io.github.mmm.orm.statement.DbStatementTest;
 /**
  * Test of {@link CreateSequenceClause} and {@link CreateSequenceStatement}.
  */
-public class CreateSequenceTest extends DbStatementTest {
+class CreateSequenceTest extends DbStatementTest {
 
   /** Test of {@link CreateSequenceClause} with all attributes. */
   @Test
-  public void testAllAttributes() {
+  void testAllAttributes() {
 
     // arrange
     DbQualifiedName sequenceName = new DbQualifiedName(null, DbName.of("MYSCHEMA"), DbName.of("MY_SEQUENCE"));

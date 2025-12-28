@@ -10,11 +10,11 @@ import io.github.mmm.orm.statement.Person;
 /**
  * Test of {@link DeleteClause} and {@link DeleteStatement}.
  */
-public class DeleteTest extends DbStatementTest {
+class DeleteTest extends DbStatementTest {
 
   /** Test of {@link DeleteClause} for entire table. */
   @Test
-  public void testDeleteAll() {
+  void testDeleteAll() {
 
     // arrange
     Person p = Person.of();
@@ -26,7 +26,7 @@ public class DeleteTest extends DbStatementTest {
 
   /** Test of {@link DeleteClause} with where clause. */
   @Test
-  public void testDeleteWhere() {
+  void testDeleteWhere() {
 
     // arrange
     Person p = Person.of();

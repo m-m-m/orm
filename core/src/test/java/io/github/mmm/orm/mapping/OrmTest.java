@@ -21,7 +21,7 @@ import io.github.mmm.orm.test.TestTypeMapping;
 /**
  * Test of {@link Orm} and {@link DbBeanMapper}.
  */
-public class OrmTest {
+class OrmTest {
 
   private Orm createOrm() {
 
@@ -30,7 +30,7 @@ public class OrmTest {
 
   /** Test {@link DbBeanMapper} on {@link City}. */
   @Test
-  public void testMapCity() {
+  void testMapCity() {
 
     // arrange
     long id = 4711L;

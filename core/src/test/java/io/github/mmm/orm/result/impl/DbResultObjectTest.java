@@ -6,7 +6,7 @@ import io.github.mmm.orm.result.DbResultValue;
 /**
  * Test of {@link DbResultObject}.
  */
-public class DbResultObjectTest extends AbstractDbResultTest {
+class DbResultObjectTest extends AbstractDbResultTest {
 
   @Override
   protected DbResult create(DbResultValue<?>... cells) {
