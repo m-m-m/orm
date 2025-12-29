@@ -88,4 +88,10 @@ public class MemoryNonUniqueIndex<K, E extends EntityBean> extends MemoryIndex<K
     return result;
   }
 
+  @Override
+  public Iterable<E> findAll(K key) {
+
+    return find(key);
+  }
+
 }

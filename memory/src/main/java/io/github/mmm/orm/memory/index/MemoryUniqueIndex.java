@@ -3,6 +3,7 @@
 package io.github.mmm.orm.memory.index;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -83,6 +84,16 @@ public class MemoryUniqueIndex<K, E extends EntityBean> extends MemoryIndex<K, E
       return null;
     }
     return this.repository.findById(id);
+  }
+
+  @Override
+  public Iterable<E> findAll(K key) {
+
+    E entity = find(key);
+    if (entity == null) {
+      return List.of();
+    }
+    return List.of(entity);
   }
 
 }

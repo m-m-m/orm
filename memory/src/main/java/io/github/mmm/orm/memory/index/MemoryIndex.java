@@ -237,4 +237,13 @@ public abstract class MemoryIndex<K, E extends EntityBean> {
     return iterable.iterator().hasNext();
   }
 
+  /**
+   * Generic access method to find by key. If you know the specific index type, prefer {@code find} methods like
+   * {@link MemoryUniqueIndex#find(Object)} or {@link MemoryNonUniqueIndex#find(Object)}.
+   *
+   * @param key the key of the {@link EntityBean} to find.
+   * @return the {@link Iterable} of {@link EntityBean}s found for the given key.
+   */
+  public abstract Iterable<E> findAll(K key);
+
 }
